@@ -92,6 +92,8 @@
                     $done[] = $row;
                 }
             }
+            if(count($done) == 1)
+                $done = $done[0];
             return $done;
         }
         

@@ -24,20 +24,57 @@
          */
 		public function login($username, $password){
 		    $username = $this->JACKED->MySQL->sanitize($username);
-    		$password = $this->JACKED->MySQL->sanitize($password);
+
+    		$vals = $this->JACKED->MySQL->getRowVals('id, password', $this->config->dbt_users, "email='$username'");
+    		
+    		if($vals['password']){
+    		    $userID = $vals['id'];
+    			$hash = $this->JACKED->checkPassword($password, $vals['password'], true);
+    			if($hash){
+    				$this->JACKED->Sessions->write("auth.Flock", array(
+    					'loggedIn' => true,
+    					'username'     => $username, 
+    					'email'     => $username, 
+    					'userid'   => $userID,
+    					'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']),
+    					'hash' => $hash
+    				));
+    				return true;
+    			}else{
+    				throw new IncorrectPasswordException();
+    			}
+    		}else{
+    			throw new UserNotFoundException();
+    		}
+		}
+		
+        /**
+         * Login the given user with the given password hash.
+         * 
+         * Uses the auth.Flock Session array
+         *
+         * @param string $username The username to log in with (usually an email)
+         * @param string $hpassword The user's password hash
+         * @throws UserNotFoundException if the given username does not exist
+         * @throws IncorrectPasswordException if the given password does not match the username's login
+         * @return boolean Whether the user is now logged in successfully
+         */
+		public function hashedLogin($username, $hpassword){
+		    $username = $this->JACKED->MySQL->sanitize($username);
 
     		$vals = $this->JACKED->MySQL->getRowVals('id, password', $this->config->dbt_users, "email='$username'");
     		
     		if($vals['password']){
     		    $userID = $vals['id'];
     			
-    			if($this->JACKED->checkPassword($password, $vals['password'])){
+    			if($hpassword == $vals['password']){
     				$this->JACKED->Sessions->write("auth.Flock", array(
     					'loggedIn' => true,
     					'username'     => $username, 
     					'email'     => $username, 
     					'userid'   => $userID,
-    					'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
+    					'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']),
+    					'hash' => $hpassword
     				));
     				return true;
     			}else{

@@ -1,5 +1,5 @@
 <?php
-    //LOL FIND THE SECRET FILE
+
     include(JACKED_SECRET_FILE);
     
     $settings['db_name'] = 'vitogo';
