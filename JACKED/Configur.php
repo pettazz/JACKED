@@ -34,6 +34,7 @@
         }*/
         
         //ABRA KADABRA! ヽ( ﾟヮ・)ノ.･ﾟ*｡･+☆ NOW IT MAKES FUCKING SENSE INSTEAD!
+        ////this crap will go in the trash someday but it's here for possible sanity later
         
         public function __construct($name){
             $file = JACKED_CONFIG_ROOT . $name . '.php';

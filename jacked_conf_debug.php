@@ -10,10 +10,10 @@
     }
     set_error_handler("exception_error_handler");
 
-    define('JACKED_MODULES_ROOT', '/srv/www/vitogo/public_html/JACKED/');
-    define('JACKED_CONFIG_ROOT', '/srv/www/vitogo/public_html/JACKED/conf/');
-    define('JACKED_LIB_ROOT', '/srv/www/vitogo/public_html/JACKED/lib/');
-    define('JACKED_SECRET_FILE', '/srv/www/vitogo/mysql.php');
+    define('JACKED_MODULES_ROOT', '/Users/pope/Sites/JACKED/');
+    define('JACKED_CONFIG_ROOT', '/Users/pope/Sites/JACKED/conf/');
+    define('JACKED_LIB_ROOT', '/Users/pope/Sites/JACKED/lib/');
+    define('JACKED_SECRET_FILE', '/Users/pope/Sites/mysql.php');
     
     try{
     	include(JACKED_MODULES_ROOT . 'JACKED.php');

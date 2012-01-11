@@ -2,17 +2,11 @@
 
     class MySQL extends JACKEDModule{
         const moduleName = 'MySQL';
-        const moduleVersion = 2.0;
+        const moduleVersion = 2.5;
         const dependencies = '';
         const optionalDependencies = '';
         
         private $mysql_link = NULL;
-        
-        public function __construct($JACKED){
-
-            
-            JACKEDModule::__construct($JACKED);
-        }
         
         public function __destruct(){
             if($this->isLinkOpen()){
@@ -22,22 +16,45 @@
         }
         
         //LOOK ITS STUFF TO MAKEHAS WORKING
+
+        /**
+        * Checks if the MySQL link is open.
+        * 
+        * @param $link int [optional] MySQL Link ID to check. Defaults to default link.
+        * @return Boolean Whether the link is active.
+        */
         private function isLinkOpen($link = NULL){
             $link = $link? $link : $this->mysql_link;
             return ($this->mysql_link == NULL)? false : true;
         }
         
-        private function openLink(){
+        /**
+        * Opens a new link to MySQL. If $setDefault is true and link creation fails, the module is disabled.
+        * 
+        * @param $setDefault Boolean [optional] Whether to make the new link the default link. Defaults to true.
+        * @return int MySQL Link ID that was just opened.
+        */
+        private function openLink($setDefault = true){
             try{
-                $this->mysql_link = mysql_connect($this->config->db_host, $this->config->db_user, $this->config->db_pass);
+                $link = mysql_connect($this->config->db_host, $this->config->db_user, $this->config->db_pass);
                 mysql_select_db($this->config->db_name);
-                return $this->mysql_link;
+                if($setDefault){
+                    $this->mysql_link = $link;
+                }
+                return $link;
             }catch(Exception $e){
-                self::$isModuleEnabled = false;
+                if($setDefault){
+                    self::$isModuleEnabled = false;
+                }
                 throw $e;
             }
         }
         
+        /**
+        * Returns the default link. If it's not open, opens it then returns the link.
+        * 
+        * @return int The default MySQL Link ID.
+        */
         private function getLink(){
             if($this->isLinkOpen()){
                 return $this->mysql_link;
@@ -50,41 +67,63 @@
         //actual public mysql stuff//
         /////////////////////////////
         
-        //maybe handle some better mysql sanitizing later or something
-        //takes a value, returns a sanitized version of it for mysql
+        /**
+        * Sanitize a string to be safe for use in MySQL queries.
+        * TODO: add even better sanitization
+        * 
+        * @param $value String Value to sanitize.
+        * @param $link int [optional] MySQL Link ID to use. Defaults to default link. Opens new default if necessary.
+        * @return String Sanitized version of the input string.
+        */
         public function sanitize($value, $link = NULL){
             $link = $link? $link : $this->getLink();
             return mysql_real_escape_string($value, $link);
         }
-        
-        //should probably make a generic paginator function:
-        //paginator(howmany, page)
-        ////return the LIMIT string
+
+        /**
+        * Get the MySQL LIMIT clause to use for paginating a query.
+        * 
+        * @param $rows int Number of rows/values per page.
+        * @param $page int Page number to get values for.
+        * @return String MySQL LIMIT clause.
+        */
         public function paginator($howMany, $page){
             return " LIMIT " . ($howMany * ($page - 1)) . ", " . $howMany;
         }
         
-        //takes an array of fields, checks against an array of allowed fields,
-        ////returns a string of csv fields suitable for mysql SELECT 
+        /**
+        * Create a string of comma separated field names suitable for MySQL SELECT based
+        * on a given Array of string fields. Takes an optional Array of allowed field 
+        * strings to filter input against.
+        * 
+        * @param $fields Array String fields to create fieldstring from.
+        * @param $allowedFields Array [optional] List of only String fields allowed in output.
+        * @return String MySQL LIMIT clause.
+        */
         public function getFieldString($fields, $allowedFields = false){
-            $fieldschecked = array();
-            if($allowedFields){
-                if($fields){
-                    foreach($fields as $field){
-                        if(in_array($field, $allowedFields))
-                            $fieldschecked[] = '`' . $field . '`';
-                    }
+            if($allowedFields && !empty($allowedFields)){
+                if(!empty($fields)){
+                    $fields = array_filter($fields, function ($var) use ($allowedFields){
+                        return in_array($var, $allowedFields);
+                    });
                 }
             }
-            if(empty($fieldschecked))
+            if(empty($fields)){
                 $fieldstring = "*";
-            else
-                $fieldstring = implode(", ", $fieldschecked);
+            }else{
+                $fieldstring = implode(", ", $fields);
+            }
         
             return $fieldstring;
         }
         
-        //take a MySQL result and translate it into an Array with the given result type
+        /**
+        * Parse a given MySQL Resource ID into an associative array of the given type.
+        * 
+        * @param $result int MySQL Resource ID to parse.
+        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
+        * @return Array Result data parsed into an associative array.
+        */
         public function parseResult($result, $result_type = MYSQL_BOTH){
            $done = array();
             if($result){

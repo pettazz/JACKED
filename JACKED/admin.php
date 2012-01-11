@@ -3,7 +3,7 @@
     class admin extends JACKEDModule{
 		const moduleName = 'admin';
 		const moduleVersion = 2.0;
-		const dependencies = 'MySQL, Sessions';
+		const dependencies = 'MySQL, Flock, Sessions';
 		const optionalDependencies = '';
 		
 		//Controller for making the admin section do stuff
@@ -14,51 +14,52 @@
 		
 	    //get a list of all the installed modules
 	    public function getModules(){
-	        $mods = $this->JACKED->MySQL->getResult($this->JACKED->config->mod_table, '1');
-    		while($row = mysql_fetch_array($mods)){
-    		
+	        $modres = $this->JACKED->MySQL->getResult($this->JACKED->config->mod_table, '1');
+    		while($row = mysql_fetch_array($modres)){
     			$modules[$row['shortName']]['moduleName'] = $row['name'];
     			$modules[$row['shortName']]['moduleVersion'] = $row['version'];
     			$modules[$row['shortName']]['moduleDescription'] = $row['description'];
     		}
-    		
     		return $modules;
+	    }
+	    
+	    //check whether a given module is installed
+	    public function isModuleInstalled($shortName){
+	        return !($this->JACKED->MySQL->getVal('id', $this->JACKED->config->mod_table, 'shortName = "' . $shortName . '"') === false);
 	    }
 		
 		//Log into JACKED with the given username and password combination
 		public function login($username, $password){
-    		$username = $this->JACKED->MySQL->sanitize($username);
-    		$password = $this->JACKED->MySQL->sanitize($password);
-
-    		$vals = $this->JACKED->MySQL->getRowVals('id, password', $this->config->dbt_users, "username='$username'");
-    		
-    		if($vals['password']){
-    		    $userID = $vals['id'];
-    			
-    			if($this->JACKED->checkPassword($password, $vals['password'])){
-    				if($this->config->session_unique){
-    					if($this->JACKED->MySQL->getVal('id', $this->JACKED->Sessions->config->db_sessions, "data LIKE '%userid|s:1:\"" . $userID . "\"%'")){
-    						return array('done' => 'NOEP', 'reason' => 'This user is already logged in.');
-    					}
-    				}	
-    				$this->JACKED->Sessions->write("auth.post", array(
-    					'loggedIn' => true,
-    					'user'     => $username, 
-    					'userid'   => $userID,
-    					'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
-    				));
-    				return true;
-    			}else{
-    				return array('done' => 'NOEP', 'reason' => 'Incorrect password');
-    			}
-    		}else{
-    			return array('done' => 'NOEP', 'reason' => 'That user does not exist');
+    		try{
+    		    $this->JACKED->Flock->login($username, $password);
+    		}catch(IncorrectPasswordException $e){
+    		    return array('reason' => 'Incorrect password.');
+    		}catch(UserNotFoundException $e){
+    		    return array('reason' => 'User does not exist.');
     		}
+    		$id = $this->JACKED->Sessions->read('auth.Flock.userid');
+    		
+    		$admin = $this->JACKED->MySQL->getVal('id',
+    		    $this->config->dbt_users,
+    		    'user_id = ' . $id
+    		);
+    		
+        	if($admin){
+        		$this->JACKED->Sessions->write("auth.admin", array(
+    				'loggedIn' => true,
+    				'user'     => $username, 
+    				'userid'   => $id,
+    				'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])
+    			));
+    		}else{
+    		    return array('reason' => 'This user does not have admin privileges.');
+    		}
+    		
     	}
     	
     	//log out of the current session
     	public function logout(){
-    	    $this->JACKED->Sessions->write("auth.post", array(
+    	    $this->JACKED->Sessions->write("auth.admin", array(
 				'loggedIn' => false,
 				'user'     => NULL, 
 				'userid'   => NULL,
@@ -70,7 +71,7 @@
     	//checkLogin(void) -> boolean
     	//returns logged in status
     	public function checkLogin(){
-    		return ($this->JACKED->Sessions->read('auth.post.loggedIn') && ($this->JACKED->Sessions->read('auth.post.sessionID') == md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])));
+    		return ($this->JACKED->Sessions->read('auth.admin.loggedIn') && ($this->JACKED->Sessions->read('auth.admin.sessionID') == md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'])));
     	}
     	
     	//requireLogin(void) -> boolean

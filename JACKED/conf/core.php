@@ -2,12 +2,15 @@
 
 	$settings = array(
 	
-	    'client_name' => 'Vitogo',
-	    'email_url' => '@vitogo.com',
+	    'client_name' => 'JACKED',
+	    'email_url' => '@jackedmanager.com',
+	    
+	    'base_url' => 'http://jackedmanager.com/',
 	    
 	    'remote_addr' => preg_match('/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', $_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "127.0.0.1",
 	    
 	    'mod_table' => 'jacked_modules',
+	    
 	    
 	    //for a deprecated function
 	    'salt_length' => 17,

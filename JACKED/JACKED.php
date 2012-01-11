@@ -216,7 +216,7 @@
     	
     	//harp darp
     	public function derp(){
-    	    echo self::$_instance->checkPassword('lolforlfsjbww', self::$_instance->hashPassword('lolforlfsjbww'))? 'yes' : 'no';
+    	    //here there be a space for testing
     	}
 	}
 ?>
