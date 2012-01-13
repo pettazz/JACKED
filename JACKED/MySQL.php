@@ -285,14 +285,7 @@
         public function query($query, $link = NULL){
             $link = $link? $link : $this->getLink();
             JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
-            
-            if($result && mysql_num_rows($result) > 0)
-                $final = $result;
-            else
-                $final = false;
-            
-            return $final;
+            return mysql_query($query, $link);
         }
         
         //INSERT INTO table (fields) VALUES (values)
