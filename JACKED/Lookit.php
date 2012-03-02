@@ -181,7 +181,7 @@
                 throw new AchievementAlreadyAwardedException();
             }
             
-            return $this->JACKED->MySQL->insertValues(
+            return $this->JACKED->MySQL->insert(
                 $this->config->dbt_unlock_queue,
                 array(
                     'user_id' => $user,
