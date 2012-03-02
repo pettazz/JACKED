@@ -79,7 +79,7 @@
             $this->JACKED->Flock->requireLogin();
             $userid = $this->JACKED->MySQL->sanitize($this->JACKED->Sessions->read('auth.Flock.userid'));
             
-            return $this->JACKED->MySQL->getAllVals(
+            return $this->JACKED->MySQL->getAll(
                 array('id', 'user_id'),
                 $this->config->dbt_friends,
                 'pending = 1 AND friend_id = ' . $userid
@@ -178,7 +178,7 @@
                 }catch(Exception $e){echo "something went wrong";}
             }
 
-            $done = $this->JACKED->MySQL->insertValues(
+            $done = $this->JACKED->MySQL->insert(
                 $this->config->dbt_friends,
                 array(
                     'user_id' => $userid,
@@ -225,7 +225,7 @@
             }
 
             return (
-                $this->JACKED->MySQL->insertValues(
+                $this->JACKED->MySQL->insert(
                     $this->config->dbt_friends,
                     array(
                         'user_id' => $ids['friend_id'],
@@ -249,7 +249,7 @@
         * @return Boolean If the rejection was successful
         */
         public function rejectRequest($id){
-            $user = $this->JACKED->MySQL->getVal(
+            $user = $this->JACKED->MySQL->get(
                 'user_id',
                 $this->config->dbt_friends,
                 'id = ' . $id
@@ -432,7 +432,7 @@
             );
             if($userid)
                 $values['poster_id'] = $userid;
-            return $this->JACKED->MySQL->insertValues(
+            return $this->JACKED->MySQL->insert(
                 $this->config->dbt_posts,
                 $values
             );
@@ -455,7 +455,7 @@
             if($postData['user_id'] != $userid)
                 $this->requireFriendship($postData['user_id']);
 
-            return $this->JACKED->MySQL->insertValues(
+            return $this->JACKED->MySQL->insert(
                 $this->config->dbt_comments,
                 array(
                     'user_post_id' => $post,
