@@ -14,8 +14,8 @@
 		
 	    //get a list of all the installed modules
 	    public function getModules(){
-	        $modres = $this->JACKED->MySQL->getResult($this->JACKED->config->mod_table, '1');
-    		while($row = mysql_fetch_array($modres)){
+	        $modres = $this->JACKED->MySQL->getRows($this->JACKED->config->mod_table);
+    		foreach($modres as $row){
     			$modules[$row['shortName']]['moduleName'] = $row['name'];
     			$modules[$row['shortName']]['moduleVersion'] = $row['version'];
     			$modules[$row['shortName']]['moduleDescription'] = $row['description'];
@@ -25,7 +25,7 @@
 	    
 	    //check whether a given module is installed
 	    public function isModuleInstalled($shortName){
-	        return !($this->JACKED->MySQL->getVal('id', $this->JACKED->config->mod_table, 'shortName = "' . $shortName . '"') === false);
+	        return !($this->JACKED->MySQL->get('id', $this->JACKED->config->mod_table, 'shortName = "' . $shortName . '"') === false);
 	    }
 		
 		//Log into JACKED with the given username and password combination
@@ -39,7 +39,7 @@
     		}
     		$id = $this->JACKED->Sessions->read('auth.Flock.userid');
     		
-    		$admin = $this->JACKED->MySQL->getVal('id',
+    		$admin = $this->JACKED->MySQL->get('id',
     		    $this->config->dbt_users,
     		    'user_id = ' . $id
     		);
