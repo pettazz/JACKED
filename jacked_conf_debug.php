@@ -13,7 +13,7 @@
     define('JACKED_MODULES_ROOT', '/var/www/jacked-prod/JACKED/');
     define('JACKED_CONFIG_ROOT', '/var/www/jacked-prod/JACKED/conf/');
     define('JACKED_LIB_ROOT', '/var/www/jacked-prod/JACKED/lib/');
-    define('JACKED_SECRET_FILE', '/var/www/mysql.php');
+    define('JACKED_SECRET_FILE', '/var/www/mysql_jacked.php');
     
     try{
     	include(JACKED_MODULES_ROOT . 'JACKED.php');
