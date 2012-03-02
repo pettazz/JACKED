@@ -114,7 +114,7 @@
                 }else{
                     //need to create a new source for this guy
                     $source = array("id" => '', "uuid" => $uuid, "Application" => $approw['id']);
-                    $newID = $this->JACKED->MySQL->insertValues($this->config->db_sources, $source);
+                    $newID = $this->JACKED->MySQL->insert($this->config->db_sources, $source);
                     if($newID){
                         $source['id'] = $newID;
                         $source['Application'] = null;
@@ -175,7 +175,7 @@
         public function getNotifications(){
             $this->trimNotifications();
             $now = time();
-            return $this->JACKED->MySQL->getAllVals("*", $this->config->db_notifications, "`start` <= '" . $now . "' AND `end` >= '" . $now . "' AND (`Application` = '0' OR `Application` = '" . $this->getMyApplicationID() . "')");
+            return $this->JACKED->MySQL->getAll("*", $this->config->db_notifications, "`start` <= '" . $now . "' AND `end` >= '" . $now . "' AND (`Application` = '0' OR `Application` = '" . $this->getMyApplicationID() . "')");
         }
         
         //trims the notification table of anything that expired a month ago
