@@ -21,7 +21,7 @@
             $this->JACKED->Flock->requireLogin();
             $userid = $this->JACKED->MySQL->sanitize($this->JACKED->Sessions->read('auth.Flock.userid'));
             if($userid == $user){
-                $result = true;
+                $done = true;
             }else{
                 $result = $this->JACKED->MySQL->query(
                     "SELECT id FROM 
@@ -29,10 +29,12 @@
                     WHERE
                         user_id = " . $userid . " AND
                         friend_id = " . $user . " AND
-                        pending != 1"
+                        pending != 1
+                    ORDER BY id DESC"
                 );
+                $done = mysql_num_rows($result);
             }
-            return (bool)$result;
+            return (bool)$done;
         }
 
         /**
@@ -176,7 +178,7 @@
                 }catch(Exception $e){echo "something went wrong";}
             }
 
-            return $this->JACKED->MySQL->insertValues(
+            $done = $this->JACKED->MySQL->insertValues(
                 $this->config->dbt_friends,
                 array(
                     'user_id' => $userid,
@@ -184,6 +186,25 @@
                     'pending' => 1
                 )
             );
+
+            if($done){
+                require("postmark.php");
+                $postmark = new Postmark("fd9e4960-c857-429c-b927-de65b121d292", "friend-request@vitogo.com", "contact@vitogo.com");
+                
+                ob_start(); include('/home/myvitogo/production_web/JACKED/friendRequest.html'); $html=ob_get_contents(); ob_end_clean();
+
+                $html = str_replace('{{new_friend_name}}', $userData['given_name'], $html);
+                $html = str_replace('{{user_name}}', $friendData['given_name'], $html);
+                $html = str_replace('{{new_friend_avatar_url}}', 'http://vitogo.com' . $userData['photo'], $html);
+
+
+                $result = $postmark->to($friendData['email'])
+                        ->subject("You have a new friend request on Vitogo!")
+                        ->html_message($html)
+                        ->send();
+                
+            }
+            return $done;
         }
         
         /**

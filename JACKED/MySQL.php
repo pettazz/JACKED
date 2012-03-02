@@ -2,7 +2,7 @@
 
     class MySQL extends JACKEDModule{
         const moduleName = 'MySQL';
-        const moduleVersion = 2.5;
+        const moduleVersion = 2.7;
         const dependencies = '';
         const optionalDependencies = '';
         
@@ -14,8 +14,6 @@
                 $this->mysql_link = NULL;
             }
         }
-        
-        //LOOK ITS STUFF TO MAKEHAS WORKING
 
         /**
         * Checks if the MySQL link is open.
@@ -77,7 +75,7 @@
         */
         public function sanitize($value, $link = NULL){
             $link = $link? $link : $this->getLink();
-            return mysql_real_escape_string($value, $link);
+            return mysql_real_escape_string(stripslashes($value), $link);
         }
 
         /**
@@ -135,21 +133,54 @@
                 $done = $done[0];
             return $done;
         }
-        
-        //SELECT val FROM table WHERE cond
-        //val is just one field, and you only get the first result
-        ////default link can be overridden
-        public function getVal($val, $table, $cond = null, $link = NULL){
+
+        /**
+        * Get the string value of the last MySQL error on the given link.
+        * 
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return String Last error message from the database connection identified by the link
+        */
+        public function getError($link = NULL){
             $link = $link? $link : $this->getLink();
-            if(stripos($val, "function:") === 0){
+            $err = mysql_error($link);
+            JACKED::debug_dump($err);
+            return $err;
+        }
+
+        /**
+        * Perform a MySQL query on the given database connection, and return the result identifier. 
+        * 
+        * @param $query String query to perform
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return MySQL Result Identifier for @$query result
+        */
+        public function query($query, $link = NULL){
+            $link = $link? $link : $this->getLink();
+            $query = $this->sanitize($query);
+            JACKED::debug_dump($query);
+            return mysql_query($query, $link);
+        }
+        
+        /**
+        * Get a single value from a given MySQL field that matches a condition. If the condition matches
+        * more than one row, the value from first row will be returned.
+        * 
+        * 
+        * @param $field string Field name to get value of. Accepts strings beginning with "function:" as MySQL function calls.
+        * @param $table string Table name to search
+        * @param $cond string [optional] Condition to use for query: "WHERE @$cond". Default will return first row retreived from db.
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Mixed Result data from @$field matching @$cond
+        */
+        public function get($field, $table, $cond = null, $link = NULL){
+            if(stripos($field, "function:") === 0){
                 $val = substr($val, 9); //function: ends at 9, lol.
-                $query = "SELECT " . $val . " FROM `" . $table . "`";
+                $query = "SELECT " . $field . " FROM `" . $table . "`";
             }else
-                $query = "SELECT `" . $val . "` FROM `" . $table . "`";
+                $query = "SELECT `" . $field . "` FROM `" . $table . "`";
             if($cond)
                 $query .= " WHERE " . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $result = $this->query($query, $link);
             
             if($result && mysql_num_rows($result) > 0){
                 $row = mysql_fetch_array($result, MYSQL_NUM);
@@ -162,32 +193,20 @@
             return $final;
         }
         
-        //SELECT vals FROM table WHERE cond
-        ////default link can be overridden
-        public function getRowVals($vals, $table, $cond, $result_type = MYSQL_BOTH, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            $query = "SELECT $vals FROM `" . $table . "` WHERE " . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
-            $row = mysql_fetch_array($result, $result_type);
-            
-            if($result && mysql_num_rows($result) > 0){
-                $final = array_map("stripslashes", $row);
-                mysql_free_result($result);
-            }else{
-                $final = false;
-            }
-            
-            return $final;
-        }
-        
-        //SELECT * FROM table WHERE cond
-        ////default link can be overridden
+        /**
+        * Get an entire row from the given table matching the given cond. If the condition matches more than one row, 
+        * returns the first in retrieved data.
+        * SELECT * FROM @$table WHERE $@cond LIMIT 1
+        * 
+        * @param $table string Table name to search
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Array Result data from @$field matching @$cond
+        */
         public function getRow($table, $cond, $result_type = MYSQL_BOTH, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
+            $result = $this->query($query, $link);
             
             if($result && mysql_num_rows($result) > 0){
                 $row = mysql_fetch_array($result, $result_type);
@@ -200,80 +219,31 @@
             return $final;
         }
         
-        //SELECT vals FROM table WHERE cond
-        //vals is an array of field names
-        //returns an array of vals
-        ////default link can be overridden
-        public function getAllVals($vals, $table, $cond, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            if(is_array($vals)){
-                $query = "SELECT " . implode(",", $vals) . " FROM `" . $table . "` WHERE " . $cond;
-            }else{
-                $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            }
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
-            if($result && mysql_num_rows($result) > 0){
-                $final = array();
-                if(is_array($vals)){
-                    while($row = mysql_fetch_array($result, MYSQL_ASSOC)){		
-                        $newrow = array();
-                        foreach($vals as $fieldname){
-                            $newrow[$fieldname] = stripslashes($row[$fieldname]);
-                        }
-                        $final[] = $newrow;
-                    }
-                }else{
-                    while($row = mysql_fetch_array($result, MYSQL_ASSOC)){		
-                        $newrow = array();
-                        foreach($row as $fieldname => $value){
-                            $newrow[$fieldname] = stripslashes($row[$fieldname]);
-                        }
-                        $final[] = $newrow;
-                    }
-                }
-                mysql_free_result($result);
-            }else{
-                $final = false;
-            }
-            
-            return $final;
-        }
-        
-        //SELECT * FROM table WHERE cond
-        ////default link can be overridden
-        ////returns array of all rows
-        public function getRows($table, $cond = NULL, $link = NULL){
-            $link = $link? $link : $this->getLink();
+        /**
+        * Get all entire rows from the given table matching the given cond. 
+        * SELECT * FROM @$table WHERE $@cond
+        * 
+        * @param $table string Table name to search
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Array Array of rows from @$field matching @$cond
+        */
+        public function getRows($table, $cond = NULL, $result_type = MYSQL_BOTH, $link = NULL){
             $cond = $cond? $cond : '1';
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $result = $this->query($query, $link);
             
-            if($result && mysql_num_rows($result) > 0){
+            if($result && mysql_num_rows($result) == 1){
+                $row = mysql_fetch_array($result, $result_type);
+                $final = array(0 => array_map("stripslashes", $row));
+                mysql_free_result($result);
+            }else if($result && mysql_num_rows($result) > 1){
                 $final = array();
-                while($row = mysql_fetch_array($result, MYSQL_ASSOC)){
+                while($row = mysql_fetch_array($result, $result_type)){
                     $final[] = $row;
                 }
                 mysql_free_result($result);
-            }else
-                $final = false;
-            
-            return $final;
-        }
-        
-        //SELECT * FROM table WHERE cond
-        ////default link can be overridden
-        ////returns the result
-        public function getResult($table, $cond, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
-            
-            if($result && mysql_num_rows($result) > 0){
-                $final = $result;
-                mysql_free_result($result);
             }else{
                 $final = false;
             }
@@ -281,28 +251,61 @@
             return $final;
         }
         
-        //make does do a query!
-        public function query($query, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            JACKED::debug_dump($query);
-            return mysql_query($query, $link);
-        }
         
-        //INSERT INTO table (fields) VALUES (values)
-        ///$data is an associative array where $field=>$value
-        ////default link can be overridden
-        ////returns bool whether it worked
-        public function insertValues($table, $data, $link = NULL){
-            $link = $link? $link : $this->getLink();
+        /**
+        * Get all values from given MySQL fields that match a condition. 
+        * SELECT @$fields FROM @$table WHERE $@cond
+        * 
+        * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
+        * @param $table string Table name to search
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Array Result data from @$fields matching @$cond
+        */
+        public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL){
+            if(is_array($fields)){
+                $query = "SELECT " . implode(",", $fields) . " FROM `" . $table . "` WHERE " . $cond;
+            }else{
+                $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
+            }
+            $result = $this->query($query, $link);
+
+            if($result && mysql_num_rows($result) == 1){
+                $row = mysql_fetch_array($result, $result_type);
+                $final = array(0 => array_map("stripslashes", $row));
+                mysql_free_result($result);
+            }else if($result && mysql_num_rows($result) > 1){
+                $final = array();
+                while($row = mysql_fetch_array($result, $result_type)){
+                    $final[] = array_map("stripslashes", $row);
+                }
+                mysql_free_result($result);
+            }else{
+                $final = false;
+            }
+            
+            return $final;
+        }
+
+        /**
+        * Insert data into the database.
+        * INSERT INTO @$table @$fields
+        * 
+        * @param $table string Table name to insert data into
+        * @param $data Array Associative array of data as ('field name' => 'value') to insert.
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return int The id of the newly inserted row if successful, false on failure
+        */
+        public function insert($table, $data, $link = NULL){
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
-                $fields[] = $this->sanitize($field, $link);
-                $values[] = $this->sanitize($value, $link);
+                $fields[] = $field;
+                $values[] = $value;
             }
             $query = "INSERT INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $result = $this->query($query, $link);
             if($result){
                 $done = mysql_insert_id($link);
             }else{
@@ -311,62 +314,69 @@
             return $done;
         }
         
-        //UPDATE table SET field1 = value1, ... fieldn = value1 WHERE cond
-        ///$data is an associative array where $field=>$value
-        ////default link can be overridden
-        ////returns bool whether it worked
+        /**
+        * Update data in the database with new values.
+        * UPDATE @$table SET @$fields WHERE @$cond
+        * 
+        * @param $table string Table name to update
+        * @param $data Array Associative array of ('field name' => 'value') to update. If a field name starts with 'function:' the 
+        * value is evaluated as a MySQL function rather than a string, like: function:NOW()
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Boolean Whether the update was successful
+        */
         public function update($table, $data, $cond, $link = NULL){
-            $link = $link? $link : $this->getLink();
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
-                if(stripos($value, "literal:") === 0){
-                    $pairs[] = "`" . $this->sanitize($field, $link) . "` = " . $this->sanitize(substr($value, 8), $link) . "";
+                if(stripos($value, "function:") === 0){
+                    $pairs[] = "`" . $field . "` = " . substr($value, 9) . "";
                 }else{
-                    $pairs[] = "`" . $this->sanitize($field, $link) . "` = '" . $this->sanitize($value, $link) . "'";
+                    $pairs[] = "`" . $field . "` = '" . $value . "'";
                 }
             }
             
             $query = "UPDATE $table SET " . implode($pairs, ', ') . " WHERE " . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $result = $this->query($query, $link);
             return $result;
         }
         
-        //REPLACE INTO table (field1, ... fieldn) VALUES (value1, ... value1)
-        ///$data is an associative array where $field=>$value
-        ////default link can be overridden
-        ////returns bool whether it worked
+        /**
+        * Replace data in the database with new values.
+        * REPLACE INTO @$table @$fields
+        * 
+        * @param $table string Table name to update
+        * @param $data Array Associative array of ('field name' => 'value') to update. 
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Boolean Whether the replace was successful
+        */
         public function replace($table, $data, $link = NULL){
-            $link = $link? $link : $this->getLink();
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
-                $fields[] = $this->sanitize($field, $link);
-                $values[] = $this->sanitize($value, $link);
+                $fields[] = $field;
+                $values[] = $value;
             }
             
             $query = "REPLACE INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $result = $this->query($query, $link);
             return $result;
         }
         
-        //DELETE FROM table WHERE cond
-        ////default link can be overridden
-        ////returns bool whether it worked
+        /**
+        * Delete data from a given table that matches a given condition
+        * DELETE FROM @$table WHERE @$cond
+        * 
+        * @param $table string Table name to update
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @return Boolean Whether the replace was successful
+        */
         public function delete($table, $cond, $link = NULL){
-            $link = $link? $link : $this->getLink();
             $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $cond;
-            JACKED::debug_dump($query);
-            $result = mysql_query($query, $link);
+            $result = $this->query($query, $link);
             return $result;
-        }
-        
-        //get the last MySQL error
-        public function getError($link = NULL){
-            $link = $link? $link : $this->getLink();
-            return mysql_error($link);
         }
     }
 

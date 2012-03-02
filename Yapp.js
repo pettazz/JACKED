@@ -1,7 +1,7 @@
 var API = (function(){
 
         const apikey = 'testur'; //change this once we use a real api key
-        const API_PATH = 'https://vitogo.hipposerver.com/api.php'; //the url of the api endpoint
+        const API_PATH = 'https://jackedmanager.com/api.php'; //the url of the api endpoint
         var token = '';
         var ttl = 0;
         var opened;
