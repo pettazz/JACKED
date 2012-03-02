@@ -36,7 +36,7 @@
     	
     	//session read function
     	private function _read($id){
-    		return $this->JACKED->MySQL->getVal('data', $this->config->db_sessions, "id = '$id'");
+    		return $this->JACKED->MySQL->get('data', $this->config->db_sessions, "id = '$id'");
     	}
     	
     	//session destroy function
