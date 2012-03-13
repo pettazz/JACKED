@@ -1,8 +1,8 @@
 <?php
 
     class Configur implements ArrayAccess, Countable, IteratorAggregate{
-		const moduleName = 'Configur';
-		const moduleVersion = 1.5;
+        const moduleName = 'Configur';
+        const moduleVersion = 1.5;
     
         protected $_values = array();
     
@@ -22,15 +22,15 @@
             if(!in_array($name, self::$_modules)){
                 $file = JACKED_CONFIG_ROOT . $name . '.php';
                 if (file_exists($file)){
-    				include($file);
-    				foreach($settings as $opt => $val){
-    					$this->_values[$opt] = $val;
-    				}
-    				array_push(self::$_modules, $name);
-    			}else{
-    			    throw new Exception("JACKED Configurator can't find a config file named " . $name . ".");
-    			}
-    		}
+                    include($file);
+                    foreach($settings as $opt => $val){
+                        $this->_values[$opt] = $val;
+                    }
+                    array_push(self::$_modules, $name);
+                }else{
+                    throw new Exception("JACKED Configurator can't find a config file named " . $name . ".");
+                }
+            }
         }*/
         
         //ABRA KADABRA! ヽ( ﾟヮ・)ノ.･ﾟ*｡･+☆ NOW IT MAKES FUCKING SENSE INSTEAD!
@@ -39,13 +39,13 @@
         public function __construct($name){
             $file = JACKED_CONFIG_ROOT . $name . '.php';
             if (file_exists($file)){
-				include($file);
-				foreach($settings as $opt => $val){
-					$this->_values[$opt] = $val;
-				}
-			}else{
-			    throw new Exception("JACKED Configurator can't find a config file named " . $name . ".");
-			}
+                include($file);
+                foreach($settings as $opt => $val){
+                    $this->_values[$opt] = $val;
+                }
+            }else{
+                throw new Exception("JACKED Configurator can't find a config file named " . $name . ".");
+            }
         }
         
         final protected function __clone(){

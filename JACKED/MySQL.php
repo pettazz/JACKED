@@ -4,7 +4,7 @@
         const moduleName = 'MySQL';
         const moduleVersion = 2.7;
         const dependencies = '';
-        const optionalDependencies = '';
+        const optionalDependencies = 'Memcache';
         
         private $mysql_link = NULL;
         
@@ -42,7 +42,7 @@
                 return $link;
             }catch(Exception $e){
                 if($setDefault){
-                    self::$isModuleEnabled = false;
+                    self->$isModuleEnabled = false;
                 }
                 throw $e;
             }
@@ -148,17 +148,35 @@
         }
 
         /**
-        * Perform a MySQL query on the given database connection, and return the result identifier. 
+        * Perform a MySQL query on the given database connection, and return the result identifier. If memcache is 
+        * enabled and $use_memcache is True, it will try to use a cached value of the query, or add/set the results.
         * 
         * @param $query String query to perform
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return MySQL Result Identifier for @$query result
         */
-        public function query($query, $link = NULL){
+        public function query($query, $link = NULL, $use_memcache = false){
+            if($this->config->use_memcache && $use_memcache){
+                if(!$this->JACKED->Memcache->isModuleEnabled)
+                    //make sure memcache is still up, if it's dead disable it
+                    $this->config->offsetSet('use_memcache', false);
+                }else{
+                    $key = md5($query);
+                    $value = $this->JACKED->Memcache->get($key);
+                    if($value)
+                        return $value;
+                }
+            }
             $link = $link? $link : $this->getLink();
             $query = $this->sanitize($query);
             JACKED::debug_dump($query);
-            return mysql_query($query, $link);
+            $value = mysql_query($query, $link);
+            if($this->config->use_memcache && $use_memcache){
+                $key = md5($query);
+                $this->JACKED->Memcache->set($key, $value);
+            }
+            return $value;
         }
         
         /**
@@ -170,17 +188,18 @@
         * @param $table string Table name to search
         * @param $cond string [optional] Condition to use for query: "WHERE @$cond". Default will return first row retreived from db.
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Mixed Result data from @$field matching @$cond
         */
-        public function get($field, $table, $cond = null, $link = NULL){
+        public function get($field, $table, $cond = null, $link = NULL, $use_memcache = true){
             if(stripos($field, "function:") === 0){
-                $val = substr($val, 9); //function: ends at 9, lol.
+                $val = substr($val, 9); //"function:" ends at 9, lol.
                 $query = "SELECT " . $field . " FROM `" . $table . "`";
             }else
                 $query = "SELECT `" . $field . "` FROM `" . $table . "`";
             if($cond)
                 $query .= " WHERE " . $cond;
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, $use_memcache);
             
             if($result && mysql_num_rows($result) > 0){
                 $row = mysql_fetch_array($result, MYSQL_NUM);
@@ -202,11 +221,12 @@
         * @param $cond string Condition to use for query: "WHERE @$cond"
         * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$field matching @$cond
         */
-        public function getRow($table, $cond, $result_type = MYSQL_BOTH, $link = NULL){
+        public function getRow($table, $cond, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, $use_memcache);
             
             if($result && mysql_num_rows($result) > 0){
                 $row = mysql_fetch_array($result, $result_type);
@@ -227,12 +247,13 @@
         * @param $cond string Condition to use for query: "WHERE @$cond"
         * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Array of rows from @$field matching @$cond
         */
-        public function getRows($table, $cond = NULL, $result_type = MYSQL_BOTH, $link = NULL){
+        public function getRows($table, $cond = NULL, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
             $cond = $cond? $cond : '1';
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, $use_memcache);
             
             if($result && mysql_num_rows($result) == 1){
                 $row = mysql_fetch_array($result, $result_type);
@@ -261,15 +282,16 @@
         * @param $cond string Condition to use for query: "WHERE @$cond"
         * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields matching @$cond
         */
-        public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL){
+        public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL, $use_memcache = true){
             if(is_array($fields)){
                 $query = "SELECT " . implode(",", $fields) . " FROM `" . $table . "` WHERE " . $cond;
             }else{
                 $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
             }
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, $use_memcache);
 
             if($result && mysql_num_rows($result) == 1){
                 $row = mysql_fetch_array($result, $result_type);
@@ -305,7 +327,7 @@
                 $values[] = $value;
             }
             $query = "INSERT INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, false);
             if($result){
                 $done = mysql_insert_id($link);
             }else{
@@ -337,7 +359,7 @@
             }
             
             $query = "UPDATE $table SET " . implode($pairs, ', ') . " WHERE " . $cond;
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, false);
             return $result;
         }
         
@@ -360,7 +382,7 @@
             }
             
             $query = "REPLACE INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, false);
             return $result;
         }
         
@@ -375,7 +397,7 @@
         */
         public function delete($table, $cond, $link = NULL){
             $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $cond;
-            $result = $this->query($query, $link);
+            $result = $this->query($query, $link, false);
             return $result;
         }
     }

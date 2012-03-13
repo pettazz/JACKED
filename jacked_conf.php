@@ -11,7 +11,7 @@
     define('JACKED_SECRET_FILE', '/var/www/mysql_jacked.php');
     
     try{
-    	include(JACKED_MODULES_ROOT . 'JACKED.php');
+        include(JACKED_MODULES_ROOT . 'JACKED.php');
     }catch(Exception $e){
         die("<h1>JACKED could not root itself.</h1> <h4>Check your configuration, dude.</h4> <br /> Here's the actual exception: <p><code>" . $e->getMessage() . "</code></p>");
     }

@@ -3,19 +3,20 @@
     class JACKEDModule {
         public $config;
         protected $JACKED;
+        public $isModuleEnabled = true;
         
-	    protected static $moduleName = "Some JACKED Module";
-	    protected static $moduleVersion = 0;
-	    protected static $dependencies = '';
-	    protected static $optionalDependencies = '';
+        protected static $moduleName = "Some JACKED Module";
+        protected static $moduleVersion = 0;
+        protected static $dependencies = '';
+        protected static $optionalDependencies = '';
     
         public function __construct($JACKED){
-        	$this->config = new Configur($this->getModuleName());
-        	
-			$this->JACKED = $JACKED;
-			$this->JACKED->loadDependencies($this::getModuleDependencies());
-			$this->JACKED->loadOptionalDependencies($this::getModuleOptionalDependencies());
-    	}
+            $this->config = new Configur($this->getModuleName());
+            
+            $this->JACKED = $JACKED;
+            $this->JACKED->loadDependencies($this::getModuleDependencies());
+            $this->JACKED->loadOptionalDependencies($this::getModuleOptionalDependencies());
+        }
         
         public static function getModuleName(){
             return static::moduleName;
