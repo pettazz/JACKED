@@ -158,14 +158,15 @@
         */
         public function query($query, $link = NULL, $use_memcache = false){
             if($this->config->use_memcache && $use_memcache){
-                if(!$this->JACKED->Memcache->isModuleEnabled)
+                if(!$this->JACKED->Memcache->isModuleEnabled){
                     //make sure memcache is still up, if it's dead disable it
                     $this->config->offsetSet('use_memcache', false);
                 }else{
                     $key = md5($query);
                     $value = $this->JACKED->Memcache->get($key);
-                    if($value)
+                    if($value){
                         return $value;
+                    }
                 }
             }
             $link = $link? $link : $this->getLink();
