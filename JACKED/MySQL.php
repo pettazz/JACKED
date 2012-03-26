@@ -42,7 +42,7 @@
                 return $link;
             }catch(Exception $e){
                 if($setDefault){
-                    self->isModuleEnabled = false;
+                    $this->isModuleEnabled = false;
                 }
                 throw $e;
             }
