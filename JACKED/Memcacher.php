@@ -8,7 +8,7 @@
         
         private $M;
         
-        public function __construct(){
+        public function __construct($JACKED){
             JACKEDModule::__construct($JACKED);
 
             try{
