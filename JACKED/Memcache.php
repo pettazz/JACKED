@@ -6,7 +6,6 @@
         const dependencies = '';
         const optionalDependencies = '';
         
-        private $JACKED;
         private $M;
         
         public function __construct(){
