@@ -34,7 +34,7 @@
         * @param $timeout int [optional] Set the seconds expiration on this value in the cache (defaults to module config value)
         * @return Boolean Whether the value was set successfully, or False if the key already exists
         */
-        private function add($key, $value, $timeout = NULL){
+        public function add($key, $value, $timeout = NULL){
             if($timeout === NULL){
                 $timeout = $this->config->cache_expire;
             }
@@ -50,7 +50,7 @@
         * @param $timeout int [optional] Set the seconds expiration on this value in the cache (defaults to module config value)
         * @return Boolean Whether the value was set successfully
         */
-        private function set($key, $value, $timeout = NULL){
+        public function set($key, $value, $timeout = NULL){
             if($timeout === NULL){
                 $timeout = $this->config->cache_expire;
             }
@@ -65,7 +65,7 @@
         * @param $inc Mixed The value to increment $key by
         * @return Mixed The newly incremented value, or False on failure
         */
-        private function increment($key, $inc){
+        public function increment($key, $inc){
             return $this->M->increment($key, $inc);
         }
         
@@ -76,7 +76,7 @@
         * @param $dec Mixed The value to decrement $key by
         * @return Mixed The newly decremented value, or False on failure
         */
-        private function decrement($key, $dec){
+        public function decrement($key, $dec){
             return $this->M->decrement($key, $dec);
         }
         
@@ -88,7 +88,7 @@
         * @param $timeout int [optional] Set the seconds expiration on this value in the cache (defaults to module config value)
         * @return Boolean Whether the value was replaced successfully
         */
-        private function replace($key, $value, $timeout = NULL){
+        public function replace($key, $value, $timeout = NULL){
             if($timeout === NULL){
                 $timeout = $this->config->cache_expire;
             }
@@ -102,7 +102,7 @@
         * @param $key String The key to store the value as
         * @return Mixed The cache value for $key (defaults to false if none was found)
         */
-        private function get($key){
+        public function get($key){
             $done = $this->M->get($key);
             return $done? $done : false;
         }
@@ -113,7 +113,7 @@
         * @param $key String The key to be deleted
         * @return Boolean Whether the delete was successful
         */
-        private function delete($key){
+        public function delete($key){
             return $this->M->delete($key);
         }     
         
@@ -122,7 +122,7 @@
         * 
         * @return Boolean Whether the flush was successful
         */
-        private function flush(){
+        public function flush(){
             return $this->M->flush();
         }       
     }
