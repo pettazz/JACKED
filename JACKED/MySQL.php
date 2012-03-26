@@ -4,7 +4,7 @@
         const moduleName = 'MySQL';
         const moduleVersion = 2.7;
         const dependencies = '';
-        const optionalDependencies = 'Memcache';
+        const optionalDependencies = 'Memcacher';
         
         private $mysql_link = NULL;
         
