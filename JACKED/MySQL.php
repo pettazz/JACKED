@@ -158,12 +158,12 @@
         */
         public function query($query, $link = NULL, $use_memcache = false){
             if($this->config->use_memcache && $use_memcache){
-                if(!$this->JACKED->Memcache->isModuleEnabled){
+                if(!$this->JACKED->Memcacher->isModuleEnabled){
                     //make sure memcache is still up, if it's dead disable it
                     $this->config->offsetSet('use_memcache', false);
                 }else{
                     $key = md5($query);
-                    $value = $this->JACKED->Memcache->get($key);
+                    $value = $this->JACKED->Memcacher->get($key);
                     if($value){
                         return $value;
                     }
@@ -175,7 +175,7 @@
             $value = mysql_query($query, $link);
             if($this->config->use_memcache && $use_memcache){
                 $key = md5($query);
-                $this->JACKED->Memcache->set($key, $value);
+                $this->JACKED->Memcacher->set($key, $value);
             }
             return $value;
         }
