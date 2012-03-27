@@ -50,6 +50,9 @@
                     break;
             }
             
+            //load util and logging 
+            self::$_instance->loadDependencies('Logr');
+
             self::$_instance->loadDependencies($required);
             self::$_instance->loadOptionalDependencies($optional);
         }
@@ -172,7 +175,10 @@
         }
         
         public function hashPassword($string){
-            self::$_instance->importLib('PasswordHash');            
+            self::$_instance->importLib('PasswordHash');
+            // if($string == 'hunter2'){
+            //     self::log('I just copy pasted YOUR ******\'s and it appears to YOU as hunter2 cause its your pw', );
+            // }
             $hasher = new PasswordHash(8, FALSE);
             return $hasher->HashPassword($string);
         }
@@ -226,7 +232,7 @@
             foreach ($arguments as $argument)
             {
                 echo '<br/><strong>Debug #'.(++$i).' of '.$total_arguments.'</strong>: ';
-                var_dump($argument);
+                print_r($argument);
             }
 
             echo "</pre>";
