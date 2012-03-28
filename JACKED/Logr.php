@@ -29,14 +29,14 @@
                                 $this->lognl = "\r\n";
                             }
                             $this->locations[] = 'file';
-                            $this->write('Logfile opened. Sup?');
+                            fwrite($this->logfp, 'Logfile opened. Sup?', $this->lognl);
                         }catch(Exception $e){
-                            $this->write('Error configuring log file: ' . $e->getMessage(), );
+                            $this->write('Error configuring log file: ' . $e->getMessage());
                         }
                         break;
                     case 'MySQL':
                         try{
-                            $this->JACKED->loadDependency('MySQL');
+                            $this->JACKED->loadDependencies('MySQL');
                             if(mysql_num_rows($this->JACKED->MySQL->query('show tables like "' . $data . '"')) == 0){
                                 throw new Exception("Logging table '$data' not found.");
                             }
@@ -172,7 +172,9 @@
                             $time = date('r');
                             fwrite($this->logfp, '[' . time() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg, $this->lognl);
                         }catch(Exception $e){
-                            //dunno yet
+                            if($this->JACKED->config->debug > 0){
+                                self::printMessage('Error writing to log file: ' . $e->getMessage());
+                            }
                         }
                         break;
                     case 'MySQL':
