@@ -170,10 +170,10 @@
                     case 'file':
                         try{
                             $time = date('r');
-                            fwrite($this->logfp, '[' . time() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg, $this->lognl);
+                            fwrite($this->logfp, '[' . time() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg . $this->lognl);
                         }catch(Exception $e){
                             if($this->JACKED->config->debug > 0){
-                                $bt = debug_backtrace();
+                                $bt = $e->getTrace();
                                 self::printMessage('Error writing to log file: ' . $e->getMessage(), $bt[0]);
                             }
                         }
