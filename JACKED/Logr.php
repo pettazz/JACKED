@@ -173,7 +173,8 @@
                             fwrite($this->logfp, '[' . time() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg, $this->lognl);
                         }catch(Exception $e){
                             if($this->JACKED->config->debug > 0){
-                                self::printMessage('Error writing to log file: ' . $e->getMessage(), $stacktrace[0]);
+                                $bt = debug_backtrace();
+                                self::printMessage('Error writing to log file: ' . $e->getMessage(), $bt[0]);
                             }
                         }
                         break;
