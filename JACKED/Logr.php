@@ -125,9 +125,12 @@
                 list($callee) = debug_backtrace();
             }
             echo '<fieldset style="background: #fefefe !important; border:2px red solid; padding:5px">';
-            echo '<legend style="background:lightgrey; padding:5px;">'.$callee['file'].' @ line: '.$callee['line'].'</legend><pre>';
-
-            echo '<br />'. $msg;
+            try{
+                echo '<legend style="background:lightgrey; padding:5px;">'. $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
+            }catch(Exception $e){
+                echo '<legend style="background:lightgrey; padding:5px;">Logr Message</legend>';
+            }
+            echo '<pre><br />'. $msg;
 
             echo "</pre>";
             echo "</fieldset>";
