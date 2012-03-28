@@ -209,7 +209,7 @@
         
         //dumps a given var, if conf->debug is not turned off
         public function debug_dump($var){
-            $this->Logr->write($var);
+            $this->Logr->write($var, debug_backtrace());
             /*if(self::$_instance->config->debug > 0){
                 self::print_repr('DEBUG DUMP', $var);
             }*/
