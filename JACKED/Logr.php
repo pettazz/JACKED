@@ -48,12 +48,11 @@
                     case 'stdout':
                         $this->locations[] = 'stdout';
                         break;
-                    default:
-                        if($JACKED->config->debug > 0){
-                            $this->locations[] = 'stdout';
-                        }
-                        break;
                 }
+            }
+            //If core debug is enabled, include stdout logging
+            if($JACKED->config->debug > 0){
+                $this->locations[] = 'stdout';
             }
         }
         
@@ -170,7 +169,7 @@
                     case 'file':
                         try{
                             $time = date('r');
-                            fwrite($this->logfp, '[' . time() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg . $this->lognl);
+                            fwrite($this->logfp, '[' . microtime() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg . $this->lognl);
                         }catch(Exception $e){
                             if($this->JACKED->config->debug > 0){
                                 $bt = $e->getTrace();
