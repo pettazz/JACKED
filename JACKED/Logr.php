@@ -29,7 +29,7 @@
                                 $this->lognl = "\r\n";
                             }
                             $this->locations[] = 'file';
-                            fwrite($this->logfp, 'Logfile opened. Sup?', $this->lognl);
+                            fwrite($this->logfp, 'Logfile opened. Sup?' . $this->lognl);
                         }catch(Exception $e){
                             $this->write('Error configuring log file: ' . $e->getMessage());
                         }
