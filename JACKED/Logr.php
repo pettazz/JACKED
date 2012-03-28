@@ -189,11 +189,11 @@
                         }
                         break;
                     case 'stdout':
-                        self::printMessage($msg, $stacktrace);
+                        self::printMessage($msg, $stacktrace[0]);
                         break;
                     default:
                         if($this->JACKED->config->debug > 0){
-                            self::printMessage($msg, $stacktrace);
+                            self::printMessage($msg, $stacktrace[0]);
                         }
                 }
             }
