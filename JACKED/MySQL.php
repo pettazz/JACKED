@@ -143,7 +143,7 @@
         public function getError($link = NULL){
             $link = $link? $link : $this->getLink();
             $err = mysql_error($link);
-            JACKED::debug_dump($err);
+            $this->JACKED->debug_dump($err);
             return $err;
         }
 
@@ -171,7 +171,7 @@
             }
             $link = $link? $link : $this->getLink();
             $query = $this->sanitize($query);
-            JACKED::debug_dump($query);
+            $this->JACKED->debug_dump($query);
             $value = mysql_query($query, $link);
             if($this->config->use_memcache && $use_memcache){
                 $key = md5($query);

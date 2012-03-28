@@ -5,6 +5,12 @@
         const moduleVersion = 1.0;
         const dependencies = '';
         const optionalDependencies = '';
+
+        const LEVEL_FATAL = 4;        
+        const LEVEL_SEVERE = 3;
+        const LEVEL_WARNING = 2;
+        const LEVEL_NOTICE = 1;
+        const LEVEL_LOL = 0;
         
         private $locations = array();
 
@@ -23,32 +29,102 @@
                                 $this->lognl = "\r\n";
                             }
                             $this->locations[] = 'file';
+                            $this->write('Logfile opened. Sup?');
                         }catch(Exception $e){
-                            self::printMessage('<strong>Error configuring log file: </strong>' . $e->getMessage())
+                            $this->write('Error configuring log file: ' . $e->getMessage(), );
                         }
                         break;
-                    // case 'MySQL':
-                    //     try{
-                    //         $JACKED->loadDependency('MySQL');
-                    //     }catch(Exception $e){
-                    //        
-                    //     }
-                    //     break;
+                    case 'MySQL':
+                        try{
+                            $this->JACKED->loadDependency('MySQL');
+                            if(mysql_num_rows($this->JACKED->MySQL->query('show tables like "' . $data . '"')) == 0){
+                                throw new Exception("Logging table '$data' not found.");
+                            }
+                            $this->locations[] = 'MySQL';
+                        }catch(Exception $e){
+                            $this->write('Error configuring MySQL logging: ' . $e->getMessage());
+                        }
+                        break;
+                    case 'stdout':
+                        $this->locations[] = 'stdout';
+                        break;
                     default:
-                        //stderr? or whatever
+                        if($JACKED->config->debug > 0){
+                            $this->locations[] = 'stdout';
+                        }
                         break;
                 }
             }
         }
         
         public function __destruct(){
-            /*try{
-                $this->M->close();
-            }catch(Exception $e){}*/
+            foreach($this->locations as $loc){
+                switch($loc){
+                    case 'file':
+                        try{
+                            fclose($this->logfp);
+                        }catch(Exception $e){}
+                        break;
+                    case 'MySQL':
+                        try{
+                            // nothing to do here
+                            // ...for now
+                        }catch(Exception $e){}
+                        break;
+                }
+            }
+            $this->locations = array();
         }
 
-        public static function printMessage($msg){
-            list($callee) = debug_backtrace();
+        /**
+        * Translates an error level to a human readable string.
+        * 
+        * @param $level Int The error level to be converted.
+        * @return String Human readable representation of log level
+        */
+        public static function levelName($level){
+            /*
+                const LEVEL_FATAL = 4;        
+                const LEVEL_SEVERE = 3;
+                const LEVEL_WARNING = 2;
+                const LEVEL_NOTICE = 1;
+                const LEVEL_LOL = 0;
+            */
+            $str = '';
+            switch($level){
+                case self::LEVEL_FATAL:
+                    $str = 'fatal';
+                    break;
+                case self::LEVEL_SEVERE:
+                    $str = 'severe';
+                    break;
+                case self::LEVEL_WARNING:
+                    $str = 'warning';
+                    break;
+                case self::LEVEL_NOTICE:
+                    $str = 'notice';
+                    break;
+                case self::LEVEL_LOL:
+                    $str = 'lol';
+                    break;
+                default:
+                    $str = 'notice';
+                    break;
+            }
+
+            return $str;
+        }
+
+        /**
+        * Prints a given message to the output (most commonly this will be inline on the page being rendered)
+        * 
+        * @param $msg String The message value to print (preformatted)
+        * @param $callee Array The callee data for printing the header. Defaults to list($callee) = debug_backtrace();
+        */
+        public static function printMessage($msg, $callee = NULL){
+            if($callee == NULL){
+                list($callee) = debug_backtrace();
+            }
             echo '<fieldset style="background: #fefefe !important; border:2px red solid; padding:5px">';
             echo '<legend style="background:lightgrey; padding:5px;">'.$callee['file'].' @ line: '.$callee['line'].'</legend><pre>';
 
@@ -58,31 +134,64 @@
             echo "</fieldset>";
         }
 
-        public static function full_dump(){
+        /**
+        * Prints a given set of values to the output (see printMessage) in a human readable way (print_r style).
+        * Magically gets any number of arguments passed to it of Mixed types. 
+        */
+        public static function printDump(){
             list($callee) = debug_backtrace();
             $arguments = func_get_args();
             $total_arguments = count($arguments);
 
-            echo '<fieldset style="background: #fefefe !important; border:2px red solid; padding:5px">';
-            echo '<legend style="background:lightgrey; padding:5px;">'.$callee['file'].' @ line: '.$callee['line'].'</legend><pre>';
             $i = 0;
+            $msg = '';
             foreach ($arguments as $argument)
             {
-                echo '<br/><strong>Debug #'.(++$i).' of '.$total_arguments.'</strong>: ';
-                print_r($argument);
+                $msg .= '<br/><strong>Debug #'.(++$i).' of '.$total_arguments.'</strong>: ';
+                $msg .= print_r($argument, true);
             }
 
-            echo "</pre>";
-            echo "</fieldset>";
+            $this->printMessage($msg, $callee);
         }
         
         /**
-        * Set the value of a new key in the cache. Will not overwrite existing keys with the same name.
+        * Write to any configured/active logs.
         * 
-        * @param $key String The key to store the value as
-        * @param $value Mixed The value to store in the cache
-        * @param $timeout int [optional] Set the seconds expiration on this value in the cache (defaults to module config value)
-        * @return Boolean Whether the value was set successfully, or False if the key already exists
+        * @param $msg String The message to write to the log
+        * @param $level Int [optional] The error level. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
+        * @param $stacktrace Array [optional] Output of the debug_backtrace relevant to logging the error, defaults to currently generated
         */
-
+        public function write($msg, $level = 1, $stacktrace = NULL){
+            if($stacktrace == NULL){
+                $stacktrace = debug_backtrace();
+            }
+            foreach($this->locations as $loc){
+                switch($loc){
+                    case 'file':
+                        try{
+                            $time = date('r');
+                            fwrite($this->logfp, '[' . time() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg, $this->lognl);
+                        }catch(Exception $e){
+                            //dunno yet
+                        }
+                        break;
+                    case 'MySQL':
+                        try{
+                            // nothing to do here
+                            // ...for now
+                        }catch(Exception $e){
+                            //dunno yet
+                        }
+                        break;
+                    case 'stdout':
+                        self::printMessage($msg, $stacktrace);
+                        break;
+                    default:
+                        if($this->JACKED->config->debug > 0){
+                            self::printMessage($msg, $stacktrace);
+                        }
+                }
+            }
+        }
+    }
 ?>

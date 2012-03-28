@@ -194,7 +194,8 @@
         //    motherfuckin debuggery
         ////////////////////////////////////////////
         
-        //MAKE THE PRINTS
+        //all of this is now officially deprecated
+
         private static function print_repr($title, $var){
             echo '<br /><font color="red">' . $title . ':</font><br /><pre><code>';
             echo print_r($var, true);
@@ -207,10 +208,11 @@
         }
         
         //dumps a given var, if conf->debug is not turned off
-        public static function debug_dump($var){
-            if(self::$_instance->config->debug > 0){
+        public function debug_dump($var){
+            $this->Logr->write($var);
+            /*if(self::$_instance->config->debug > 0){
                 self::print_repr('DEBUG DUMP', $var);
-            }
+            }*/
         }
         
         //prints a backtrace
