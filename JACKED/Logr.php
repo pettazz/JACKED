@@ -132,6 +132,7 @@
 
             echo "</pre>";
             echo "</fieldset>";
+            flush();
         }
 
         /**
@@ -187,8 +188,8 @@
                                     'message' => $msg,
                                     'file' => $stacktrace[0]['file'],
                                     'line' => $stacktrace[0]['line'],
-                                    'stacktrace' => print_r($stacktrace, true),
-                                    'stack_hash' => md5(print_r($stacktrace, true))
+                                    'stacktrace' => print_r($stacktrace[0], true),
+                                    'stack_hash' => md5(print_r($stacktrace[0], true))
                                 ));
                             }catch(Exception $e){
                                 $bt = $e->getTrace();

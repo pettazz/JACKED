@@ -171,7 +171,7 @@
             }
             $link = $link? $link : $this->getLink();
             $query = $this->sanitize($query);
-            $this->JACKED->debug_dump($query);
+            $this->JACKED->Logr->write->($query, Logr::LEVEL_NOTICE, NULL, 'MySQL');
             $value = mysql_query($query, $link);
             if($this->config->use_memcache && $use_memcache){
                 $key = md5($query);
