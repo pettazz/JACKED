@@ -176,16 +176,13 @@
                             }catch(Exception $e){
                                 $bt = $e->getTrace();
                                 $this->write('Error writing to log file: ' . $e->getMessage(), Logr::LEVEL_WARNING, $bt, 'file');
-                                if($this->JACKED->config->debug > 0){
-                                    self::printMessage('Error writing to log file: ' . $e->getMessage(), $bt[0]);
-                                }
                             }
                         }
                         break;
                     case 'MySQL':
                         if($skipLocation != 'MySQL'){
                             try{
-                                $this->JACKED->MySQL->insert($this->config->locations->MySQL, array(
+                                $this->JACKED->MySQL->insert($this->config->locations['MySQL'], array(
                                     'guid' => $this->JACKED->uuid4(),
                                     'message' => $msg,
                                     'file' => $stacktrace[0]['file'],
@@ -196,9 +193,6 @@
                             }catch(Exception $e){
                                 $bt = $e->getTrace();
                                 $this->write('Error writing to log table: ' . $e->getMessage(), Logr::LEVEL_WARNING, $bt, 'MySQL');
-                                if($this->JACKED->config->debug > 0){
-                                    self::printMessage('Error writing to log table: ' . $e->getMessage(), $bt[0]);
-                                }
                             }
                         }
                         break;
