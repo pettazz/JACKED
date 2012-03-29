@@ -132,7 +132,6 @@
 
             echo "</pre>";
             echo "</fieldset>";
-            flush();
         }
 
         /**
