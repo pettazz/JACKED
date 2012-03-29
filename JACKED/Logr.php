@@ -37,9 +37,6 @@
                     case 'MySQL':
                         try{
                             $this->JACKED->loadDependencies('MySQL');
-                            if(mysql_num_rows($this->JACKED->MySQL->query('show tables like "' . $data . '"')) == 0){
-                                throw new Exception("Logging table '$data' not found.");
-                            }
                             $this->locations[] = 'MySQL';
                         }catch(Exception $e){
                             $this->write('Error configuring MySQL logging: ' . $e->getMessage());
@@ -61,6 +58,7 @@
                 switch($loc){
                     case 'file':
                         try{
+                            fwrite($this->logfp, 'Logfile closed. Bye!' . $this->lognl . $this->lognl);
                             fclose($this->logfp);
                         }catch(Exception $e){}
                         break;
@@ -163,39 +161,57 @@
         * @param $level Int [optional] The error level. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
         * @param $stacktrace Array [optional] Output of the debug_backtrace relevant to logging the error, defaults to currently generated
         */
-        public function write($msg, $level = 1, $stacktrace = NULL){
+        public function write($msg, $level = 1, $stacktrace = NULL, $skipLocation = NULL){
             if($stacktrace == NULL){
                 $stacktrace = debug_backtrace();
             }
+            
             foreach($this->locations as $loc){
                 switch($loc){
                     case 'file':
-                        try{
-                            $time = date('r');
-                            fwrite($this->logfp, '[' . microtime() . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg . $this->lognl);
-                        }catch(Exception $e){
-                            if($this->JACKED->config->debug > 0){
+                        if($skipLocation != 'file'){
+                            try{
+                                $time = date('r');
+                                fwrite($this->logfp, '[' . microtime(true) . ' - ' . $time . '] [' . strtoupper(self::levelName($level)) . '] ' . $msg . $this->lognl);
+                            }catch(Exception $e){
                                 $bt = $e->getTrace();
-                                self::printMessage('Error writing to log file: ' . $e->getMessage(), $bt[0]);
+                                $this->write('Error writing to log file: ' . $e->getMessage(), Logr::LEVEL_WARNING, $bt, 'file');
+                                if($this->JACKED->config->debug > 0){
+                                    self::printMessage('Error writing to log file: ' . $e->getMessage(), $bt[0]);
+                                }
                             }
                         }
                         break;
                     case 'MySQL':
-                        try{
-                            // nothing to do here
-                            // ...for now
-                        }catch(Exception $e){
-                            //dunno yet
+                        if($skipLocation != 'MySQL'){
+                            try{
+                                $this->JACKED->MySQL->insert($this->config->locations->MySQL, array(
+                                    'guid' => $this->JACKED->uuid4(),
+                                    'message' => $msg,
+                                    'file' => $stacktrace[0]['file'],
+                                    'line' => $stacktrace[0]['line'],
+                                    'stacktrace' => print_r($stacktrace, true),
+                                    'stack_hash' => md5(print_r($stacktrace, true))
+                                ));
+                            }catch(Exception $e){
+                                $bt = $e->getTrace();
+                                $this->write('Error writing to log table: ' . $e->getMessage(), Logr::LEVEL_WARNING, $bt, 'MySQL');
+                                if($this->JACKED->config->debug > 0){
+                                    self::printMessage('Error writing to log table: ' . $e->getMessage(), $bt[0]);
+                                }
+                            }
                         }
                         break;
                     case 'stdout':
-                        self::printMessage($msg, $stacktrace[0]);
-                        break;
-                    default:
-                        if($this->JACKED->config->debug > 0){
+                        if($skipLocation != 'stdout'){
                             self::printMessage($msg, $stacktrace[0]);
                         }
+                        break;
                 }
+            }
+            //if global debug is on and we haven't already printed this
+            if($this->JACKED->config->debug > 0 && !in_array('stdout', $this->locations)){
+                self::printMessage($msg, $stacktrace[0]);
             }
         }
     }
