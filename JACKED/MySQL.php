@@ -143,20 +143,20 @@
         public function getError($link = NULL){
             $link = $link? $link : $this->getLink();
             $err = mysql_error($link);
-            $this->JACKED->debug_dump($err);
             return $err;
         }
 
         /**
         * Perform a MySQL query on the given database connection, and return the result identifier. If memcache is 
         * enabled and $use_memcache is True, it will try to use a cached value of the query, or add/set the results.
+        * For internal use only, doesn't handle any sanitization.
         * 
         * @param $query String query to perform
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return MySQL Result Identifier for @$query result
         */
-        public function query($query, $link = NULL, $use_memcache = false){
+        private function mysqlQuery($query, $link = NULL, $use_memcache = false){
             if($this->config->use_memcache && $use_memcache){
                 if(!$this->JACKED->Memcacher->isModuleEnabled){
                     //make sure memcache is still up, if it's dead disable it
@@ -177,7 +177,25 @@
                 $key = md5($query);
                 $this->JACKED->Memcacher->set($key, $value);
             }
+
+            if($value === false){
+                $this->JACKED->Logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL, 'MySQL');
+            }
             return $value;
+        }
+
+        /**
+        * Perform a MySQL query on the given database connection, and return the result identifier. If memcache is 
+        * enabled and $use_memcache is True, it will try to use a cached value of the query, or add/set the results.
+        * 
+        * @param $query String query to perform
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
+        * @return MySQL Result Identifier for @$query result
+        */
+        public function query($query, $link = NULL, $use_memcache = false){
+            $query = $this->sanitize($query);
+            return $this->mysqlQuery($query, $link, $use_memcache);
         }
         
         /**
@@ -193,6 +211,9 @@
         * @return Mixed Result data from @$field matching @$cond
         */
         public function get($field, $table, $cond = null, $link = NULL, $use_memcache = true){
+            $field = $this->sanitize($field);
+            $table = $this->sanitize($table);
+            $cond = $this->sanitize($cond);
             if(stripos($field, "function:") === 0){
                 $val = substr($val, 9); //"function:" ends at 9, lol.
                 $query = "SELECT " . $field . " FROM `" . $table . "`";
@@ -200,7 +221,7 @@
                 $query = "SELECT `" . $field . "` FROM `" . $table . "`";
             if($cond)
                 $query .= " WHERE " . $cond;
-            $result = $this->query($query, $link, $use_memcache);
+            $result = $this->mysqlQuery($query, $link, $use_memcache);
             
             if($result && mysql_num_rows($result) > 0){
                 $row = mysql_fetch_array($result, MYSQL_NUM);
@@ -226,8 +247,10 @@
         * @return Array Result data from @$field matching @$cond
         */
         public function getRow($table, $cond, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
+            $table = $this->sanitize($table);
+            $cond = $this->sanitize($cond);
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
-            $result = $this->query($query, $link, $use_memcache);
+            $result = $this->mysqlQuery($query, $link, $use_memcache);
             
             if($result && mysql_num_rows($result) > 0){
                 $row = mysql_fetch_array($result, $result_type);
@@ -252,9 +275,9 @@
         * @return Array Array of rows from @$field matching @$cond
         */
         public function getRows($table, $cond = NULL, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
-            $cond = $cond? $cond : '1';
-            $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            $result = $this->query($query, $link, $use_memcache);
+            $cond = $cond? $this->sanitixe($cond) : '1';
+            $query = "SELECT * FROM `" . $this->sanitize($table) . "` WHERE " . $cond;
+            $result = $this->mysqlQuery($query, $link, $use_memcache);
             
             if($result && mysql_num_rows($result) == 1){
                 $row = mysql_fetch_array($result, $result_type);
@@ -287,12 +310,14 @@
         * @return Array Result data from @$fields matching @$cond
         */
         public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL, $use_memcache = true){
+            $table = $this->sanitize($table);
+            $cond = $this->sanitize($cond);
             if(is_array($fields)){
-                $query = "SELECT " . implode(",", $fields) . " FROM `" . $table . "` WHERE " . $cond;
+                $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM `" . $table . "` WHERE " . $cond;
             }else{
                 $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
             }
-            $result = $this->query($query, $link, $use_memcache);
+            $result = $this->mysqlQuery($query, $link, $use_memcache);
 
             if($result && mysql_num_rows($result) == 1){
                 $row = mysql_fetch_array($result, $result_type);
@@ -321,14 +346,15 @@
         * @return int The id of the newly inserted row if successful, false on failure
         */
         public function insert($table, $data, $link = NULL){
+            $table = $this->sanitize($table);
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
-                $fields[] = $field;
-                $values[] = $value;
+                $fields[] = $this->sanitize($field);
+                $values[] = $this->sanitize($value);
             }
             $query = "INSERT INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            $result = $this->query($query, $link, false);
+            $result = $this->mysqlQuery($query, $link, false);
             if($result){
                 $done = mysql_insert_id($link);
             }else{
@@ -349,9 +375,13 @@
         * @return Boolean Whether the update was successful
         */
         public function update($table, $data, $cond, $link = NULL){
+            $table = $this->sanitize($table);
+            $cond = $this->sanitize($cond);
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
+                $field = $this->sanitize($field);
+                $value = $this->sanitize($value);
                 if(stripos($value, "function:") === 0){
                     $pairs[] = "`" . $field . "` = " . substr($value, 9) . "";
                 }else{
@@ -360,7 +390,7 @@
             }
             
             $query = "UPDATE $table SET " . implode($pairs, ', ') . " WHERE " . $cond;
-            $result = $this->query($query, $link, false);
+            $result = $this->mysqlQuery($query, $link, false);
             return $result;
         }
         
@@ -375,15 +405,16 @@
         * @return Boolean Whether the replace was successful
         */
         public function replace($table, $data, $link = NULL){
+            $table = $this->sanitize($table);
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
-                $fields[] = $field;
-                $values[] = $value;
+                $fields[] = $this->sanitize($field);
+                $values[] = $this->sanitize($value);
             }
             
             $query = "REPLACE INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            $result = $this->query($query, $link, false);
+            $result = $this->mysqlQuery($query, $link, false);
             return $result;
         }
         
@@ -397,8 +428,8 @@
         * @return Boolean Whether the replace was successful
         */
         public function delete($table, $cond, $link = NULL){
-            $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $cond;
-            $result = $this->query($query, $link, false);
+            $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $this->sanitize($cond);
+            $result = $this->mysqlQuery($query, $link, false);
             return $result;
         }
     }
