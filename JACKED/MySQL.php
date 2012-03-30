@@ -345,6 +345,7 @@
         * @return int The id of the newly inserted row if successful, false on failure
         */
         public function insert($table, $data, $link = NULL){
+            $link = $link? $link : $this->getLink();
             $table = $this->sanitize($table);
             $fields = array();
             $values = array();
