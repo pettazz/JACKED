@@ -213,7 +213,7 @@
         public function get($field, $table, $cond = null, $link = NULL, $use_memcache = true){
             $field = $this->sanitize($field);
             $table = $this->sanitize($table);
-            $cond = $this->sanitize($cond);
+            $cond = $cond;
             if(stripos($field, "function:") === 0){
                 $val = substr($val, 9); //"function:" ends at 9, lol.
                 $query = "SELECT " . $field . " FROM `" . $table . "`";
@@ -248,7 +248,7 @@
         */
         public function getRow($table, $cond, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
             $table = $this->sanitize($table);
-            $cond = $this->sanitize($cond);
+            $cond = $cond;
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
             $result = $this->mysqlQuery($query, $link, $use_memcache);
             
@@ -311,7 +311,7 @@
         */
         public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL, $use_memcache = true){
             $table = $this->sanitize($table);
-            $cond = $this->sanitize($cond);
+            $cond = $cond;
             if(is_array($fields)){
                 $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM `" . $table . "` WHERE " . $cond;
             }else{
@@ -376,7 +376,7 @@
         */
         public function update($table, $data, $cond, $link = NULL){
             $table = $this->sanitize($table);
-            $cond = $this->sanitize($cond);
+            $cond = $cond;
             $fields = array();
             $values = array();
             foreach($data as $field => $value){
@@ -428,7 +428,7 @@
         * @return Boolean Whether the replace was successful
         */
         public function delete($table, $cond, $link = NULL){
-            $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $this->sanitize($cond);
+            $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $cond;
             $result = $this->mysqlQuery($query, $link, false);
             return $result;
         }
