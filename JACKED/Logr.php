@@ -117,8 +117,9 @@
         * 
         * @param $msg String The message value to print (preformatted)
         * @param $callee Array The callee data for printing the header. Defaults to list($callee) = debug_backtrace();
+        * @param $level Int [optional] The error level of the message to print. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
         */
-        public static function printMessage($msg, $callee = NULL){
+        public static function printMessage($msg, $callee = NULL, $level = 1){
             if($callee == NULL){
                 list($callee) = debug_backtrace();
             }
@@ -160,6 +161,7 @@
         * @param $msg String The message to write to the log
         * @param $level Int [optional] The error level. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
         * @param $stacktrace Array [optional] Output of the debug_backtrace relevant to logging the error, defaults to currently generated
+        * @param $skipLocation String [optional] A specific log location to ignore in this write (use to stop infinite recursion)
         */
         public function write($msg, $level = 1, $stacktrace = NULL, $skipLocation = NULL){
             if($stacktrace == NULL){
@@ -184,6 +186,7 @@
                             try{
                                 $this->JACKED->MySQL->insert($this->config->locations['MySQL'], array(
                                     'guid' => $this->JACKED->uuid4(),
+                                    'timestamp' => microtime(true),
                                     'message' => $msg,
                                     'file' => $stacktrace[0]['file'],
                                     'line' => $stacktrace[0]['line'],
