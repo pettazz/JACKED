@@ -21,7 +21,7 @@
             JACKEDModule::__construct($JACKED);
 
             //set up debug
-            switch(self::$_instance->config->debug){
+            switch($JACKED->config->debug){
                 case 1:
                     ini_set('display_errors', 'On');
                     error_reporting(E_ALL ^ E_NOTICE);
