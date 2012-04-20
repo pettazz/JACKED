@@ -33,24 +33,33 @@
             self::$_instance->loadOptionalDependencies($optional);
         }
         
+        public static function getInstance(){
+            if(!isset(self::$_instance)){
+                self::$_instance = new JACKED();
+                self::$_instance->Logr->write('The JACKED static instance was accessed before instantiation. Dependences may not have been loaded', 2);
+            }
+            return self::$_instance;
+        }
+
         private function isModuleRegistered($name){
-            return property_exists(self::$_instance, $name);
+            return property_exists(self::getInstance(), $name);
         }
         
         private function registerModule($name){
             if($name && !self::$_instance->isModuleRegistered($name)){
-                self::$_instance->$name = new $name(self::$_instance);
+                self::$_instance->$name = new $name(self::getInstance());
             }
         }
     
         public function loadDependencies($deps){
             foreach(explode(", ", $deps) as $module){
-                if(!self::$_instance->isModuleRegistered($module)){
+                $instance = self::getInstance();
+                if(!$instance->isModuleRegistered($module)){
                     try{
-                        self::$_instance->registerModule($module);
+                        $instance->registerModule($module);
                     }catch(Exception $e){
                         try{
-                            self::$_instance->Logr->write('Required module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
+                            $instance->Logr->write('Required module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
                         }catch(Exception $ex){}
                         die('JACKED failed to load required module <strong>' . $module . '</strong>.');
                     }
@@ -60,13 +69,14 @@
         
         public function loadOptionalDependencies($mods){
             foreach(explode(", ", $mods) as $module){
-                if(!self::$_instance->isModuleRegistered($module)){
+                $instance = self::getInstance();
+                if(!$instance->isModuleRegistered($module)){
                     try{
-                        self::$_instance->registerModule($module);
+                        $instance->registerModule($module);
                     }catch(Exception $e){
-                        self::$_instance->$module = new Derper();
+                        $instance->$module = new Derper();
                         try{
-                            self::$_instance->Logr->write('Optional module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 3, $e-getTrace());
+                            $instance->Logr->write('Optional module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 3, $e-getTrace());
                         }catch(Exception $ex){}
                     }
                 }
@@ -83,7 +93,8 @@
                     require($file);
                     $did = true;
                 }else{
-                    self::$_instance->Logr->write('Library ' . $libname . ' couldn\'t be loaded: File does not exist.', 4);
+                    $instance = self::getInstance();
+                    $instance->Logr->write('Library ' . $libname . ' couldn\'t be loaded: File does not exist.', 4);
                     throw new Exception("JACKED can't find a library named " . $libname . ".");
                 }
                 return $did;
@@ -93,7 +104,7 @@
         }
         
         public function __destruct(){
-            //unload?
+            unset(self::$_instance);
         }
         
         public function derp(){
