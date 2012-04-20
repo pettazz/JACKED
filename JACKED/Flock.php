@@ -29,7 +29,7 @@
             
             if($vals['password']){
                 $userID = $vals['id'];
-                $hash = $this->JACKED->checkPassword($password, $vals['password'], true);
+                $hash = $this->JACKED->Util->checkPassword($password, $vals['password'], true);
                 if($hash){
                     $this->JACKED->Sessions->write("auth.Flock", array(
                         'loggedIn' => true,

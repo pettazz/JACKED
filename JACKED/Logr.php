@@ -20,6 +20,32 @@
         public function __construct($JACKED){
             JACKEDModule::__construct($JACKED);
 
+            //set up debug
+            switch(self::$_instance->config->debug){
+                case 1:
+                    ini_set('display_errors', 'On');
+                    error_reporting(E_ALL ^ E_NOTICE);
+                    break;
+                case 2:
+                    ini_set('display_errors', 'On');
+                    error_reporting(-1);
+                    break;
+                case -1:
+                    ini_set('display_errors', 'On');
+                    error_reporting(E_ALL ^ E_NOTICE);
+                    break;
+                case -2:
+                    ini_set('display_errors', 'On');
+                    error_reporting(-1);
+                    break;
+        
+                default:
+                    ini_set('display_errors', 'Off');
+                    ini_set('log_errors', 'On');
+                    error_reporting(E_ALL ^ E_NOTICE);
+                    break;
+            }
+
             foreach($this->config->locations as $loc => $data){
                 switch($loc){
                     case 'file':
@@ -185,7 +211,7 @@
                         if($skipLocation != 'MySQL'){
                             try{
                                 $this->JACKED->MySQL->insert($this->config->locations['MySQL'], array(
-                                    'guid' => $this->JACKED->uuid4(),
+                                    'guid' => $this->JACKED->Util->uuid4(),
                                     'timestamp' => microtime(true),
                                     'message' => $msg,
                                     'file' => $stacktrace[0]['file'],

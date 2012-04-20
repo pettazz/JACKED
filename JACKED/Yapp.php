@@ -36,7 +36,7 @@
         }
         
         private function exception($exception){
-            $this->JACKED->debug_dump($exception);
+            $this->JACKED->Logr->write($exception->getMessage(), 2, $exception->getTrace());
             return json_encode(array("done" => False, "message" => $exception->getMessage()));
         }
         
