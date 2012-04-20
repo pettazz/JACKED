@@ -117,7 +117,7 @@
         public function hashPassword($string){
             $this->JACKED->importLib('PasswordHash');
             if($string == 'hunter2'){
-                $this->JACKED->Logr->write('I just copy pasted YOUR ******\'s and it appears to YOU as hunter2 cause its your pw', 0;
+                $this->JACKED->Logr->write('I just copy pasted YOUR ******\'s and it appears to YOU as hunter2 cause its your pw', 0);
             }
             $hasher = new PasswordHash(8, FALSE);
             return $hasher->HashPassword($string);
