@@ -104,7 +104,7 @@
         }
         
         public function __destruct(){
-            unset(self::$_instance);
+            self::$_instance = NULL;
         }
         
         public function derp(){
