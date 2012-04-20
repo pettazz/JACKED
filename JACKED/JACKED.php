@@ -50,7 +50,7 @@
                         self::$_instance->registerModule($module);
                     }catch(Exception $e){
                         try{
-                            self::$_instance->Logr->write('Required module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 4, $e-getTrace());
+                            self::$_instance->Logr->write('Required module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
                         }catch(Exception $ex){}
                         die('JACKED failed to load required module <strong>' . $module . '</strong>.');
                     }
