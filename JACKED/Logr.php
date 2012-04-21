@@ -149,9 +149,34 @@
             if($callee == NULL){
                 list($callee) = debug_backtrace();
             }
-            echo '<fieldset style="background: #fefefe !important; border:2px red solid; padding:5px">';
+
+            //set some style stuff for different levels
+            switch($level){
+                case 0:
+                    $color = "3366FF";
+                    $label = "LOL: ";
+                    break;
+                case 1:
+                    $color = "0000FF";
+                    $label = "Notice: ";
+                    break;
+                case 2:
+                    $color = "CC6600";
+                    $label = "Warning: ";
+                    break;
+                case 3:
+                    $color = "FF3300";
+                    $label = "Severe: ";
+                    break;
+                case 4:
+                    $color = "FF0000";
+                    $label = "Fatal: ";
+                    break;
+            }
+
+            echo '<fieldset style="background: #fefefe !important; border:2px ' . $color . ' solid; padding:5px">';
             try{
-                echo '<legend style="background:lightgrey; padding:5px;">'. $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
+                echo '<legend style="background:lightgrey; padding:5px;">'. $label . $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
             }catch(Exception $e){
                 echo '<legend style="background:lightgrey; padding:5px;">Logr Message</legend>';
             }
