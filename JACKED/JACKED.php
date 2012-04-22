@@ -81,7 +81,7 @@
                 if(!$instance->isModuleRegistered($module, $modDetails['version'])){
                     try{
                         $instance->registerModule($module, $modDetails['version']);
-                    }catch(ModuleLoadException $e){
+                    }catch(Exception $e){
                         if($module['required']){
                             try{
                                 $instance->Logr->write('Required module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
@@ -125,10 +125,5 @@
         public function derp(){
             //here there be a space for testing
         }
-    }
-
-
-    class ModuleLoadException extends Exception{
-        protected $message = 'The requested module could not be loaded.';
     }
 ?>
