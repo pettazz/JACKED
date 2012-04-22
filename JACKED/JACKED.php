@@ -67,6 +67,7 @@
             foreach($deps as $module => $modDetails){
                 //for sanity
                 if(!is_array($modDetails)){
+                    $module = $modDetails;
                     $modDetails = array('version' => false, 'required' => true);
                 }else{
                     if(!array_key_exists($modDetails, 'version')){
