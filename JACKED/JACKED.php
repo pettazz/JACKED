@@ -62,7 +62,7 @@
                 if($version){
                     $newMod = self::$_instance->$name;
                     if((float) $newMod::getModuleVersion() != (float) $version){
-                        throw new Exception("Installed module $name v" . $newMod::getModuleVersion() . "does not match requested version $version");
+                        throw new Exception("Installed module $name v" . $newMod::getModuleVersion() . " does not match requested version $version");
                     }
                 }
             }
