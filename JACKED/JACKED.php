@@ -59,6 +59,12 @@
         private function registerModule($name, $version = false){
             if($name && !self::$_instance->isModuleRegistered($name, $version)){
                 self::$_instance->$name = new $name(self::getInstance());
+                if($version){
+                    $newMod = self::$_instance->$name;
+                    if((float) $newMod::getModuleVersion() != (float) $version){
+                        throw new Exception("Installed module $name v" . $newMod::getModuleVersion() . "does not match requested version $version");
+                    }
+                }
             }
         }
     
