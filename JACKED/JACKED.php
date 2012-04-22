@@ -16,7 +16,7 @@
 
     class JACKED{
         const moduleName = "JACKED Core";
-        const moduleVersion = 3.0;
+        const moduleVersion = 3.5;
     
         protected static $_instance = null;
         public $config;

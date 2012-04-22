@@ -10,13 +10,13 @@
         
         const moduleName = 'Yapp';
         const moduleVersion = 2.0;
-        protected static dependencies = array('MySQL, Sessions');
+        protected static $dependencies = array('MySQL', 'Sessions');
         
         public function __construct($JACKED){
             $this->request_method = $_SERVER['REQUEST_METHOD'];
             
             JACKEDModule::__construct($JACKED);
-            $JACKED->loadDependencies(implode(", ", $this->config->interface_classes));
+            $JACKED->loadDependencies($this->config->interface_classes);
         }
         
         /////////////////////////////////////////////////////

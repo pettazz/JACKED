@@ -60,7 +60,7 @@
                         break;
                     case 'MySQL':
                         try{
-                            $this->JACKED->loadDependencies('MySQL');
+                            $this->JACKED->loadDependencies(array('MySQL'));
                             $this->locations[] = 'MySQL';
                         }catch(Exception $e){
                             $this->write('Error configuring MySQL logging: ' . $e->getMessage());
