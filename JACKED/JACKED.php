@@ -26,7 +26,7 @@
             self::$_instance->config = new Configur("core");
             
             //load util and logging 
-            self::$_instance->loadDependencies(array('Logr, Util'));
+            self::$_instance->loadDependencies(array('Logr', 'Util'));
 
             //load dependencies
             //sanity
