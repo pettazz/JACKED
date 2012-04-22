@@ -3,7 +3,7 @@
     class Sessions extends JACKEDModule{
         const moduleName = 'Sessions';
         const moduleVersion = 2.0;
-        protected static dependencies = array('MySQL');
+        protected static $dependencies = array('MySQL');
         
         public function __construct($JACKED){
             JACKEDModule::__construct($JACKED);

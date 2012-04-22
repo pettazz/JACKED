@@ -3,7 +3,7 @@
     class Lookit extends JACKEDModule{
         const moduleName = 'Lookit';
         const moduleVersion = 1.0;
-        protected static dependencies = array('MySQL', 'Flock', 'Sessions');
+        protected static $dependencies = array('MySQL', 'Flock', 'Sessions');
         
         ///////////////
         // Accessing Achievements  //
