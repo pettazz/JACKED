@@ -26,10 +26,10 @@
             self::$_instance->config = new Configur("core");
             
             //load util and logging 
-            self::$_instance->loadDependencies('Logr, Util');
+            self::$_instance->loadDependencies(array('Logr, Util'));
 
             //load dependencies
-            self::$_instance->loadDependencies($depenc);
+            self::$_instance->loadDependencies($depencies);
         }
         
         public static function getInstance(){
