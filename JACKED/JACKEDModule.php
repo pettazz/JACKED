@@ -1,13 +1,12 @@
 <?php
 
-    class JACKEDModule {
+    abstract class JACKEDModule{
         public $config;
         protected $JACKED;
         public $isModuleEnabled = true;
         
-        protected static $moduleName = "Some JACKED Module";
-        protected static $moduleVersion = 0;
-        protected static $dependencies = array();
+        const moduleName = "Some JACKED Module";
+        const moduleVersion = 0;
     
         public function __construct($JACKED){
             $this->config = new Configur($this->getModuleName());
@@ -16,16 +15,13 @@
             $this->JACKED->loadDependencies($this::getModuleDependencies());
         }
         
-        public static function getModuleName(){
-            return static::moduleName;
-        }
-        public static function getModuleVersion(){
-            return static::moduleVersion;
-        }
         public static function getModuleDependencies(){
-            return self::$dependencies;
+            if(isset(self::dependencies)){
+                return self::dependencies;
+            }else{
+                return array();
+            }
         }
-        
         
     }
 
