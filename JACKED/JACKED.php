@@ -29,6 +29,10 @@
             self::$_instance->loadDependencies(array('Logr, Util'));
 
             //load dependencies
+            //sanity
+            if(!is_array($dependencies)){
+                $dependencies = explode(", ", $dependencies);
+            }
             self::$_instance->loadDependencies($dependencies);
         }
         
