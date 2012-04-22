@@ -3,8 +3,7 @@
     class MySQL extends JACKEDModule{
         const moduleName = 'MySQL';
         const moduleVersion = 2.7;
-        const dependencies = '';
-        const optionalDependencies = 'Memcacher';
+        protected static dependencies = array('Memcacher' => array('required' => false));
         
         private $mysql_link = NULL;
         

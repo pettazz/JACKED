@@ -7,15 +7,13 @@
         
         protected static $moduleName = "Some JACKED Module";
         protected static $moduleVersion = 0;
-        protected static $dependencies = '';
-        protected static $optionalDependencies = '';
+        protected static $dependencies = array();
     
         public function __construct($JACKED){
             $this->config = new Configur($this->getModuleName());
             
             $this->JACKED = $JACKED;
             $this->JACKED->loadDependencies($this::getModuleDependencies());
-            $this->JACKED->loadOptionalDependencies($this::getModuleOptionalDependencies());
         }
         
         public static function getModuleName(){
@@ -26,9 +24,6 @@
         }
         public static function getModuleDependencies(){
             return static::dependencies;
-        }
-        public static function getModuleOptionalDependencies(){
-            return static::optionalDependencies;
         }
         
         

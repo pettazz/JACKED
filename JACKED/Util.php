@@ -3,8 +3,6 @@
     class Util extends JACKEDModule{
         const moduleName = 'Util';
         const moduleVersion = 1.0;
-        const dependencies = '';
-        const optionalDependencies = '';
 
         /**
         * Validates authenticity of an email address

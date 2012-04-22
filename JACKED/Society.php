@@ -3,8 +3,7 @@
     class Society extends JACKEDModule{
         const moduleName = 'Society';
         const moduleVersion = 1.0;
-        const dependencies = 'MySQL, Flock, Sessions';
-        const optionalDependencies = '';
+        protected static dependencies = array('MySQL', 'Flock', 'Sessions');
         
         ///////////////////////////////////
         //              FRIENDSHIP!             //

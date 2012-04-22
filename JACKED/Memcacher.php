@@ -3,8 +3,6 @@
     class Memcacher extends JACKEDModule{
         const moduleName = 'Memcacher';
         const moduleVersion = 1.0;
-        const dependencies = '';
-        const optionalDependencies = '';
         
         private $M;
         

@@ -21,7 +21,7 @@
         protected static $_instance = null;
         public $config;
     
-        public function __construct($required="", $optional=""){
+        public function __construct($dependencies = array()){
             self::$_instance = $this;
             self::$_instance->config = new Configur("core");
             
@@ -29,8 +29,7 @@
             self::$_instance->loadDependencies('Logr, Util');
 
             //load dependencies
-            self::$_instance->loadDependencies($required);
-            self::$_instance->loadOptionalDependencies($optional);
+            self::$_instance->loadDependencies($depenc);
         }
         
         public static function getInstance(){
@@ -41,43 +40,54 @@
             return self::$_instance;
         }
 
-        private function isModuleRegistered($name){
-            return property_exists(self::getInstance(), $name);
+        private function isModuleRegistered($name, $version = false){
+            $instance = self::getInstance();
+            if(property_exists($instance, $name)){
+                if($version){
+                    $module = $instance->$name;
+                    return (float) $module::getModuleVersion() == (float) $version;
+                }else{
+                    return true;
+                }
+            }
         }
         
-        private function registerModule($name){
-            if($name && !self::$_instance->isModuleRegistered($name)){
+        private function registerModule($name, $version = false){
+            if($name && !self::$_instance->isModuleRegistered($name, $version)){
                 self::$_instance->$name = new $name(self::getInstance());
             }
         }
     
         public function loadDependencies($deps){
-            foreach(explode(", ", $deps) as $module){
-                $instance = self::getInstance();
-                if(!$instance->isModuleRegistered($module)){
-                    try{
-                        $instance->registerModule($module);
-                    }catch(Exception $e){
-                        try{
-                            $instance->Logr->write('Required module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
-                        }catch(Exception $ex){}
-                        die('JACKED failed to load required module <strong>' . $module . '</strong>.');
+            $instance = self::getInstance();
+            foreach($deps as $module => $modDetails){
+                //for sanity
+                if(!is_array($modDetails)){
+                    $modDetails = array('version' => false, 'required' => true);
+                }else{
+                    if(!array_key_exists($modDetails, 'version')){
+                        $modDetails['version'] = false;
+                    }
+                    if(!array_key_exists($modDetails, 'required')){
+                        $modDetails['required'] = true;
                     }
                 }
-            }
-        }
-        
-        public function loadOptionalDependencies($mods){
-            foreach(explode(", ", $mods) as $module){
-                $instance = self::getInstance();
-                if(!$instance->isModuleRegistered($module)){
+
+                if(!$instance->isModuleRegistered($module, $modDetails['version'])){
                     try{
-                        $instance->registerModule($module);
-                    }catch(Exception $e){
-                        $instance->$module = new Derper();
-                        try{
-                            $instance->Logr->write('Optional module ' . $module . ' couldn\'t be loaded: ' . $e->getMessage(), 3, $e-getTrace());
-                        }catch(Exception $ex){}
+                        $instance->registerModule($module, $modDetails['version']);
+                    }catch(ModuleLoadException $e){
+                        if($module['required']){
+                            try{
+                                $instance->Logr->write('Required module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
+                            }catch(Exception $ex){}
+                            die('JACKED failed to load required module <strong>' . $module . ' (v' . $modDetails['version'] . ')</strong>.');
+                        }else{
+                            $instance->$module = new Derper();
+                            try{
+                                $instance->Logr->write('Optional module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 3, $e-getTrace());
+                            }catch(Exception $ex){}
+                        }
                     }
                 }
             }
@@ -110,5 +120,10 @@
         public function derp(){
             //here there be a space for testing
         }
+    }
+
+
+    class ModuleLoadException extends Exception{
+        protected $message = 'The requested module could not be loaded.';
     }
 ?>

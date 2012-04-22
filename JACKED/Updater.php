@@ -5,8 +5,7 @@
     class Updater extends JACKEDModule{
         const moduleName = 'Updater';
         const moduleVersion = 1.0;
-        const dependencies = 'MySQL';
-        const optionalDependencies = '';
+        protected static dependencies = array('MySQL');
 
 
         /**

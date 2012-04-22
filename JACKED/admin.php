@@ -3,8 +3,7 @@
     class admin extends JACKEDModule{
         const moduleName = 'admin';
         const moduleVersion = 2.0;
-        const dependencies = 'MySQL, Flock, Sessions';
-        const optionalDependencies = '';
+        protected static dependencies = array('MySQL', 'Flock', 'Sessions');
         
         //Controller for making the admin section do stuff
         

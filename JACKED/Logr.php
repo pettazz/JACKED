@@ -3,8 +3,6 @@
     class Logr extends JACKEDModule{
         const moduleName = 'Logr';
         const moduleVersion = 1.0;
-        const dependencies = '';
-        const optionalDependencies = '';
 
         const LEVEL_FATAL = 4;        
         const LEVEL_SEVERE = 3;
