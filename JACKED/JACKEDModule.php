@@ -23,7 +23,7 @@
             return static::moduleVersion;
         }
         public static function getModuleDependencies(){
-            return static::dependencies;
+            return $dependencies;
         }
         
         
