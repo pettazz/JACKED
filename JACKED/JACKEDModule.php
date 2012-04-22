@@ -14,10 +14,14 @@
             $this->JACKED = $JACKED;
             $this->JACKED->loadDependencies($this::getModuleDependencies());
         }
+
+        public static function getModuleName(){
+            return static::moduleName;
+        }
         
         public static function getModuleDependencies(){
-            if(isset(self::dependencies)){
-                return self::dependencies;
+            if(is_array(static::$dependencies)){
+                return static::$dependencies;
             }else{
                 return array();
             }
