@@ -20,6 +20,10 @@
         public static function getModuleName(){
             return static::moduleName;
         }
+
+        public static function getModuleVersion(){
+            return static::moduleVersion;
+        }
         
         public static function getModuleDependencies(){
             return static::$dependencies;
