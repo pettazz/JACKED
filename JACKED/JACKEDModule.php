@@ -7,6 +7,8 @@
         
         const moduleName = "Some JACKED Module";
         const moduleVersion = 0;
+
+        protected static $dependencies = array();
     
         public function __construct($JACKED){
             $this->config = new Configur($this->getModuleName());
@@ -20,11 +22,7 @@
         }
         
         public static function getModuleDependencies(){
-            if(is_array(static::$dependencies)){
-                return static::$dependencies;
-            }else{
-                return array();
-            }
+            return static::$dependencies;
         }
         
     }
