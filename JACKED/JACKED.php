@@ -70,10 +70,10 @@
                     $module = $modDetails;
                     $modDetails = array('version' => false, 'required' => true);
                 }else{
-                    if(!array_key_exists($modDetails, 'version')){
+                    if(!array_key_exists('version', $modDetails)){
                         $modDetails['version'] = false;
                     }
-                    if(!array_key_exists($modDetails, 'required')){
+                    if(!array_key_exists('required', $modDetails)){
                         $modDetails['required'] = true;
                     }
                 }
