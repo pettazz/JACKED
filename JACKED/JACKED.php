@@ -29,7 +29,7 @@
             self::$_instance->loadDependencies(array('Logr, Util'));
 
             //load dependencies
-            self::$_instance->loadDependencies($depencies);
+            self::$_instance->loadDependencies($dependencies);
         }
         
         public static function getInstance(){
