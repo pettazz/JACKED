@@ -10,7 +10,7 @@
         
         const moduleName = 'Yapp';
         const moduleVersion = 2.0;
-        protected static $dependencies = array('MySQL', 'Sessions');
+        public static $dependencies = array('MySQL', 'Sessions');
         
         public function __construct($JACKED){
             $this->request_method = $_SERVER['REQUEST_METHOD'];

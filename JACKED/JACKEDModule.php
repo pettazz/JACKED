@@ -8,13 +8,13 @@
         const moduleName = "Some JACKED Module";
         const moduleVersion = 0;
 
-        protected static $dependencies = array();
+        public static $dependencies = array();
     
         public function __construct($JACKED){
-            $this->config = new Configur($this->getModuleName());
+            $this->config = new Configur(self::getModuleName());
             
             $this->JACKED = $JACKED;
-            $this->JACKED->loadDependencies($this::getModuleDependencies());
+            $this->JACKED->loadDependencies(self::getModuleDependencies());
         }
 
         public static function getModuleName(){

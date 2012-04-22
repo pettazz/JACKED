@@ -3,7 +3,7 @@
     class Flock extends JACKEDModule{
         const moduleName = 'Flock';
         const moduleVersion = 1.0;
-        protected static $dependencies = array('MySQL', 'Sessions');
+        public static $dependencies = array('MySQL', 'Sessions');
         
         //Flock provides user management functions
         ////manage your flock of sheeple
