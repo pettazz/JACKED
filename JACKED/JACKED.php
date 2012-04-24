@@ -127,9 +127,5 @@
         public function __destruct(){
             self::$_instance = NULL;
         }
-        
-        public function derp(){
-            //here there be a space for testing
-        }
     }
 ?>
