@@ -6,9 +6,8 @@
     
     //test.php
     
-	require('jacked_conf_debug.php');
+	require('jacked_conf.php');
 	$JACKED = new JACKED("Yapp");
-    $JACKED->config->offsetSet('debug', 1);
     echo $JACKED->Yapp->call();
 
     //end test.php
