@@ -83,7 +83,7 @@
                 $one = $this->getMark($name1, $values);
                 $two = $this->getMark($name2, $values);
                 foreach($one as $key => $val){
-                    $retval[$key] = $one[$key] - $two[$key];
+                    $retval[$key] = $two[$key] - $one[$key];
                 }
             }
 
