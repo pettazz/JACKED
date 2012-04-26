@@ -27,7 +27,7 @@
         * @return float The current memory usage (in bytes or requested $scale), or 0 if we can't call memory_get_usage.
         */
         private function getMemoryUsage($rounding = 4, $scale = 0){
-            if($this->$mem_active){
+            if($this->mem_active){
                 $mem = round(memory_get_usage() / (($scale > 0)? 1024 * $scale : 1), $rounding);
             }else{
                 $mem = 0;
