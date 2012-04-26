@@ -11,7 +11,7 @@
 	$JACKED->EYS->setMark('yapp_call');
     echo $JACKED->Yapp->call();
     $JACKED->EYS->setMark('yapp_call_end');
-    $timer = $JACKED->EYS->getDelta('yap_call', 'yapp_call_end');
+    $timer = $JACKED->EYS->getDelta('yapp_call', 'yapp_call_end');
     echo '<br /><br />Yapp call took: ' . print_r($timer) . '<br /><br />';
     //end test.php
 	

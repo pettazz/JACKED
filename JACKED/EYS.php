@@ -82,7 +82,7 @@
             if(array_key_exists($name1, $this->marks) && array_key_exists($name2, $this->marks)){
                 $one = $this->getMark($name1, $values);
                 $two = $this->getMark($name2, $values);
-                foreach($one as $key){
+                foreach($one as $key => $val){
                     $retval[$key] = $one[$key] - $two[$key];
                 }
             }
