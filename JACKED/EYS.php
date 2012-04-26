@@ -56,12 +56,14 @@
         */
         public function getMark($name, $values = false){
             $retval = array();
-            if($values){
-                foreach($values as $key){
-                    $retval[$key] = $this->marks[$name][$key];
+            if(array_key_exists($name, $this->marks)){
+                if($values){
+                    foreach($values as $key){
+                        $retval[$key] = $this->marks[$name][$key];
+                    }
+                }else{
+                    $retval = $this->marks[$name];
                 }
-            }else{
-                $retval = $this->marks[$name];
             }
 
             return $retval;
@@ -77,10 +79,12 @@
         */
         public function getDelta($name1, $name2, $values = false){
             $retval = array();
-            $one = $this->getMark($name1, $values);
-            $two = $this->getMark($name2, $values);
-            foreach($one as $key){
-                $retval[$key] = $one[$key] - $two[$key];
+            if(array_key_exists($name1, $this->marks) && array_key_exists($name2, $this->marks)){
+                $one = $this->getMark($name1, $values);
+                $two = $this->getMark($name2, $values);
+                foreach($one as $key){
+                    $retval[$key] = $one[$key] - $two[$key];
+                }
             }
 
             return $retval;
