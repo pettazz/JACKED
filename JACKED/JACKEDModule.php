@@ -31,7 +31,7 @@
         }
 
 
-        public function subscribeToEvent($event, $callback){
+        public function attachToEvent($event, $callback){
             if(array_key_exists($event, $this->events)){
                 $this->events[$event][] = $callback;
             }else{
