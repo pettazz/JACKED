@@ -3,6 +3,7 @@
     abstract class JACKEDModule{
         public $config;
         protected $JACKED;
+        protected $events = array();
         public $isModuleEnabled = true;
         
         const moduleName = "Some JACKED Module";
@@ -27,6 +28,23 @@
         
         public static function getModuleDependencies(){
             return static::$dependencies;
+        }
+
+
+        public function subscribeToEvent($event, $callback){
+            if(array_key_exists($event, $this->events)){
+                $this->events[$event][] = $callback;
+            }else{
+                $this->events[$event] = array($callback);
+            }
+        }
+
+        public function fireEvent($event, $data = array()){
+            if(array_key_exists($event, $this->events)){
+                foreach($this->events[$event] as $observer){
+                    $observer($data);
+                }
+            }
         }
         
     }
