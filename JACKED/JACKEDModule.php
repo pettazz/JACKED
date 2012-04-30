@@ -16,6 +16,9 @@
             
             $this->JACKED = $JACKED;
             $this->JACKED->loadDependencies(self::getModuleDependencies());
+            $this->JACKED->Logr->write(self::getModuleName() . ' module was successfully loaded.');
+
+            $this->fireEvent('moduleLoaded');
         }
 
         public static function getModuleName(){
@@ -45,6 +48,10 @@
                     $observer($data);
                 }
             }
+        }
+
+        public function __destruct(){
+            $this->fireEvent('moduleUnload');
         }
         
     }
