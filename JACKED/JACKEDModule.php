@@ -16,7 +16,6 @@
             
             $this->JACKED = $JACKED;
             $this->JACKED->loadDependencies(self::getModuleDependencies());
-            $this->JACKED->Logr->write(self::getModuleName() . ' module was successfully loaded.');
 
             $this->fireEvent('moduleLoaded');
         }
