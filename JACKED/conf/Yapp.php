@@ -9,7 +9,7 @@
 	    'key_restrict' => true, 
 	
 	    //array of classes to attach to and provide API interface for
-	    'interface_classes' => array('Society', 'Lookit', 'Flock'),
+	    'interface_classes' => array('Society', 'Lookit'),
 	    //at some point this may include either a whitelist or blacklist for
 	    ////limiting the methods it can use
 	    
