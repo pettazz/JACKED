@@ -5,7 +5,7 @@
     */
     class Updater extends JACKEDModule{
         const moduleName = 'Updater';
-        const moduleVersion = 1.0;
+        const moduleVersion = 0.1;
         public static $dependencies = array('MySQL');
 
 
