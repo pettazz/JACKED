@@ -1,0 +1,2 @@
+
+RewriteRule ^admin/module/([A-Za-z0-9]+)/?$ admin/index.php?manage_module=$1 [QSA]
