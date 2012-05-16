@@ -1,6 +1,6 @@
 
       <footer>
-        <p>&copy; <?php echo $JACKED->config->client_name; ?> 2011</p>
+        <p>&copy; <?php echo $JACKED->config->client_name . ' ' . date('Y'); ?></p>
 
       </footer>
 

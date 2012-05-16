@@ -14,14 +14,11 @@
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.4.0/bootstrap-alerts.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.4.0/bootstrap-modal.js"></script>
     <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.4.0/bootstrap-dropdown.js"></script>
-    <script type="text/javascript" src="http://autobahn.tablesorter.com/jquery.tablesorter.min.js"></script>
     <script type="text/javascript" src="http://fgnass.github.com/spin.js/dist/spin.min.js"></script>
 
     <script type="text/javascript">
         
         $(document).ready(function(){
-            $("table.sorted").tablesorter({ sortList: [[0,0]] });
-            
             $(".alert-message").alert();
         });
     </script>
