@@ -40,9 +40,11 @@
         * Create and save a mark with the given name for use in later comparisons
         * 
         * @param $name String Name of the mark to create
+        * @param $rounding int [optional] Number of decimal places to round memory results to. Defaults to 4.
+        * @param $scale int [optional] Number of times to divide memory bytes by 1024. 1 = KB, 2 = MB, etc. Defaults to 0 (bytes).
         */
-        public function setMark($name){
-            $memory = $this->getMemoryUsage();
+        public function setMark($name, $rounding = 4, $scale = 0){
+            $memory = $this->getMemoryUsage($rounding, $scale);
             $time = microtime(true);
             $this->marks[$name] = array('memory' => $memory, 'time' => $time);
         }
