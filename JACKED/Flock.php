@@ -20,14 +20,8 @@
             if(!$unique){
                 $unique = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
             }
-
             //hashpassword uses bcrypt and is irreversible, so why not?
-            $unique_hash = $this->JACKED->Util=>hashPassword($unique);
-
-            $source = $this->JACKED->MySQL->getRow(
-                $this->config->dbt_sources,
-                'unique = ' . $unique_hash
-            );
+            $unique_hashed = $this->JACKED->Util=>hashPassword($unique);
 
             if($this->checkLogin()){
                 $user = $this->JACKED->Sessions->read("auth.Flock.userid");
@@ -35,16 +29,84 @@
                 $user = NULL;
             }
 
-            if(!$source){
+            $sources = $this->JACKED->MySQL->getRows(
+                $this->config->dbt_sources,
+                'unique = ' . $unique_hash
+            );
+
+            if(!$sources){
+                // $sources has no matches for this unique
+                ////create a new Source, tag it with the user id if there is one
+                $new_guid = $this->JACKED->Util->uuid4();
                 $this->JACKED->MySQL->insert(
                     $this->config->dbt_sources,
                     array(
-                        'guid' => $this->JACKED->Util->uuid4(),
+                        'guid' => $new_guid,
                         'unique' => $unique_hash,
-                        
+                        'User' => $user
                     )
                 );
+                $retval = $new_guid;
+
+            }else if(count($sources) == 1){
+                // $sources has exactly one match for this unique AND
+                if(($user && $sources[0]['user'] == $user) || !$user){
+                    //user is logged in and the single Source is tagged as this user, OR
+                    //user is not logged in
+                    ////return the Source guid
+                    $retval = $sources[0]['guid'];
+                }elseif($user && $sources[0]['user'] != $user){
+                    //user is logged in and the single source is tagged as another user
+                    ////create a new source for this user
+                    $new_guid = $this->JACKED->Util->uuid4();
+                    $this->JACKED->MySQL->insert(
+                        $this->config->dbt_sources,
+                        array(
+                            'guid' => $new_guid,
+                            'unique' => $unique_hash,
+                            'User' => $user
+                        )
+                    );
+                    $retval = $new_guid;
+                }
+            }else{
+                // $sources has more than one match AND
+                if($user){
+                    // user is logged in
+                    ////get the one that matches this user
+                    $user_source = $this->JACKED->MySQL->getRow(
+                        $this->config->dbt_sources,
+                        'unique = ' . $unique_hash . ' AND User = ' . $user
+                    );
+                }else{
+                    // user is not logged in
+                    ////get the one that has no user
+                    $user_source = $this->JACKED->MySQL->getRow(
+                        $this->config->dbt_sources,
+                        'unique = ' . $unique_hash . ' AND User IS NULL'
+                    );
+                }
+                if(!$user_source){
+                    // query returned nothing
+                    ////create a new source for this user
+                    $new_guid = $this->JACKED->Util->uuid4();
+                    $this->JACKED->MySQL->insert(
+                        $this->config->dbt_sources,
+                        array(
+                            'guid' => $new_guid,
+                            'unique' => $unique_hash,
+                            'User' => $user
+                        )
+                    );
+                    $retval = $new_guid;
+                }else{
+                    // query returned a Source
+                    ////return its guid
+                    $retval = $user_source['guid'];
+                }
             }
+
+            return $retval;
         }
         
         /**
