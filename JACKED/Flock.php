@@ -2,13 +2,50 @@
 
     class Flock extends JACKEDModule{
         const moduleName = 'Flock';
-        const moduleVersion = 1.0;
+        const moduleVersion = 1.1;
         public static $dependencies = array('MySQL', 'Sessions');
         
         //Flock provides user management functions
         ////manage your flock of sheeple
         
-        //login session management
+        /**
+         * Get or generate the Source UUID for a user. If the user is logged in as well, tag this new Source
+         * with the user id.
+         *
+         * @param string $unique [optional] If a UDID or MAC or other uniquely identifying id is accessible,
+         * this should be passed in here. Defaults to the remote IP + UserAgent.
+         * @return string GUID for this Source.
+         */
+        public function getSource($unique = false){
+            if(!$unique){
+                $unique = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
+            }
+
+            //hashpassword uses bcrypt and is irreversible, so why not?
+            $unique_hash = $this->JACKED->Util=>hashPassword($unique);
+
+            $source = $this->JACKED->MySQL->getRow(
+                $this->config->dbt_sources,
+                'unique = ' . $unique_hash
+            );
+
+            if($this->checkLogin()){
+                $user = $this->JACKED->Sessions->read("auth.Flock.userid");
+            }else{
+                $user = NULL;
+            }
+
+            if(!$source){
+                $this->JACKED->MySQL->insert(
+                    $this->config->dbt_sources,
+                    array(
+                        'guid' => $this->JACKED->Util->uuid4(),
+                        'unique' => $unique_hash,
+                        
+                    )
+                );
+            }
+        }
         
         /**
          * Login the given user with the given password.
@@ -58,6 +95,7 @@
          * @throws IncorrectPasswordException if the given password does not match the username's login
          * @return boolean Whether the user is now logged in successfully
          */
+        /* this was probably a bad idea to begin with. 
         public function hashedLogin($username, $hpassword){
             $username = $this->JACKED->MySQL->sanitize($username);
 
@@ -82,7 +120,7 @@
             }else{
                 throw new UserNotFoundException();
             }
-        }
+        }*/
         
         /**
          * Checks the current session to see if a user is logged in
