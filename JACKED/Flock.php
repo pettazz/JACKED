@@ -108,6 +108,22 @@
 
             return $retval;
         }
+
+        /**
+         * Tag an anonymous Source with a User id
+         *
+         * @param string $source The guid of the Source to tag
+         * @param string $user The guid of the User to tag the Source as
+         * @return boolean Whether the tagging was successful
+         */
+        private function tagSource($source, $user){
+            return $this->JACKED->MySQL->update(
+                $this->config->dbt_sources,
+                array('User' => $user),
+                'guid = ' . $source
+            );
+        }
+
         
         /**
          * Login the given user with the given password.
