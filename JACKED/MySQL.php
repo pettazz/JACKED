@@ -233,6 +233,45 @@
         }
         
         /**
+        * Get all rows of specific values from given MySQL fields that match a condition. 
+        * SELECT @$fields FROM @$table WHERE $@cond
+        * 
+        * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
+        * @param $table string Table name to search
+        * @param $cond string Condition to use for query: "WHERE @$cond"
+        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
+        * @return Array Result data from @$fields matching @$cond
+        */
+        public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL, $use_memcache = true){
+            $table = $this->sanitize($table);
+            $cond = $cond;
+            if(is_array($fields)){
+                $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM `" . $table . "` WHERE " . $cond;
+            }else{
+                $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
+            }
+            $result = $this->mysqlQuery($query, $link, $use_memcache);
+
+            if($result && mysql_num_rows($result) == 1){
+                $row = mysql_fetch_array($result, $result_type);
+                $final = array(0 => array_map("stripslashes", $row));
+                mysql_free_result($result);
+            }else if($result && mysql_num_rows($result) > 1){
+                $final = array();
+                while($row = mysql_fetch_array($result, $result_type)){
+                    $final[] = array_map("stripslashes", $row);
+                }
+                mysql_free_result($result);
+            }else{
+                $final = false;
+            }
+            
+            return $final;
+        }
+        
+        /**
         * Get an entire row from the given table matching the given cond. If the condition matches more than one row, 
         * returns the first in retrieved data.
         * SELECT * FROM @$table WHERE $@cond LIMIT 1
@@ -285,46 +324,6 @@
                 $final = array();
                 while($row = mysql_fetch_array($result, $result_type)){
                     $final[] = $row;
-                }
-                mysql_free_result($result);
-            }else{
-                $final = false;
-            }
-            
-            return $final;
-        }
-        
-        
-        /**
-        * Get all values from given MySQL fields that match a condition. 
-        * SELECT @$fields FROM @$table WHERE $@cond
-        * 
-        * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
-        * @param $table string Table name to search
-        * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
-        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
-        * @return Array Result data from @$fields matching @$cond
-        */
-        public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL, $use_memcache = true){
-            $table = $this->sanitize($table);
-            $cond = $cond;
-            if(is_array($fields)){
-                $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM `" . $table . "` WHERE " . $cond;
-            }else{
-                $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
-            }
-            $result = $this->mysqlQuery($query, $link, $use_memcache);
-
-            if($result && mysql_num_rows($result) == 1){
-                $row = mysql_fetch_array($result, $result_type);
-                $final = array(0 => array_map("stripslashes", $row));
-                mysql_free_result($result);
-            }else if($result && mysql_num_rows($result) > 1){
-                $final = array();
-                while($row = mysql_fetch_array($result, $result_type)){
-                    $final[] = array_map("stripslashes", $row);
                 }
                 mysql_free_result($result);
             }else{
