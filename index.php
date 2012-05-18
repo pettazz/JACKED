@@ -18,5 +18,5 @@
 	
 	echo '</pre>';
 	$runtime = microtime(true) - $start;
-	echo '<h4>processed in ' . $runtime . ' seconds</h4></body></html>';
+	echo '<h4>processed in ' . ($runtime * 1000) . ' ms</h4></body></html>';
 ?>
