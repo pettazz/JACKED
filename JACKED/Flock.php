@@ -335,7 +335,7 @@
         /**
          * Update an existing user with the given details
          *
-         * @param $userguid int User GUID to change
+         * @param $userguid string User GUID to change
          * @param $details array Associative array of user details
          * @throws UserNotFoundException if the user is not found
          * @return boolean Whether the update was successful
@@ -352,7 +352,7 @@
         /**
          * Update an existing user's username with the given details
          *
-         * @param $userguid int User GUID to change
+         * @param $userguid string User GUID to change
          * @param $username String New username
          * @throws ExistingUserException if the new username already exists
          * @return boolean Whether the update was successful
@@ -379,7 +379,7 @@
         /**
          * Update an existing user's username with the given details
          *
-         * @param $userguid int User ID to change
+         * @param $userguid string User ID to change
          * @param $password String New password
          * @return boolean Whether the update was successful
          */
