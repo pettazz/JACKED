@@ -4,7 +4,7 @@
     
         'locations' => array(
 
-            'file' => '/var/log/JACKED.log',
+            'file' => '/var/log/JACKED/JACKED.log',
             'MySQL' => 'Logr'
 
         )
