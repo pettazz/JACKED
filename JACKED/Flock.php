@@ -145,7 +145,7 @@
                     array('User' => $user),
                     'guid = ' . $source
                 ) &&
-                $this->JACKED->Sessions->write('Flock.Source.user', $user);
+                $this->JACKED->Sessions->write('Flock.Source.user', $user)
             );
         }
 
