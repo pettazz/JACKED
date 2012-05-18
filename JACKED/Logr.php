@@ -51,7 +51,7 @@
                             if(file_exists($data)){
                                 $opened_date = date('Ymd', filemtime($data));
                                 if(date('Ymd') != $opened_date){
-                                    rename($data, $data . $opened_date . '.log');
+                                    rename($data, $data . '.' . $opened_date . '.log');
                                 }
                             }
 
