@@ -48,6 +48,13 @@
                 switch($loc){
                     case 'file':
                         try{
+                            if(file_exists($data)){
+                                $opened_date = date('Ymd', filemtime($data));
+                                if(date('Ymd') != $opened_date){
+                                    rename($data, $data . $opened_date . '.log');
+                                }
+                            }
+
                             $this->logfp = fopen($data, 'a');
                             if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
                                 $this->lognl = "\r\n";
