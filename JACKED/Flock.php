@@ -17,96 +17,118 @@
          * @return string GUID for this Source.
          */
         public function getSource($unique = false){
-            if(!$unique){
-                $unique = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
-            }
-            //hashpassword uses bcrypt and is irreversible, so why not?
-            $unique_hashed = $this->JACKED->Util=>hashPassword($unique);
-
-            if($this->checkLogin()){
-                $user = $this->JACKED->Sessions->read("auth.Flock.userid");
+            if($this->JACKED->Sessions->check('Flock.Source')){
+                return $this->JACKED->Sessions->read('Flock.Source.guid');
             }else{
-                $user = NULL;
-            }
+                if(!$unique){
+                    $unique = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
+                }
+                //hashpassword uses bcrypt and is irreversible, so why not?
+                $unique_hashed = $this->JACKED->Util=>hashPassword($unique);
 
-            $sources = $this->JACKED->MySQL->getRows(
-                $this->config->dbt_sources,
-                'unique = ' . $unique_hash
-            );
+                if($this->checkLogin()){
+                    $user = $this->JACKED->Sessions->read("auth.Flock.userid");
+                }else{
+                    $user = NULL;
+                }
 
-            if(!$sources){
-                // $sources has no matches for this unique
-                ////create a new Source, tag it with the user id if there is one
-                $new_guid = $this->JACKED->Util->uuid4();
-                $this->JACKED->MySQL->insert(
+                $sources = $this->JACKED->MySQL->getRows(
                     $this->config->dbt_sources,
-                    array(
+                    'unique = ' . $unique_hash
+                );
+
+                if(!$sources){
+                    // $sources has no matches for this unique
+                    ////create a new Source, tag it with the user id if there is one
+                    $new_guid = $this->JACKED->Util->uuid4();
+                    $this->JACKED->MySQL->insert(
+                        $this->config->dbt_sources,
+                        array(
+                            'guid' => $new_guid,
+                            'unique' => $unique_hash,
+                            'User' => $user
+                        )
+                    );
+                    $this->JACKED->Sessions->write('Flock.Source', array(
                         'guid' => $new_guid,
                         'unique' => $unique_hash,
                         'User' => $user
-                    )
-                );
-                $retval = $new_guid;
+                    ));
+                    $retval = $new_guid;
 
-            }else if(count($sources) == 1){
-                // $sources has exactly one match for this unique AND
-                if(($user && $sources[0]['user'] == $user) || !$user){
-                    //user is logged in and the single Source is tagged as this user, OR
-                    //user is not logged in
-                    ////return the Source guid
-                    $retval = $sources[0]['guid'];
-                }elseif($user && $sources[0]['user'] != $user){
-                    //user is logged in and the single source is tagged as another user
-                    ////create a new source for this user
-                    $new_guid = $this->JACKED->Util->uuid4();
-                    $this->JACKED->MySQL->insert(
-                        $this->config->dbt_sources,
-                        array(
+                }else if(count($sources) == 1){
+                    // $sources has exactly one match for this unique AND
+                    if(($user && $sources[0]['user'] == $user) || !$user){
+                        //user is logged in and the single Source is tagged as this user, OR
+                        //user is not logged in
+                        ////return the Source guid
+                        $retval = $sources[0]['guid'];
+                        $this->JACKED->Sessions->write('Flock.Source', $sources[0]);
+                    }elseif($user && $sources[0]['user'] != $user){
+                        //user is logged in and the single source is tagged as another user
+                        ////create a new source for this user
+                        $new_guid = $this->JACKED->Util->uuid4();
+                        $this->JACKED->MySQL->insert(
+                            $this->config->dbt_sources,
+                            array(
+                                'guid' => $new_guid,
+                                'unique' => $unique_hash,
+                                'User' => $user
+                            )
+                        );
+                        $this->JACKED->Sessions->write('Flock.Source', array(
                             'guid' => $new_guid,
                             'unique' => $unique_hash,
                             'User' => $user
-                        )
-                    );
-                    $retval = $new_guid;
-                }
-            }else{
-                // $sources has more than one match AND
-                if($user){
-                    // user is logged in
-                    ////get the one that matches this user
-                    $user_source = $this->JACKED->MySQL->getRow(
-                        $this->config->dbt_sources,
-                        'unique = ' . $unique_hash . ' AND User = ' . $user
-                    );
+                        ));
+                        $retval = $new_guid;
+                    }
                 }else{
-                    // user is not logged in
-                    ////get the one that has no user
-                    $user_source = $this->JACKED->MySQL->getRow(
-                        $this->config->dbt_sources,
-                        'unique = ' . $unique_hash . ' AND User IS NULL'
-                    );
-                }
-                if(!$user_source){
-                    // query returned nothing
-                    ////create a new source for this user
-                    $new_guid = $this->JACKED->Util->uuid4();
-                    $this->JACKED->MySQL->insert(
-                        $this->config->dbt_sources,
-                        array(
+                    // $sources has more than one match AND
+                    if($user){
+                        // user is logged in
+                        ////get the one that matches this user
+                        $user_source = $this->JACKED->MySQL->getRow(
+                            $this->config->dbt_sources,
+                            'unique = ' . $unique_hash . ' AND User = ' . $user
+                        );
+                    }else{
+                        // user is not logged in
+                        ////get the one that has no user
+                        $user_source = $this->JACKED->MySQL->getRow(
+                            $this->config->dbt_sources,
+                            'unique = ' . $unique_hash . ' AND User IS NULL'
+                        );
+                    }
+                    if(!$user_source){
+                        // query returned nothing
+                        ////create a new source for this user
+                        $new_guid = $this->JACKED->Util->uuid4();
+                        $this->JACKED->MySQL->insert(
+                            $this->config->dbt_sources,
+                            array(
+                                'guid' => $new_guid,
+                                'unique' => $unique_hash,
+                                'User' => $user
+                            )
+                        );
+                        $this->JACKED->Sessions->write('Flock.Source', array(
                             'guid' => $new_guid,
                             'unique' => $unique_hash,
                             'User' => $user
-                        )
-                    );
-                    $retval = $new_guid;
-                }else{
-                    // query returned a Source
-                    ////return its guid
-                    $retval = $user_source['guid'];
+                        ));
+                        $retval = $new_guid;
+                    }else{
+                        // query returned a Source
+                        ////return its guid
+                        $retval = $user_source['guid'];
+
+                        $this->JACKED->Sessions->write('Flock.Source', $user_source);
+                    }
                 }
+
+                return $retval;
             }
-
-            return $retval;
         }
 
         /**
@@ -117,10 +139,13 @@
          * @return boolean Whether the tagging was successful
          */
         private function tagSource($source, $user){
-            return $this->JACKED->MySQL->update(
-                $this->config->dbt_sources,
-                array('User' => $user),
-                'guid = ' . $source
+            return (
+                $this->JACKED->MySQL->update(
+                    $this->config->dbt_sources,
+                    array('User' => $user),
+                    'guid = ' . $source
+                ) &&
+                $this->JACKED->Sessions->write('Flock.Source.user', $user);
             );
         }
 
@@ -153,6 +178,9 @@
                         'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']),
                         'hash' => $hash
                     ));
+                    if($this->JACKED->Sessions->check('Flock.Source') && $this->JACKED->Sessions->check('Flock.Source.user') != $userID){
+                        $this->tagSource($this->JACKED->Sessions->read('Flock.Source.guid'), $userID);
+                    }
                     return true;
                 }else{
                     throw new IncorrectPasswordException();
@@ -250,6 +278,7 @@
                     'userid'   => NULL,
                     'sessionID' => NULL
                 ));
+                $this->JACKED->Sessions->delete("Flock.Source");
                 return true;
             }else{
                 throw new NotLoggedInException();
