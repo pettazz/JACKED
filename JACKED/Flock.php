@@ -164,10 +164,10 @@
         public function login($username, $password){
             $username = $this->JACKED->MySQL->sanitize($username);
 
-            $vals = $this->JACKED->MySQL->getAll('id, password', $this->config->dbt_users, "email='$username'");
+            $vals = $this->JACKED->MySQL->getAll('guid, password', $this->config->dbt_users, "email='$username'");
             
             if($vals['password']){
-                $userID = $vals['id'];
+                $userID = $vals['guid'];
                 $hash = $this->JACKED->Util->checkPassword($password, $vals['password'], true);
                 if($hash){
                     $this->JACKED->Sessions->write("auth.Flock", array(
@@ -300,8 +300,9 @@
             if($this->JACKED->MySQL->get('email', $this->config->dbt_users, "email='" . $username. "'")){
                 throw new ExistingUserException();
             }
+            $guid = $this->JACKED->Util->uuid4();
             $details = array_merge($details, array(
-                'email' => $username, 'password' => $this->JACKED->hashPassword($password)
+                'guid' => $guid, 'email' => $username, 'password' => $this->JACKED->hashPassword($password)
             ));
             return $this->JACKED->MySQL->insert($this->config->dbt_users, $details);
         }
@@ -315,8 +316,8 @@
          * @return boolean Whether the update was successful
          */
         public function updateUser($username, $details=array()){
-            $id = $this->JACKED->MySQL->get('id', $this->config->dbt_users,  "email='" . $username. "'");
-            if(!$id){
+            $guid = $this->JACKED->MySQL->get('guid', $this->config->dbt_users,  "email='" . $username. "'");
+            if(!$guid){
                 throw new UserNotFoundException();
             }
             if(array_key_exists('email', $details)){ 
@@ -325,38 +326,38 @@
             if(array_key_exists('password', $details)){ 
                 unset($details['password']);
             }
-            if(array_key_exists('id', $details)){ 
-                unset($details['id']);
+            if(array_key_exists('guid', $details)){ 
+                unset($details['guid']);
             }
-            return $this->JACKED->MySQL->update($this->config->dbt_users, $details, 'id=' . $id);
+            return $this->JACKED->MySQL->update($this->config->dbt_users, $details, 'guid=' . $guid);
         }
         
         /**
          * Update an existing user with the given details
          *
-         * @param $userid int User ID to change
+         * @param $userguid int User GUID to change
          * @param $details array Associative array of user details
          * @throws UserNotFoundException if the user is not found
          * @return boolean Whether the update was successful
          */
-        public function updateUserByID($userid, $details=array()){
-            if(!$this->JACKED->MySQL->get('id', $this->config->dbt_users, 'id=' . $userid)){
+        public function updateUserByGUID($userguid, $details=array()){
+            if(!$this->JACKED->MySQL->get('id', $this->config->dbt_users, 'guid=' . $userguid)){
                 throw new UserNotFoundException();
             }
             
             $details['email'] = $username;
-            return $this->JACKED->MySQL->update($this->config->dbt_users, $details, 'id=' . $id);
+            return $this->JACKED->MySQL->update($this->config->dbt_users, $details, 'guid=' . $guid);
         }
         
         /**
          * Update an existing user's username with the given details
          *
-         * @param $userid int User ID to change
+         * @param $userguid int User GUID to change
          * @param $username String New username
          * @throws ExistingUserException if the new username already exists
          * @return boolean Whether the update was successful
          */
-        public function updateUserEmail($userid, $email){
+        public function updateUserEmail($userguid, $email){
            try{
                 $this->getUser($email);
                 throw new ExistingUserException();
@@ -367,7 +368,7 @@
                         array(
                             'email' => $email
                         ),
-                        'id = ' . $userid
+                        'guid = ' . $userguid
                     ) &&
                     $this->JACKED->Sessions->write("auth.Flock.username", $email) &&
                     $this->JACKED->Sessions->write("auth.Flock.email", $email)
@@ -378,18 +379,18 @@
         /**
          * Update an existing user's username with the given details
          *
-         * @param $userid int User ID to change
+         * @param $userguid int User ID to change
          * @param $password String New password
          * @return boolean Whether the update was successful
          */
-        public function updateUserPassword($userid, $password){
+        public function updateUserPassword($userguid, $password){
             //this would be a good place to check things like mininum password security stuff
             return $emailDone = $this->JACKED->MySQL->update(
                 $this->config->dbt_users,
                 array(
                     'password' => $this->JACKED->hashPassword($password)
                 ),
-                'id = ' . $userid
+                'guid = ' . $userguid
             );
         }
         
@@ -401,29 +402,29 @@
          * @return array Associative array of all the details of the user details
          */
         public function getUser($username){
-            $id = $this->JACKED->MySQL->get('id', $this->config->dbt_users,  "email='" . $username. "'");
-            if(!$id){
+            $guid = $this->JACKED->MySQL->get('guid', $this->config->dbt_users,  "email='" . $username. "'");
+            if(!$guid){
                 throw new UserNotFoundException();
             }
             
-            $done = $this->JACKED->MySQL->getRow($this->config->dbt_users, 'id=' . $id);
+            $done = $this->JACKED->MySQL->getRow($this->config->dbt_users, 'guid=' . $guid);
             unset($done['password']);
             return $done;
         }
         
         /**
-         * Gets user details for a given user id
+         * Gets user details for a given user guid
          *
-         * @param $userid int User ID to get details for
+         * @param $userguid string User GUID to get details for
          * @throws UserNotFoundException if the user is not found
          * @return array Associative array of all the details of the user details
          */
-        public function getUserByID($userid){
-            if(!$this->JACKED->MySQL->get('id', $this->config->dbt_users, 'id=' . $userid)){
+        public function getUserByGUID($userguid){
+            if(!$this->JACKED->MySQL->get('guid', $this->config->dbt_users, 'guid=' . $userguid)){
                 throw new UserNotFoundException();
             }
             
-            $done = $this->JACKED->MySQL->getRow($this->config->dbt_users, 'id=' . $userid);
+            $done = $this->JACKED->MySQL->getRow($this->config->dbt_users, 'guid=' . $userguid);
             unset($done['password']);
             return $done;
         }
@@ -436,27 +437,27 @@
          * @return boolean Whether the delete worked
          */
         public function deleteUser($username){
-            $id = $this->JACKED->MySQL->get('id', $this->config->dbt_users,  "email='" . $username. "'");
-            if(!$id){
+            $guid = $this->JACKED->MySQL->get('guid', $this->config->dbt_users,  "email='" . $username. "'");
+            if(!$guid){
                 throw new UserNotFoundException();
             }
             
-            return $this->JACKED->MySQL->delete($this->config->dbt_users, 'id=' . $id);
+            return $this->JACKED->MySQL->delete($this->config->dbt_users, 'guid=' . $guid);
         }
         
         /**
-         * Deletes the given user by id
+         * Deletes the given user by guid
          *
-         * @param $userid int The user to delete
+         * @param $userguid string The GUID of the user to delete
          * @throws UserNotFoundException if the user is not found
          * @return boolean Whether the delete worked
          */
-        public function deleteUserByID($userid){
-            if(!$this->JACKED->MySQL->get('id', $this->config->dbt_users, 'id=' . $userid)){
+        public function deleteUserByGUID($userguid){
+            if(!$this->JACKED->MySQL->get('guid', $this->config->dbt_users, 'guid=' . $userguid)){
                 throw new UserNotFoundException();
             }
             
-            return $this->JACKED->MySQL->delete($this->config->dbt_users, 'id=' . $userid);
+            return $this->JACKED->MySQL->delete($this->config->dbt_users, 'guid=' . $userguid);
         }
         
     }
