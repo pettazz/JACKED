@@ -164,6 +164,7 @@
                     $key = md5($query);
                     $value = $this->JACKED->Memcacher->get($key);
                     if($value){
+                        $this->JACKED->Logr->write("Memcached hit $key; Returned cached value.", Logr::LEVEL_NOTICE, NULL, 'MySQL');
                         return $value;
                     }
                 }
@@ -173,6 +174,7 @@
             $value = mysql_query($query, $link);
             if($this->config->use_memcache && $use_memcache){
                 $key = md5($query);
+                $this->JACKED->Logr->write("Memcached miss $key; Stored.", Logr::LEVEL_NOTICE, NULL, 'MySQL');
                 $this->JACKED->Memcacher->set($key, $value);
             }
 
