@@ -237,7 +237,7 @@
                 $result = $result[0][0];
             }
             
-            return $final;
+            return $result;
         }
         
         /**
