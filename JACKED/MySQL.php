@@ -312,7 +312,7 @@
         * @return Array Array of rows from @$field matching @$cond
         */
         public function getRows($table, $cond = NULL, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
-            $cond = $cond? $this->sanitixe($cond) : '1';
+            $cond = $cond? $this->sanitize($cond) : '1';
             $query = "SELECT * FROM `" . $this->sanitize($table) . "` WHERE " . $cond;
             $result = $this->mysqlQuery($query, $link, $use_memcache);
             
