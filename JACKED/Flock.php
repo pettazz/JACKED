@@ -39,7 +39,7 @@
 
                 $sources = $this->JACKED->MySQL->getRows(
                     $this->config->dbt_sources,
-                    'unique = "' . $unique_hash . '"'
+                    'unique = ' . $unique_hash
                 );
 
                 if(!$sources){
