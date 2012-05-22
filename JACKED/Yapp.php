@@ -39,6 +39,7 @@
             return json_encode(array("done" => False, "message" => $exception->getMessage()));
         }
         
+        //replace these with the new JACKED module events
         private function execPreCallHooks($methodname, &$args){
             if(array_key_exists($methodname, $this->config->interface_pre_hooks)){
                 call_user_func_array($this->config->interface_pre_hooks[$methodname], array($this->JACKED, &$args));
@@ -55,25 +56,25 @@
         //////////////////////////////////////////////////////
         //public api-related
         public function getMyUUID(){
-            return $this->JACKED->Sessions->read("user.Source.uuid");
+            return $this->JACKED->Flock->getUnique();
         }
         
         public function getMySourceID(){
-            return $this->JACKED->Sessions->read("user.Source.id");
+            return $this->JACKED->Flock->getSourceGUID();
         }
         
         public function getMyApplicationInfo(){
-            return $this->JACKED->Sessions->read("user.Application");
+            return $this->JACKED->Flock->getApplication();
         }
         
         public function isDevice(){
-            return (bool) $this->JACKED->Sessions->read("user.Application.device");
+            return $this->JACKED->Flock->isDevice();
         }
         
         public function getMyApplicationID(){
-            return $this->JACKED->Sessions->read("user.Application.id");
+            return $this->JACKED->Flock->getApplicationGUID();
         }
-        
+        /*
         public function updateSourceUser($userid){
             //if($this->isDevice()){
                 return $this->JACKED->MySQL->update(
@@ -85,62 +86,29 @@
                     "id = '" . $this->getMySourceID() . "'"
                 );
             //}
-        }
+        }*/
         
         //start a new API session for the given APIKey and UUID
         ////returns the new API session id if it all works, 
         ////or an Exception
         public function open($apiKey, $uuid = null){
-            //validate the API key, set up the Source, blah blah
-            $approw = $this->JACKED->MySQL->getRow($this->config->db_apps, "`apiKey` = '$apiKey'", MYSQL_ASSOC);
-            if($approw){
-                ////check if this application type requires a uuid or we're supplying that based on ip
-                if($approw['device'] == 1){
-                    if(!$uuid){
-                        throw new NoUUIDForDeviceException();
-                    }
-                }else{
-                    $uuid = $_SERVER['REMOTE_ADDR'];
-                }
-                
-                /////////// !!!
-                //ONLY SOURCE IS CHECKED HERE, TWO APPS ON THE SAME IP/UUID WOULD BE CONSIDERED THE SAME SOURCE
-                ///////////////////////////////////////////////////////////////////////////////////////////////////
-                $sourcedb = $this->JACKED->MySQL->getRow($this->config->db_sources, "`uuid` = '" . trim($uuid) . "'", MYSQL_ASSOC);
-                if($sourcedb){
-                    //already have a source
-                    $source = array("id" => $sourcedb['id'], "uuid" => $sourcedb['uuid'], "user_id" => $sourcedb["user_id"]);
-                }else{
-                    //need to create a new source for this guy
-                    $source = array("id" => '', "uuid" => $uuid, "Application" => $approw['id']);
-                    $newID = $this->JACKED->MySQL->insert($this->config->db_sources, $source);
-                    if($newID){
-                        $source['id'] = $newID;
-                        $source['Application'] = null;
-                        $source['user_id'] = null;
-                    }else{
-                        throw new Exception('Couldn\'t create this as a new Source.');
-                    }
-                }
-                            
-                //write all this into the session            
-                $this->JACKED->Sessions->write("user.Source", $source);
-                $this->JACKED->Sessions->write("user.Application", $approw);
-                $this->JACKED->Sessions->write("auth.API", md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']));
-                
-            }else{
+            $app = $this->JACKED->Flock->getApplicatonByAPIKey($apiKey);
+            if(!$app){
                 throw new APIKeyNotFoundException();
+            }else if($app['device'] == 1 && !$uuid){
+                throw new NoUUIDForDeviceException();
             }
-    
+            $source = $this->JACKED->Flock->getSource($uuid, $app['guid']);
+                
+            $this->JACKED->Sessions->write("auth.API", md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']));
+            
             return session_id();
         }
         
         //KILL IT ALL WITH FIRE
         public function close(){
-        
-            $this->JACKED->Sessions->write("user", array());
             $this->JACKED->Sessions->write("auth.API", array());
-            
+            $this->JACKED->Sessions->delete("auth.API");
         }
         
         //boolean: is an API session currently active for me? Here is my session id. HALP?
@@ -170,6 +138,8 @@
         //    NOTIFICATIONS  //
                         ///////
         
+        //this should be better too
+
         //gets any visible notifications
         public function getNotifications(){
             $this->trimNotifications();
@@ -225,20 +195,6 @@
                 if(!$api_authorized){
                     throw new APIRestrictedException();
                 }
-                //only authenticated sessions allowed from here on
-                
-                /* This is the call-a-proxy-method method. Reflection can do better for us.
-                    Keeping this in case we need it later
-                
-                    //check if the action exists as a public method of the class we're using as the interface
-                    $classname = $this->config->interface_class;
-                    $methodname = "API_" . $_REQUEST['action'];
-                    if(method_exists($this->JACKED->$classname, $methodname)){
-                        return $this->success($this->JACKED->$classname->$methodname($_REQUEST));
-                    }else{
-                        throw new APIActionNotRecognizedException();
-                    }
-                */
 
                 if(array_key_exists('action', $_REQUEST))
                     $methodname = $_REQUEST['action'];
