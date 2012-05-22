@@ -29,7 +29,7 @@
                     $unique = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
                 }
                 //hashpassword uses bcrypt and is irreversible, so why not?
-                $unique_hashed = $this->JACKED->Util->hashPassword($unique);
+                $unique_hash = $this->JACKED->Util->hashPassword($unique);
 
                 if($this->checkLogin()){
                     $user = $this->JACKED->Sessions->read("auth.Flock.userid");
