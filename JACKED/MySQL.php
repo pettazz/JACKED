@@ -279,7 +279,8 @@
             $cond = $cond;
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
             
-            return $this->mysqlQuery($query, $link, $use_memcache);
+            $result = $this->mysqlQuery($query, $link, $use_memcache);
+            return $result[0];
         }
         
         /**
