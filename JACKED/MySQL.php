@@ -174,6 +174,8 @@
             $result = mysql_query($query, $link);
             if($result === true){
                 $value = true;
+            }else if($result === false){
+                $value = false;
             }else if(mysql_num_rows($result) > 0){
                 $value = array();
                 while($row = mysql_fetch_array($result, MYSQL_BOTH)){
