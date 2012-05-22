@@ -153,7 +153,7 @@
         * @param $query String query to perform
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
-        * @return MySQL Result Identifier for @$query result
+        * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
         private function mysqlQuery($query, $link = NULL, $use_memcache = false){
             if($this->config->use_memcache && $use_memcache){
@@ -171,7 +171,18 @@
             }
             $link = $link? $link : $this->getLink();
             $this->JACKED->Logr->write($query, Logr::LEVEL_NOTICE, NULL, 'MySQL');
-            $value = mysql_query($query, $link);
+            $result = mysql_query($query, $link);
+            if($result === true){
+                $value = true;
+            }else if(mysql_num_rows($result) > 0){
+                $value = array();
+                while($row = mysql_fetch_array($result, MYSQL_BOTH)){
+                    $value[] = array_map("stripslashes", $row);
+                }
+            }else{
+                $value = false;
+            }
+            mysql_free_result($result);
             if($this->config->use_memcache && $use_memcache){
                 $key = md5($query);
                 $this->JACKED->Logr->write("Memcached miss $key; Stored.", Logr::LEVEL_NOTICE, NULL, 'MySQL');
@@ -191,7 +202,7 @@
         * @param $query String query to perform
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
-        * @return MySQL Result Identifier for @$query result
+        * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
         public function query($query, $link = NULL, $use_memcache = false){
             $query = $this->sanitize($query);
@@ -222,13 +233,8 @@
             if($cond)
                 $query .= " WHERE " . $cond;
             $result = $this->mysqlQuery($query, $link, $use_memcache);
-            
-            if($result && mysql_num_rows($result) > 0){
-                $row = mysql_fetch_array($result, MYSQL_NUM);
-                $final = stripslashes($row[0]);
-                mysql_free_result($result);
-            }else{
-                $final = false;
+            if($result){
+                $result = $result[0][0];
             }
             
             return $final;
@@ -241,12 +247,11 @@
         * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
         * @param $table string Table name to search
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields matching @$cond
         */
-        public function getAll($fields, $table, $cond, $result_type = MYSQL_ASSOC, $link = NULL, $use_memcache = true){
+        public function getAll($fields, $table, $cond, $link = NULL, $use_memcache = true){
             $table = $this->sanitize($table);
             $cond = $cond;
             if(is_array($fields)){
@@ -254,23 +259,8 @@
             }else{
                 $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
             }
-            $result = $this->mysqlQuery($query, $link, $use_memcache);
 
-            if($result && mysql_num_rows($result) == 1){
-                $row = mysql_fetch_array($result, $result_type);
-                $final = array(0 => array_map("stripslashes", $row));
-                mysql_free_result($result);
-            }else if($result && mysql_num_rows($result) > 1){
-                $final = array();
-                while($row = mysql_fetch_array($result, $result_type)){
-                    $final[] = array_map("stripslashes", $row);
-                }
-                mysql_free_result($result);
-            }else{
-                $final = false;
-            }
-            
-            return $final;
+            return $this->mysqlQuery($query, $link, $use_memcache);
         }
         
         /**
@@ -280,26 +270,16 @@
         * 
         * @param $table string Table name to search
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$field matching @$cond
         */
-        public function getRow($table, $cond, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
+        public function getRow($table, $cond, $link = NULL, $use_memcache = true){
             $table = $this->sanitize($table);
             $cond = $cond;
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
-            $result = $this->mysqlQuery($query, $link, $use_memcache);
             
-            if($result && mysql_num_rows($result) > 0){
-                $row = mysql_fetch_array($result, $result_type);
-                $final = array_map("stripslashes", $row);
-                mysql_free_result($result);
-            }else{
-                $final = false;
-            }
-            
-            return $final;
+            return $this->mysqlQuery($query, $link, $use_memcache);
         }
         
         /**
@@ -308,31 +288,15 @@
         * 
         * @param $table string Table name to search
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Array of rows from @$field matching @$cond
         */
-        public function getRows($table, $cond = NULL, $result_type = MYSQL_BOTH, $link = NULL, $use_memcache = true){
+        public function getRows($table, $cond = NULL, $link = NULL, $use_memcache = true){
             $cond = $cond? $this->sanitize($cond) : '1';
             $query = "SELECT * FROM `" . $this->sanitize($table) . "` WHERE " . $cond;
-            $result = $this->mysqlQuery($query, $link, $use_memcache);
-            
-            if($result && mysql_num_rows($result) == 1){
-                $row = mysql_fetch_array($result, $result_type);
-                $final = array(0 => array_map("stripslashes", $row));
-                mysql_free_result($result);
-            }else if($result && mysql_num_rows($result) > 1){
-                $final = array();
-                while($row = mysql_fetch_array($result, $result_type)){
-                    $final[] = $row;
-                }
-                mysql_free_result($result);
-            }else{
-                $final = false;
-            }
-            
-            return $final;
+
+            return $this->mysqlQuery($query, $link, $use_memcache);
         }
 
         /**
