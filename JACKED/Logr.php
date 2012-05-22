@@ -244,8 +244,8 @@
                                     'guid' => $this->JACKED->Util->uuid4(),
                                     'timestamp' => microtime(true),
                                     'message' => $msg,
-                                    'file' => $stacktrace[0]['file'],
-                                    'line' => $stacktrace[0]['line'],
+                                    'file' => array_key_exists('file', $stacktrace[0])? $stacktrace[0]['file'] : null,
+                                    'line' => array_key_exists('line', $stacktrace[0])? $stacktrace[0]['line'] : null,
                                     'stack_hash' => md5(print_r($stacktrace[0], true))
                                 ));
                             }catch(Exception $e){
