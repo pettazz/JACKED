@@ -179,10 +179,10 @@
                 while($row = mysql_fetch_array($result, MYSQL_BOTH)){
                     $value[] = array_map("stripslashes", $row);
                 }
+                mysql_free_result($result);
             }else{
                 $value = false;
             }
-            mysql_free_result($result);
             if($this->config->use_memcache && $use_memcache){
                 $key = md5($query);
                 $this->JACKED->Logr->write("Memcached miss $key; Stored.", Logr::LEVEL_NOTICE, NULL, 'MySQL');
