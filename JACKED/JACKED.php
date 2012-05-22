@@ -88,7 +88,7 @@
                     try{
                         $instance->registerModule($module, $modDetails['version']);
                     }catch(Exception $e){
-                        if($module['required']){
+                        if($modDetails['required']){
                             try{
                                 $instance->Logr->write('Required module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
                             }catch(Exception $ex){}
