@@ -14,12 +14,17 @@
          *
          * @param string $unique [optional] If a UDID or MAC or other uniquely identifying id is accessible,
          * this should be passed in here. Defaults to the remote IP + UserAgent.
+         * @param string $application [optional] The GUID of the Application that this Source is connected 
+         * through. Defaults to config->default_application.
          * @return string GUID for this Source.
          */
-        public function getSource($unique = false){
+        public function getSource($unique = false, $application = false){
             if($this->JACKED->Sessions->check('Flock.Source')){
                 return $this->JACKED->Sessions->read('Flock.Source.guid');
             }else{
+                if(!$application){
+                    $application = $this->config->default_application;
+                }
                 if(!$unique){
                     $unique = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
                 }
@@ -46,12 +51,14 @@
                         array(
                             'guid' => $new_guid,
                             'unique' => $unique_hash,
+                            'Application' => $application,
                             'User' => $user
                         )
                     );
                     $this->JACKED->Sessions->write('Flock.Source', array(
                         'guid' => $new_guid,
                         'unique' => $unique_hash,
+                        'Application' => $application,
                         'User' => $user
                     ));
                     $retval = $new_guid;
@@ -73,12 +80,14 @@
                             array(
                                 'guid' => $new_guid,
                                 'unique' => $unique_hash,
+                                'Application' => $application,
                                 'User' => $user
                             )
                         );
                         $this->JACKED->Sessions->write('Flock.Source', array(
                             'guid' => $new_guid,
                             'unique' => $unique_hash,
+                            'Application' => $application,
                             'User' => $user
                         ));
                         $retval = $new_guid;
@@ -92,6 +101,7 @@
                             $this->config->dbt_sources,
                             'unique = ' . $unique_hash . ' AND User = ' . $user
                         );
+                        $this->JACKED->Sessions->write('Flock.Source', $user_source);
                     }else{
                         // user is not logged in
                         ////get the one that has no user
@@ -99,6 +109,7 @@
                             $this->config->dbt_sources,
                             'unique = ' . $unique_hash . ' AND User IS NULL'
                         );
+                        $this->JACKED->Sessions->write('Flock.Source', $user_source);
                     }
                     if(!$user_source){
                         // query returned nothing
@@ -109,12 +120,14 @@
                             array(
                                 'guid' => $new_guid,
                                 'unique' => $unique_hash,
+                                'Application' => $application,
                                 'User' => $user
                             )
                         );
                         $this->JACKED->Sessions->write('Flock.Source', array(
                             'guid' => $new_guid,
                             'unique' => $unique_hash,
+                            'Application' => $application,
                             'User' => $user
                         ));
                         $retval = $new_guid;
@@ -132,7 +145,70 @@
         }
 
         /**
-         * Tag an anonymous Source with a User id
+         * Get the Unique for the current source
+         *
+         * @return string Unique hash of the current source, or false if no Source yet exists.
+         */
+        public function getUnique(){
+            return $this->JACKED->Sessions->read("Flock.Source.unique");
+        }
+        
+        /**
+         * Get the GUID of the current Source
+         *
+         * @return string GUID of the current source, or false if no Source yet exists.
+         */
+        public function getSourceGUID(){
+            return $this->JACKED->Sessions->read("Flock.Source.guid");
+        }
+        
+        /**
+         * Get the GUID of the Application that the current Source is using
+         *
+         * @return string GUID of the current source Application, or false if no Source yet exists.
+         */
+        public function getApplicationGUID(){
+            return $this->JACKED->Sessions->read("Flock.Source.Application");
+        }
+        
+        /**
+         * Get all the data for the Application that the current Source is using
+         *
+         * @return array Associative array of the current Application data, or false if no Source yet exists.
+         */
+        public function getApplication(){
+            return $this->JACKED->MySQL->getRow(
+                $this->config->dbt_apps,
+                'guid = ' . $this->getApplicationGUID()
+            );
+        }
+        
+        /**
+         * Whether the current Source Application is on a device (smartphone, tablet, etc) that 
+         * allows for some kind of more accurate Unique to be provided
+         *
+         * @return boolean If the current Application is on a device
+         */
+        public function isDevice(){
+            $app = $this->getApplication();
+            return (bool) $app['device'];
+        }
+        
+        /**
+         * Get the Application data for the Application with the given API key
+         * @param String $key The API key
+         *
+         * @return array Associative array of the Application data, or false if there is no API key match.
+         */
+        public function getApplicatonByAPIKey($key){
+            return $this->JACKED->MySQL->getRow(
+                $this->config->dbt_apps,
+                'apiKey = ' . $key
+            );
+        }
+
+        /**
+         * Tag an anonymous Source with a User guid
          *
          * @param string $source The guid of the Source to tag
          * @param string $user The guid of the User to tag the Source as
