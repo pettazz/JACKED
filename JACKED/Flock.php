@@ -39,7 +39,7 @@
 
                 $sources = $this->JACKED->MySQL->getRows(
                     $this->config->dbt_sources,
-                    'unique = ' . $unique_hash
+                    'unique = "' . $unique_hash . '"'
                 );
 
                 if(!$sources){
@@ -179,7 +179,7 @@
         public function getApplication(){
             return $this->JACKED->MySQL->getRow(
                 $this->config->dbt_apps,
-                'guid = ' . $this->getApplicationGUID()
+                'guid = "' . $this->getApplicationGUID() . '"'
             );
         }
         
@@ -203,7 +203,7 @@
         public function getApplicatonByAPIKey($key){
             return $this->JACKED->MySQL->getRow(
                 $this->config->dbt_apps,
-                'apiKey = ' . $key
+                'apiKey = "' . $key . '"'
             );
         }
 
@@ -219,7 +219,7 @@
                 $this->JACKED->MySQL->update(
                     $this->config->dbt_sources,
                     array('User' => $user),
-                    'guid = ' . $source
+                    'guid = "' . $source . '"'
                 ) &&
                 $this->JACKED->Sessions->write('Flock.Source.user', $user)
             );
