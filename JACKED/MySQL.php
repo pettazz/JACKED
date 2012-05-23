@@ -192,7 +192,10 @@
             }
 
             if($value === false){
-                $this->JACKED->Logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL, 'MySQL');
+                $err = $this->getError($link);
+                if($err){
+                    $this->JACKED->Logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL, 'MySQL');
+                }
             }
             return $value;
         }
