@@ -43,6 +43,10 @@
             JACKEDModule::__construct($JACKED);
             $JACKED->loadDependencies($this->config->interface_classes);
         }
+
+        public function __destruct(){
+            $this->JACKED->Flock->storeSourceData($this->JACKED->Sessions->read('Yapp.APISession'));
+        }
         
 
         /**
@@ -137,15 +141,11 @@
         * @return String The token for the newly opened API session
         */
         public function store($key, $value){
-            $done = (
-                $this->JACKED->Sessions->write('Yapp.APISession' . $key, $value) &&
-                $this->JACKED->Flock->storeSourceData($this->JACKED->Sessions->read('Yapp.APISession'))
-            );
-            return $done;
+            return $this->JACKED->Sessions->write('Yapp.APISession.' . $key, $value);
         }
         
         public function read($key){
-            return $this->JACKED->Sessions->read('Yapp.APISession' . $key);
+            return $this->JACKED->Sessions->read('Yapp.APISession.' . $key);
         }
         
         
