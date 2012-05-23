@@ -42,10 +42,14 @@
             
             JACKEDModule::__construct($JACKED);
             $JACKED->loadDependencies($this->config->interface_classes);
+
+            $this->JACKED->Flock->attachToEvent('moduleUnload', function(){
+                $this->JACKED->Flock->storeSourceData($this->JACKED->Sessions->read('Yapp.APISession'));
+            });
         }
 
         public function __destruct(){
-            $this->JACKED->Flock->storeSourceData($this->JACKED->Sessions->read('Yapp.APISession'));
+            
         }
         
 
