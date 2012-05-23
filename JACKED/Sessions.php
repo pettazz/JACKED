@@ -17,7 +17,6 @@
                 array($this, '_destroy'), 
                 array($this, '_clean')
             );
-            session_id($JACKED->Util->uuid4());
             session_start();
         }
         
