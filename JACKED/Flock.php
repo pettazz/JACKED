@@ -39,7 +39,7 @@
 
                 $sources = $this->JACKED->MySQL->getRows(
                     $this->config->dbt_sources,
-                    'unique = ' . $unique_hash
+                    '"unique" = ' . $unique_hash
                 );
 
                 if(!$sources){
@@ -99,7 +99,7 @@
                         ////get the one that matches this user
                         $user_source = $this->JACKED->MySQL->getRow(
                             $this->config->dbt_sources,
-                            'unique = ' . $unique_hash . ' AND User = ' . $user
+                            '"unique" = ' . $unique_hash . ' AND User = ' . $user
                         );
                         $this->JACKED->Sessions->write('Flock.Source', $user_source);
                     }else{
@@ -107,7 +107,7 @@
                         ////get the one that has no user
                         $user_source = $this->JACKED->MySQL->getRow(
                             $this->config->dbt_sources,
-                            'unique = ' . $unique_hash . ' AND User IS NULL'
+                            '"unique" = ' . $unique_hash . ' AND User IS NULL'
                         );
                         $this->JACKED->Sessions->write('Flock.Source', $user_source);
                     }
