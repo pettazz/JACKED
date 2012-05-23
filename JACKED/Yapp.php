@@ -1,5 +1,11 @@
 <?php
 
+    /*
+    !!!TODO: (1) replace execPreCallHooks and post with new JACKED Module events
+             (2) Persistently store API session data in the Source's data field
+             (3) Make notifications not shit and re-enable
+    */
+
     class Yapp extends JACKEDModule{
         
         /*
@@ -19,26 +25,40 @@
             $JACKED->loadDependencies($this->config->interface_classes);
         }
         
-        /////////////////////////////////////////////////////
-        //internal 
+
+        /**
+        * JSON encode the result of a successful call. 
+        * 
+        * @param mixed $data The resulting data of the call
+        * @return String JSON encoded @data
+        */
         private function success($data){
-            //some API consumers don't like it when we wrap a single array 
-            ////in an array for no reason
-            if((count($data) == 1) && (is_array($data[0]))){
-                $data = $data[0];
-            }
             return json_encode(array("done" => True, "data" => $data));
         }
         
+        /**
+        * JSON encode the result of an error during a call. 
+        * 
+        * @param mixed $message The error message
+        * @return String JSON encoded @message
+        */
         private function error($message){
             return json_encode(array("done" => False, "message" => $message));
         }
         
+        /**
+        * JSON encode and log an exception during a call. 
+        * 
+        * @param mixed $exception The exception to encode
+        * @return String JSON encoded @exception
+        */
         private function exception($exception){
             $this->JACKED->Logr->write($exception->getMessage(), 2, $exception->getTrace());
             return json_encode(array("done" => False, "message" => $exception->getMessage()));
         }
-        
+
+
+        //TODO(1)
         //replace these with the new JACKED module events
         private function execPreCallHooks($methodname, &$args){
             if(array_key_exists($methodname, $this->config->interface_pre_hooks)){
@@ -52,45 +72,18 @@
             }
             return $args;
         }
+
+
         
-        //////////////////////////////////////////////////////
-        //public api-related
-        public function getMyUUID(){
-            return $this->JACKED->Flock->getUnique();
-        }
-        
-        public function getMySourceID(){
-            return $this->JACKED->Flock->getSourceGUID();
-        }
-        
-        public function getMyApplicationInfo(){
-            return $this->JACKED->Flock->getApplication();
-        }
-        
-        public function isDevice(){
-            return $this->JACKED->Flock->isDevice();
-        }
-        
-        public function getMyApplicationID(){
-            return $this->JACKED->Flock->getApplicationGUID();
-        }
-        /*
-        public function updateSourceUser($userid){
-            //if($this->isDevice()){
-                return $this->JACKED->MySQL->update(
-                    $this->config->db_sources,
-                    array(
-                        'user_id' => $userid,
-                        'device_hash' => (($userid)? md5(session_id() . $userid) : '')
-                    ), 
-                    "id = '" . $this->getMySourceID() . "'"
-                );
-            //}
-        }*/
-        
-        //start a new API session for the given APIKey and UUID
-        ////returns the new API session id if it all works, 
-        ////or an Exception
+        /**
+        * Open a new API session for an application using the given API key, 
+        * with the given unique identifier. Flock will create a unique identifier with IP and
+        * user agent if one isn't supplied here.
+        * 
+        * @param String $apiKey The API key of the application connecting
+        * @param String $unique [optional] The unique identifier of the device/machine connecting, if applicable.
+        * @return String The token for the newly opened API session
+        */
         public function open($apiKey, $uuid = null){
             $app = $this->JACKED->Flock->getApplicatonByAPIKey($apiKey);
             if(!$app){
@@ -105,13 +98,21 @@
             return session_id();
         }
         
-        //KILL IT ALL WITH FIRE
+        /**
+        * Close the current API session and destroy all its data.
+        */
         public function close(){
+            //KILL IT ALL WITH FIRE
             $this->JACKED->Sessions->write("auth.API", array());
             $this->JACKED->Sessions->delete("auth.API");
         }
         
-        //boolean: is an API session currently active for me? Here is my session id. HALP?
+        /**
+        * Check whether a given API session is active.
+        * 
+        * @param String $sid The token of the API session to check
+        * @return Boolean Whether the given session is active
+        */
         public function isActive($sid){
             $good = false;
         
@@ -124,8 +125,14 @@
             return $good;
         }
         
-        //Allow some simple Sessions access
-        ////uses Yapp.APISession Session var
+        /**
+        * Store a key -> value pair in the current API session.
+        * TODO(2)
+        * 
+        * @param String $apiKey The API key of the application connecting
+        * @param String $unique [optional] The unique identifier of the device/machine connecting. 
+        * @return String The token for the newly opened API session
+        */
         public function store($key, $value){
             return $this->JACKED->Sessions->write('Yapp.APISession' . $key, $value);
         }
@@ -134,30 +141,44 @@
             return $this->JACKED->Sessions->read('Yapp.APISession' . $key);
         }
         
+        
+        //TODO(3)
         ///////
         //    NOTIFICATIONS  //
                         ///////
-        
-        //this should be better too
 
         //gets any visible notifications
-        public function getNotifications(){
+        /*public function getNotifications(){
             $this->trimNotifications();
             $now = time();
-            return $this->JACKED->MySQL->getAll("*", $this->config->db_notifications, "`start` <= '" . $now . "' AND `end` >= '" . $now . "' AND (`Application` = '0' OR `Application` = '" . $this->getMyApplicationID() . "')");
+            return $this->JACKED->MySQL->getAll(
+                "*", 
+                $this->config->db_notifications, 
+                "`start` <= '" . $now . "' AND `end` >= '" . $now . 
+                  "' AND (`Application` = '0' OR `Application` = '" . $this->getMyApplicationID() . "')"
+            );
         }
         
         //trims the notification table of anything that expired a month ago
         public function trimNotifications(){
             $when = time() - 2592000;
-            return $this->JACKED->MySQL->delete($this->config->db_notifications, "`end` <= '" . $when . "' AND (`Application` = '0' OR `Application` = '" . $this->getMyApplicationID() . "')");
-        }
+            return $this->JACKED->MySQL->delete(
+                $this->config->db_notifications, 
+                "`end` <= '" . $when . 
+                  "' AND (`Application` = '0' OR `Application` = '" . $this->getMyApplicationID() . "')"
+            );
+        }*/
         
         
-        /////////////////////////////////////////////////////////////////
-        //                     API CALL HANDLER!!!!!!WOOOOOOOOOOOO
-        /////////////////////////////////////////////////////////////////
+        /**
+        * Perform an API call. Uses $_REQUEST data.
+        * 
+        * @return String JSON encoded success, failure, or exception
+        */
         public function call(){
+            /////////////////////////////////////////////////////////////////
+            //                     API CALL HANDLER!!!!!!WOOOOOOOOOOOO
+            /////////////////////////////////////////////////////////////////
             try{
                 $api_authorized = true;
                 //First, if we're using keys, let's use keys.
@@ -183,7 +204,11 @@
                             }else{
                                 $uuid = (array_key_exists('uuid', $_REQUEST))? $_REQUEST['uuid'] : NULL;
                                 $openres = $this->open($_REQUEST['key'], $uuid);    
-                                return $this->success(array('api_token' => $openres, 'ttl' => $this->JACKED->Sessions->config->session_expiry, 'user_id' => $this->JACKED->Sessions->read('user.Source.user_id'), 'notifications' => $this->getNotifications()));
+                                return $this->success(array(
+                                    'api_token' => $openres, 
+                                    'ttl' => $this->JACKED->Sessions->config->session_expiry, 
+                                    'user_id' => $this->JACKED->Sessions->read('user.Source.user_id'))
+                                );
                             }
                         }else{ 
                             throw new APIRestrictedException();
@@ -271,10 +296,11 @@
                 return $this->exception($e);
             }
             
-        }//end call method
+        }
         
     }
     
+
     class NoUUIDForDeviceException extends Exception{
         protected $message = 'No UUID was provided for this device. UUIDs are required for devices.';
     }
