@@ -4,7 +4,7 @@
     ???:     (1) should pre/post call events pass args by pointer so that they can be edited pre/post call? 
                     and should it fire "preCall" . $methodName instead of a generic preCall event for every method?
     !!!TODO: x(1) replace execPreCallHooks and post with new JACKED Module events
-             (2) Persistently store API session data in the Source's data field
+             x(2) Persistently store API session data in the Source's data field
              (3) Make notifications not shit and re-enable
     */
 
@@ -137,10 +137,11 @@
         * @return String The token for the newly opened API session
         */
         public function store($key, $value){
-            return (
+            $done = (
                 $this->JACKED->Sessions->write('Yapp.APISession' . $key, $value) &&
                 $this->JACKED->Flock->storeSourceData($this->JACKED->Sessions->read('Yapp.APISession'))
             );
+            return $done;
         }
         
         public function read($key){
