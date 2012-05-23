@@ -299,7 +299,7 @@
         * @return Array Array of rows from @$field matching @$cond
         */
         public function getRows($table, $cond = NULL, $link = NULL, $use_memcache = true){
-            $cond = $cond? $this->sanitize($cond) : '1';
+            $cond = $cond? $cond : '1';
             $query = "SELECT * FROM `" . $this->sanitize($table) . "` WHERE " . $cond;
 
             return $this->mysqlQuery($query, $link, $use_memcache);
