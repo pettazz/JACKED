@@ -196,8 +196,8 @@
         
         /**
          * Get the Application data for the Application with the given API key
-         * @param String $key The API key
          *
+         * @param String $key The API key
          * @return array Associative array of the Application data, or false if there is no API key match.
          */
         public function getApplicatonByAPIKey($key){
@@ -205,6 +205,45 @@
                 $this->config->dbt_apps,
                 'apiKey = "' . $key . '"'
             );
+        }
+
+        /**
+         * Get the data in the current Source's data field in the db
+         *
+         * @return mixed The data stored in the Source, false if there is no current Source
+         */
+        private function readSourceData($data, $overwrite = true){
+            $source = $this->getSourceGUID();
+            if($source){
+                $value = unserialize($this->JACKED->MySQL->get(
+                    'data',
+                    $this->config->dbt_sources,
+                    'guid = "' . $source . '"'
+                ));
+            }else{
+                $value = false;
+            }
+            return $value;
+        }
+
+        /**
+         * Store some data in the current Source's data field in the db
+         *
+         * @param mixed $data The data to store
+         * @return boolean Whether the store was successful, also false if there is no current Source
+         */
+        private function storeSourceData($data){
+            $source = $this->getSourceGUID();
+            if($source){
+                $value = $this->JACKED->MySQL->update(
+                    $this->config->dbt_sources,
+                    array('data' => serialize($data)),
+                    'guid = "' . $source . '"'
+                );
+            }else{
+                $value = false;
+            }
+            return $value;
         }
 
         /**
