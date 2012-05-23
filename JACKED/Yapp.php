@@ -1,7 +1,9 @@
 <?php
 
     /*
-    !!!TODO: (1) replace execPreCallHooks and post with new JACKED Module events
+    ???:     (1) should pre/post call events pass args by pointer so that they can be edited pre/post call? 
+                    and should it fire "preCall" . $methodName instead of a generic preCall event for every method?
+    !!!TODO: x(1) replace execPreCallHooks and post with new JACKED Module events
              (2) Persistently store API session data in the Source's data field
              (3) Make notifications not shit and re-enable
     */
@@ -12,6 +14,23 @@
             So you made a thing that talks to apps?
             Well, I made a thing that lets you make your website able to talk to apps.
             Call it Yapp.
+
+            Event hooks:
+
+                preCall - Fired just before the called method is executed.
+                data: 
+                    String className - name of the class whose method is to be executed
+                    String methodName - name of the method to be executed
+                    Array orderedArguments - associative array of all arguments being passed to 
+                        the method with their names as keys.
+
+                postCall - Fired just after the called method is executed.
+                data: 
+                    String className - name of the class whose method was executed
+                    String methodName - name of the method executed
+                    mixed result - the return value of the executed method, to be returned from
+                        the Yapp->call method.
+
         */
         
         const moduleName = 'Yapp';
@@ -56,22 +75,6 @@
             $this->JACKED->Logr->write($exception->getMessage(), 2, $exception->getTrace());
             return json_encode(array("done" => False, "message" => $exception->getMessage()));
         }
-
-
-        //TODO(1)
-        //replace these with the new JACKED module events
-        /*private function execPreCallHooks($methodname, &$args){
-            if(array_key_exists($methodname, $this->config->interface_pre_hooks)){
-                call_user_func_array($this->config->interface_pre_hooks[$methodname], array($this->JACKED, &$args));
-            }
-        }
-        
-        private function execPostCallHooks($methodname, &$args){
-            if(array_key_exists($methodname, $this->config->interface_post_hooks)){
-                call_user_func_array($this->config->interface_post_hooks[$methodname], array($this->JACKED, &$args));
-            }
-            return $args;
-        }*/
 
 
         
@@ -283,9 +286,18 @@
                                 }
                 
                                 // call method with ordered arguments
-                                //$this->execPreCallHooks($methodname, $orderedArguments);
+                                /// ??? (1)
+                                $this->fireEvent('preCall', array(
+                                    'className' => $class, 
+                                    'methodName' => $methodname, 
+                                    'orderedArguments' => $orderedArguments)
+                                );
                                 $result = call_user_func_array(array($this->JACKED->$class, $methodname), $orderedArguments);
-                                //return $this->success($this->execPostCallHooks($methodname, $result));
+                                $this->fireEvent('postCall', array(
+                                    'className' => $class, 
+                                    'methodName' => $methodname, 
+                                    'result' => $result)
+                                );
                                 return $result;
                             }
                         }
