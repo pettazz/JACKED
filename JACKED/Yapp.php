@@ -60,7 +60,7 @@
 
         //TODO(1)
         //replace these with the new JACKED module events
-        private function execPreCallHooks($methodname, &$args){
+        /*private function execPreCallHooks($methodname, &$args){
             if(array_key_exists($methodname, $this->config->interface_pre_hooks)){
                 call_user_func_array($this->config->interface_pre_hooks[$methodname], array($this->JACKED, &$args));
             }
@@ -71,7 +71,7 @@
                 call_user_func_array($this->config->interface_post_hooks[$methodname], array($this->JACKED, &$args));
             }
             return $args;
-        }
+        }*/
 
 
         
@@ -283,9 +283,10 @@
                                 }
                 
                                 // call method with ordered arguments
-                                $this->execPreCallHooks($methodname, $orderedArguments);
+                                //$this->execPreCallHooks($methodname, $orderedArguments);
                                 $result = call_user_func_array(array($this->JACKED->$class, $methodname), $orderedArguments);
-                                return $this->success($this->execPostCallHooks($methodname, $result));
+                                //return $this->success($this->execPostCallHooks($methodname, $result));
+                                return $result;
                             }
                         }
                         throw new APIActionNotRecognizedException();

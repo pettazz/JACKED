@@ -13,6 +13,7 @@
 	    //at some point this may include either a whitelist or blacklist for
 	    ////limiting the methods it can use
 	    
+	    /*
 	    //these hooks are called before the method of the same name is executed
 	    //$JACKED is the current JACKED instance, and $args is the ordered array 
 	    //of method arguments, by reference, numerically indexed in order of the args
@@ -47,7 +48,7 @@
     	            $JACKED->Yapp->updateSourceUser('');
     	        }
 	        }
-	    )
+	    )*/
 	);
 
 ?>
