@@ -43,6 +43,10 @@
             JACKEDModule::__construct($JACKED);
             $JACKED->loadDependencies($this->config->interface_classes);
         }
+
+        public function __destruct(){
+            $this->JACKED->Flock->storeSourceData($this->JACKED->Sessions->read('Yapp.APISession'));
+        }
         
 
         /**
@@ -97,7 +101,8 @@
             $source = $this->JACKED->Flock->getSource($uuid, $app['guid']);
                 
             $this->JACKED->Sessions->write("auth.API", md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']));
-            
+            $this->JACKED->Sessions->write('Yapp.APISession', $this->JACKED->Flock->readSourceData());
+
             return session_id();
         }
         
@@ -130,7 +135,6 @@
         
         /**
         * Store a key -> value pair in the current API session.
-        * TODO(2)
         * 
         * @param String $apiKey The API key of the application connecting
         * @param String $unique [optional] The unique identifier of the device/machine connecting. 
