@@ -212,7 +212,7 @@
          *
          * @return mixed The data stored in the Source, false if there is no current Source
          */
-        public function readSourceData($data){
+        public function readSourceData(){
             $source = $this->getSourceGUID();
             if($source){
                 $value = unserialize($this->JACKED->MySQL->get(
