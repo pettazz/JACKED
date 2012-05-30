@@ -308,6 +308,39 @@
         }
 
         /**
+        * Select from a simple JOIN of two tables
+        * SELECT @fields FROM @table1 @join_type JOIN @table2 ON @table1.@join1 = @table2.@join2
+        *
+        * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
+        * @param $join_type string One of: INNER, OUTER, LEFT, RIGHT
+        * @param $table1 string Name of the left Table
+        * @param $table2 string Name of the right Table
+        * @param $join1 string Field name to join on from the left table
+        * @param $join2 string Field name to join on from the right table
+        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
+        * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
+        * @return Array Result data from @$fields 
+        */
+        public function getJoin($fields, $join_type, $table1, $table2, $link = NULL, $use_memcache = true){
+            $table1 = $this->sanitize($table1);
+            $table2 = $this->sanitize($table2);
+            $join1 = $this->sanitize($join1);
+            $join2 = $this->sanitize($join2);
+            $join_type = $this->sanitize($join_type);
+            if(is_array($fields)){
+                $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM ";
+            }else if(is_string($fields)){
+                $query = "SELECT " . $this->sanitize($fields) . " FROM ";
+            }else{
+                $query = "SELECT * FROM ";
+            }
+
+            $query .= $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 '` = `' . $table1 . '`.`' . $join1 '`';
+
+            return $this->mysqlQuery($query, $link, $use_memcache);
+        }
+
+        /**
         * Insert data into the database.
         * INSERT INTO @$table @$fields
         * 
