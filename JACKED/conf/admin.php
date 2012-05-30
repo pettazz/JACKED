@@ -2,10 +2,8 @@
 
     $settings = array(
 	
-		//right now jacked users are just elevated Flock users, but someday there will be options
-		////for how to handle this.
-
-	    'dbt_users' => 'jacked_users',
+		//jacked users are just elevated Flock users
+	    'dbt_users' => 'admin_users',
 	    
 	    //the external page that users will access admin through
 	    'entry_point' => '/admin/',

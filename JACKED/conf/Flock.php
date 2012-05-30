@@ -2,7 +2,7 @@
 
     $settings = array(
 	
-	    'dbt_users' => 'users',
+	    'dbt_users' => 'User',
 	
 	    'dbt_apps' => 'Application',
 	    'dbt_sources' => 'Source',
