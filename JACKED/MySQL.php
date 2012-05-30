@@ -261,6 +261,8 @@
             $cond = $cond;
             if(is_array($fields)){
                 $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM `" . $table . "` WHERE " . $cond;
+            }else if(is_string($fields)){
+                $query = "SELECT " . $this->sanitize($fields) . " FROM `" . $table . "` WHERE " . $cond;
             }else{
                 $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
             }
