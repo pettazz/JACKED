@@ -317,11 +317,12 @@
         * @param $table2 string Name of the right Table
         * @param $join1 string Field name to join on from the left table
         * @param $join2 string Field name to join on from the right table
+        * @param $cond string Condition to use for query: "WHERE @$cond"
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields 
         */
-        public function getJoin($fields, $join_type, $table1, $table2, $link = NULL, $use_memcache = true){
+        public function getJoin($fields, $join_type, $table1, $table2, $cond = false, $link = NULL, $use_memcache = true){
             $table1 = $this->sanitize($table1);
             $table2 = $this->sanitize($table2);
             $join1 = $this->sanitize($join1);
@@ -336,6 +337,11 @@
             }
 
             $query .= $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 '` = `' . $table1 . '`.`' . $join1 '`';
+
+            if($cond){
+                $cond = $this->sanitize($cond);
+                $cond = ' WHERE ' . $cond;
+            }
 
             return $this->mysqlQuery($query, $link, $use_memcache);
         }
