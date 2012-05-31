@@ -322,7 +322,7 @@
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields 
         */
-        public function getJoin($fields, $join_type, $table1, $table2, $cond = false, $link = NULL, $use_memcache = true){
+        public function getJoin($fields, $join_type, $table1, $table2, $join1, $join2, $cond = false, $link = NULL, $use_memcache = true){
             $table1 = $this->sanitize($table1);
             $table2 = $this->sanitize($table2);
             $join1 = $this->sanitize($join1);
