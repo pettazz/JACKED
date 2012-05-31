@@ -2,7 +2,7 @@
 
     require('jacked_conf.php');
     $JACKED = new JACKED("Blag");
-    $blog = $JACKED->blog;
+    $blog = $JACKED->Blag;
 
 ?>
 <!DOCTYPE html>
