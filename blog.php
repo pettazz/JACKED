@@ -16,7 +16,7 @@
 	<pre><code>
 	<?php
 		$eys->setMark('getposts');
-		$posts = $blog->getPost('123-test')
+		$posts = $blog->getPost('123-test');
 		$eys->setMark('getposts_end');
 		print_r($posts);	
 		$timer = $eys->getDelta('getposts', 'getposts_end');
