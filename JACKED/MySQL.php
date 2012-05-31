@@ -347,7 +347,6 @@
             $query .= ' FROM ' . $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table2 . '`.`' . $join2 . '`';
 
             if($cond){
-                $cond = $this->sanitize($cond);
                 $query .= ' WHERE ' . $cond;
             }
 
