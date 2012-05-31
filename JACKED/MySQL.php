@@ -332,16 +332,19 @@
             $query = 'SELECT ';
             if($fields1 || $fields2){
                 if(is_array($fields1)){
-                    $query .= '`' . $table1 . '`.`' . $this->sanitize(implode('`,`' . $table1 . '`.`', $fields1)) . '` ';
+                    $query .= '`' . $table1 . '`.`' . $this->sanitize(implode('`, `' . $table1 . '`.`', $fields1)) . '`';
+                    if(is_array($fields2)){
+                        $query .= ', ';
+                    }
                 }
                 if(is_array($fields2)){
-                    $query .= '`' . $table2 . '`.`' . $this->sanitize(implode('`,`' . $table2 . '`.`', $fields2)) . '` ';
+                    $query .= '`' . $table2 . '`.`' . $this->sanitize(implode('`, `' . $table2 . '`.`', $fields2)) . '`';
                 }
             }else{
-                $query .= '* ';
+                $query .= '*';
             }
 
-            $query .= 'FROM' . $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table2 . '`.`' . $join2 . '`';
+            $query .= ' FROM ' . $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table2 . '`.`' . $join2 . '`';
 
             if($cond){
                 $cond = $this->sanitize($cond);
