@@ -40,7 +40,7 @@
             return $this->JACKED->MySQL->getJoin(
                 $fields, 'INNER', 
                 $this->config->dbt_posts,
-                $this->Flock->config->dbt_users,
+                $this->JACKED->Flock->config->dbt_users,
                 'guid = ' . $guid . $cond
             );
         }
