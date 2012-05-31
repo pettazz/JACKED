@@ -348,7 +348,7 @@
 
             if($cond){
                 $cond = $this->sanitize($cond);
-                $cond = ' WHERE ' . $cond;
+                $query .= ' WHERE ' . $cond;
             }
 
             return $this->mysqlQuery($query, $link, $use_memcache);
