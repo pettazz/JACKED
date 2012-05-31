@@ -20,25 +20,25 @@
         * @return Array List of all post data, false if GUID not found
         */
         public function getPost($guid, $only_active = true){
-            $fields = array('guid', 'posted', 'title', 'headline', 'content');
+            $fields1 = array('guid', 'posted', 'title', 'headline', 'content');
+            $fields2 = false;
             $cond = $only_active? ' AND alive = 1' : '';
             switch($this->config->author_name_type){
                 case 'full':
-                    $fields[] = 'last_name';
-                    $fields[] = 'first_name';
+                    $fields2 = array('last_name', 'first_name');
                     break;
                 case 'first':
-                    $fields[] = 'first_name';
+                    $fields2 = array('first_name');
                     break;
                 case 'user':
-                    $fields[] = 'username';
+                    $fields2 = array('username');
                     break;
                 default:
-                    $fields[] = 'first_name';
+                    $fields2 = array('first_name');
                     break;
             }
             return $this->JACKED->MySQL->getJoin(
-                $fields, 'INNER', 
+                $fields1, $fields2, 'INNER', 
                 $this->config->dbt_posts,
                 $this->JACKED->Flock->config->dbt_users,
                 'User', 'guid',
