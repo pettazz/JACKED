@@ -22,7 +22,7 @@
         public function getPost($guid, $only_active = true){
             $fields1 = array('guid', 'posted', 'title', 'headline', 'content');
             $fields2 = false;
-            $cond = $only_active? ' AND ' . $this->config->dbt_posts . 'alive = 1' : '';
+            $cond = $only_active? ' AND `' . $this->config->dbt_posts . '`.`alive` = 1' : '';
             switch($this->config->author_name_type){
                 case 'full':
                     $fields2 = array('last_name', 'first_name');
@@ -42,7 +42,7 @@
                 $this->config->dbt_posts,
                 $this->JACKED->Flock->config->dbt_users,
                 'author', 'guid',
-                $this->config->dbt_posts . '`guid` = \'' . $guid . '\'' .  $cond
+                '`' . $this->config->dbt_posts . '`.`guid` = \'' . $guid . '\'' .  $cond
             );
         }
 
