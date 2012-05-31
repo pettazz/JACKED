@@ -41,6 +41,7 @@
                 $fields, 'INNER', 
                 $this->config->dbt_posts,
                 $this->JACKED->Flock->config->dbt_users,
+                'User', 'guid',
                 'guid = ' . $guid . $cond
             );
         }
