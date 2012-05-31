@@ -336,7 +336,7 @@
                 $query = "SELECT * FROM ";
             }
 
-            $query .= $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table1 . '`.`' . $join1 '`';
+            $query .= $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table1 . '`.`' . $join1 . '`';
 
             if($cond){
                 $cond = $this->sanitize($cond);
