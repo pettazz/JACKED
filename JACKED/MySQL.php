@@ -311,7 +311,8 @@
         * Select from a simple JOIN of two tables
         * SELECT @fields FROM @table1 @join_type JOIN @table2 ON @table1.@join1 = @table2.@join2
         *
-        * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
+        * @param $fields1 Array Field names to get value of from @table1. Array of string field names.
+        * @param $fields2 Array Field names to get value of from @table2. Array of string field names.
         * @param $join_type string One of: INNER, OUTER, LEFT, RIGHT
         * @param $table1 string Name of the left Table
         * @param $table2 string Name of the right Table
@@ -322,21 +323,25 @@
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields 
         */
-        public function getJoin($fields, $join_type, $table1, $table2, $join1, $join2, $cond = false, $link = NULL, $use_memcache = true){
+        public function getJoin($fields1 = false, $fields2 = false, $join_type, $table1, $table2, $join1, $join2, $cond = false, $link = NULL, $use_memcache = true){
             $table1 = $this->sanitize($table1);
             $table2 = $this->sanitize($table2);
             $join1 = $this->sanitize($join1);
             $join2 = $this->sanitize($join2);
             $join_type = $this->sanitize($join_type);
-            if(is_array($fields)){
-                $query = "SELECT " . $this->sanitize(implode(",", $fields)) . " FROM ";
-            }else if(is_string($fields)){
-                $query = "SELECT " . $this->sanitize($fields) . " FROM ";
+            $query = 'SELECT ';
+            if($fields1 || $fields2){
+                if(is_array($fields1)){
+                    $query .= '`' . $table1 . '`.`' . $this->sanitize(implode('`,`' . $table1 . '`.`', $fields1)) . '` ';
+                }
+                if(is_array($fields2)){
+                    $query .= '`' . $table2 . '`.`' . $this->sanitize(implode('`,`' . $table2 . '`.`', $fields2)) . '` ';
+                }
             }else{
-                $query = "SELECT * FROM ";
+                $query .= '* ';
             }
 
-            $query .= $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table2 . '`.`' . $join2 . '`';
+            $query .= 'FROM' . $table1 . ' ' . $join_type . ' JOIN ' . $table2 . ' ON `' . $table1 . '`.`' . $join1 . '` = `' . $table2 . '`.`' . $join2 . '`';
 
             if($cond){
                 $cond = $this->sanitize($cond);
