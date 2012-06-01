@@ -419,7 +419,12 @@
             $details = array_merge($details, array(
                 'guid' => $guid, 'email' => $username, 'password' => $this->JACKED->Util->hashPassword($password)
             ));
-            return $this->JACKED->MySQL->insert($this->config->dbt_users, $details);
+            $done = $this->JACKED->MySQL->insert($this->config->dbt_users, $details);
+            if($done){
+                return $guid;
+            }else{
+                return false;
+            }
         }
         
         /**
