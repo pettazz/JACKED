@@ -67,7 +67,6 @@
 				'author' => $authors[rand(0, (count($authors) - 1))],
 				'title' => ucfirst(generateSentence($markov, false)),
 				'headline' => ucfirst(generateSentence($markov, false)),
-				'last_name' => ucfirst($markov->generate(8, 30)),
 				'posted' => $posted,
 				'content' => $content
 			);
