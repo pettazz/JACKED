@@ -420,10 +420,10 @@
                 'guid' => $guid, 'email' => $username, 'password' => $this->JACKED->Util->hashPassword($password)
             ));
             $done = $this->JACKED->MySQL->insert($this->config->dbt_users, $details);
-            if($done){
-                return $guid;
-            }else{
+            if($done === false){
                 return false;
+            }else{
+                return $guid;
             }
         }
         
