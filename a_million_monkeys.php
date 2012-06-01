@@ -13,7 +13,9 @@
 		$markov->feed( file_get_contents( 'JACKED/lib/source.txt' ) );
 		$markov->root(2);
 
-		@unlink( 'markov.state' );
+		if(file_exists( 'markov.state' )){
+			unlink( 'markov.state' );
+		}
 
 		$v = $markov->save_state( 'markov.state', false );
 		unset( $markov );
