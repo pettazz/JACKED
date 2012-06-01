@@ -5,7 +5,7 @@
 
 	    require('jacked_conf.php');
 	    $JACKED = new JACKED(array("Blag", "Flock", "EYS"));
-	    $JACKED->config->offsetSet('debug', 0);
+	    $JACKED->Logr->config->offsetSet('debug', 0);
 	    $JACKED->importLib('MarkovGenerator');
 
 		ini_set('memory_limit', '50M'); // only needed to create the table
@@ -42,8 +42,12 @@
 					'first_name' => $markov->generate(7, 20),
 					'last_name' => $markov->generate(8, 30)
 				);
-				$newguid = $JACKED->Flock->createUser($markov->generate(7, 30), 'lol', $details);
-				echo 'added User guid: <strong>' . $newguid . '</strong> - ' . $details['first_name'] . ' . ' . $details['last_name'] . '<br />';
+				try{
+					$JACKED->Flock->createUser($markov->generate(7, 30), 'lol', $details);
+					echo 'added User: <strong>' . ucfirst($details['first_name']) . ' ' . ucfirst($details['last_name']) . '</strong><br />';
+				}catch(ExistingUserException $e){
+					echo 'duplicate username, trying again...<br />';
+				}
 			}
 		}
 		
