@@ -61,7 +61,7 @@
             $fields2 = false;
             $cond = $cond? $cond . ' AND ': '';
             $cond .= $only_active? '`' . $this->config->dbt_posts . '`.`alive` = 1' : '';
-            $cond .= ' ORDER BY \'posted\' ' . ($order == 'asc')? 'ASC' : 'DESC';
+            $cond .= ' ORDER BY \'posted\' ' . (($order == 'asc')? 'ASC' : 'DESC');
             $cond .= $this->JACKED->MySQL->paginator($count, $paged);
             switch($this->config->author_name_type){
                 case 'full':
