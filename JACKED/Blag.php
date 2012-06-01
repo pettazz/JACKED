@@ -56,7 +56,7 @@
         * @param $order String [optional] Order by date ascending or descending. One of: 'asc', 'desc'. Defaults to desc  
         * @return Array List of Arrays of data for each post found
         */
-        public function getPost($count = 10, $paged = 1, $cond = false, $only_active = true, $order = 'desc'){
+        public function getPosts($count = 10, $paged = 1, $cond = false, $only_active = true, $order = 'desc'){
             $fields1 = array('guid', 'posted', 'title', 'headline', 'content');
             $fields2 = false;
             $cond = $cond? $cond . ' AND ': '';
