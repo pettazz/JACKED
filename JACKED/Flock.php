@@ -417,7 +417,7 @@
             }
             $guid = $this->JACKED->Util->uuid4();
             $details = array_merge($details, array(
-                'guid' => $guid, 'email' => $username, 'password' => $this->JACKED->hashPassword($password)
+                'guid' => $guid, 'email' => $username, 'password' => $this->JACKED->Util->hashPassword($password)
             ));
             return $this->JACKED->MySQL->insert($this->config->dbt_users, $details);
         }
@@ -503,7 +503,7 @@
             return $emailDone = $this->JACKED->MySQL->update(
                 $this->config->dbt_users,
                 array(
-                    'password' => $this->JACKED->hashPassword($password)
+                    'password' => $this->JACKED->Util->hashPassword($password)
                 ),
                 'guid = ' . $userguid
             );
