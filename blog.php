@@ -21,7 +21,7 @@
 		foreach($posts as $num => $post){
 			echo '<h1>' . $post['title'] . '</h1>';
 			echo '<h2>' . $post['headline'] . '</h2>';
-			echo '<h4>posted by <em>' . $post['first_name'] . ' ' . $post['last_name'] '</em> on <em>' . date('r', $post['posted']) . '</em></h4>';
+			echo '<h4>posted by <em>' . $post['first_name'] . ' ' . $post['last_name'] . '</em> on <em>' . date('r', $post['posted']) . '</em></h4>';
 			echo '<p>' . $post['content'] . '</p>';
 			echo '<small>' . $post['guid'] . '</small>';
 		}
