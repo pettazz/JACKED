@@ -38,11 +38,11 @@
 			echo "<h3>adding 200 authors.</h3>";
 			for($i = 1; $i <= 200; $i++){
 				$details = array(
-					'email' => $markov->generate(1, 20) . '@gmail.com',
-					'first_name' => $markov->generate(1, 20),
-					'last_name' => $markov->generate(1, 30)
+					'email' => $markov->generate(10, 30) . '@gmail.com',
+					'first_name' => $markov->generate(7, 20),
+					'last_name' => $markov->generate(8, 30)
 				);
-				$newguid = $JACKED->Flock->createUser($markov->generate(1, 20), 'lol', $details);
+				$newguid = $JACKED->Flock->createUser($markov->generate(7, 30), 'lol', $details);
 				echo 'added User guid: <strong>' . $newguid . '</strong> - ' . $details['first_name'] . ' . ' . $details['last_name'] . '<br />';
 			}
 		}
