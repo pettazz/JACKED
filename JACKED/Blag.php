@@ -46,9 +46,47 @@
             );
         }
 
-        /*
+        /**
+        * Get all the data for a number of posts
+        * 
+        * @param $count int [optional] Number of posts to get. 0 will return all. Defaults to 10
+        * @param $paged int [optional] Which page of posts to retrieve for paginated results. Defaults to 1
+        * @param $cond String [optional] A WHERE clause to filter posts by. Ex: "`table`.`guid` = 'lol-123'"
+        * @param $only_active Boolean Whether to only get posts that have not been deactivated. Defaults to true
+        * @param $order String [optional] Order by date ascending or descending. One of: 'asc', 'desc'. Defaults to desc  
+        * @return Array List of Arrays of data for each post found
+        */
+        public function getPost($count = 10, $paged = 1, $cond = false, $only_active = true, $order = 'desc'){
+            $fields1 = array('guid', 'posted', 'title', 'headline', 'content');
+            $fields2 = false;
+            $cond = $cond? $cond . ' AND ': '';
+            $cond .= $only_active? '`' . $this->config->dbt_posts . '`.`alive` = 1' : '';
+            $cond .= ' ORDER BY \'posted\' ' . ($order == 'asc')? 'ASC' : 'DESC';
+            $cond .= $this->JACKED->MySQL->paginator($count, $paged);
+            switch($this->config->author_name_type){
+                case 'full':
+                    $fields2 = array('last_name', 'first_name');
+                    break;
+                case 'first':
+                    $fields2 = array('first_name');
+                    break;
+                case 'user':
+                    $fields2 = array('username');
+                    break;
+                default:
+                    $fields2 = array('first_name');
+                    break;
+            }
+            return $this->JACKED->MySQL->getJoin(
+                $fields1, $fields2, 'INNER', 
+                $this->config->dbt_posts,
+                $this->JACKED->Flock->config->dbt_users,
+                'author', 'guid',
+                $cond
+            );
+        }
 
-        getPosts()
+        /*
 
         getPostsWithinTimeRange() 
                         add timedelta helpers to Util 
