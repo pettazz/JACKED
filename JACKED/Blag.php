@@ -86,14 +86,38 @@
             );
         }
 
-        /*
-
-        getPostsWithinTimeRange() 
-                        add timedelta helpers to Util 
-
-        getPostsByAuthor()
-
+        /**
+        * Get all the data for a number of posts by a given author
+        * 
+        * @param $author_guid String The Flock User GUID of the author.
+        * @param $count int [optional] Number of posts to get. 0 will return all. Defaults to 10
+        * @param $paged int [optional] Which page of posts to retrieve for paginated results. Defaults to 1
+        * @param $only_active Boolean Whether to only get posts that have not been deactivated. Defaults to true
+        * @param $order String [optional] Order by date ascending or descending. One of: 'asc', 'desc'. Defaults to desc  
+        * @return Array List of Arrays of data for each post found
         */
+        public function getPostsByAuthor($author_guid, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
+            $cond = '`' . $this->config->dbt_posts . '`.`author` = \'' . $author_guid . '\'';
+            return $this->getPosts($count, $paged, $cond, $only_active, $order);
+        }
+
+        /**
+        * Get all the data for a number of posts within a given time frame
+        * 
+        * @param $time_oldest int Oldest timestamp to get.
+        * @param $time_newest int [optional] Newest timestamp to get. Defaults to now.
+        * @param $count int [optional] Number of posts to get. 0 will return all. Defaults to 10
+        * @param $paged int [optional] Which page of posts to retrieve for paginated results. Defaults to 1
+        * @param $only_active Boolean Whether to only get posts that have not been deactivated. Defaults to true
+        * @param $order String [optional] Order by date ascending or descending. One of: 'asc', 'desc'. Defaults to desc  
+        * @return Array List of Arrays of data for each post found
+        */
+        public function getPostsByTimeRange($time_oldest, $time_newest = false, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
+            $time_newest = $time_newest? $time_newest : time();
+            $cond = '`' . $this->config->dbt_posts . '`.`posted` >= \'' . $time_oldest . '\' ';
+            $cond .= 'AND `' . $this->config->dbt_posts . '`.`posted` <= \'' . $time_newest . '\'';
+            return $this->getPosts($count, $paged, $cond, $only_active, $order);
+        }
     }
 
 ?>
