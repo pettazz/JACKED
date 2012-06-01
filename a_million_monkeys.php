@@ -42,7 +42,7 @@
 					'first_name' => $markov->generate(1, 20),
 					'last_name' => $markov->generate(1, 30)
 				);
-				$newguid = $JACKED->createUser($markov->generate(1, 20), 'lol', $details);
+				$newguid = $JACKED->Flock->createUser($markov->generate(1, 20), 'lol', $details);
 				echo 'added User guid: <strong>' . $newguid . '</strong> - ' . $details['first_name'] . ' . ' . $details['last_name'] . '<br />';
 			}
 		}
