@@ -58,7 +58,7 @@
 		echo "<h3>adding 600 posts.</h3>";
 		for($i = 1; $i <= 600; $i++){
 			$content = '';
-			for($x = 0; x <= rand (0, 5), $x+=){
+			for($x = 0; x <= rand(0, 5), $x+=){
 				$content .= generateParagraph($markov);
 			}
 			$posted = rand(1022967819, time());
