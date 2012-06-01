@@ -62,7 +62,9 @@
             $cond = $cond? $cond . ' AND ': '';
             $cond .= $only_active? '`' . $this->config->dbt_posts . '`.`alive` = 1' : '';
             $cond .= ' ORDER BY \'posted\' ' . (($order == 'asc')? 'ASC' : 'DESC');
-            $cond .= $this->JACKED->MySQL->paginator($count, $paged);
+            if($count > 0){
+                $cond .= $this->JACKED->MySQL->paginator($count, $paged);
+            }
             switch($this->config->author_name_type){
                 case 'full':
                     $fields2 = array('last_name', 'first_name');
