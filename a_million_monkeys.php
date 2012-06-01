@@ -4,7 +4,8 @@
 
 
 	    require('jacked_conf.php');
-	    $JACKED = new JACKED(array("Blag", "EYS"));
+	    $JACKED = new JACKED(array("Blag", "Flock", "EYS"));
+	    $JACKED->config->offsetSet('debug', 0);
 	    $JACKED->importLib('MarkovGenerator');
 
 		ini_set('memory_limit', '50M'); // only needed to create the table
@@ -33,8 +34,19 @@
 		    return $lol;
 		}
 
-
-		echo generateParagraph($markov);
+		if($_GET['type'] = 'authors'){
+			echo "<h3>adding 200 authors.</h3>";
+			for($i = 1; $i <= 200; $i++){
+				$details = array(
+					'email' => $markov->generate(1, 20) . '@gmail.com',
+					'first_name' => $markov->generate(1, 20),
+					'last_name' => $markov->generate(1, 30)
+				);
+				$newguid = $JACKED->createUser($markov->generate(1, 20), 'lol', $details);
+				echo 'added User guid: <strong>' . $newguid . '</strong> - ' . $details['first_name'] . ' . ' . $details['last_name'] . '<br />';
+			}
+		}
+		
 
 	}else{
 		die('no.');
