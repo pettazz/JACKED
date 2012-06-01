@@ -38,7 +38,8 @@
 			echo "<h3>adding 200 authors.</h3>";
 			for($i = 1; $i <= 200; $i++){
 				$details = array(
-					'email' => $markov->generate(10, 30) . '@gmail.com',
+					$em = $markov->generate(10, 30);
+					'email' => $em . '@gmail.com',
 					'first_name' => ucfirst($markov->generate(7, 20)),
 					'last_name' => ucfirst($markov->generate(8, 30))
 				);
