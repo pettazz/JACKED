@@ -13,7 +13,6 @@
 </head>
 
 <body>
-	<pre><code>
 	<?php
 		$eys->setMark('getposts');
 		$posts = $blog->getPosts();
@@ -27,7 +26,6 @@
 		}
 		$timer = $eys->getDelta('getposts', 'getposts_end');
 	?>
-	</code></pre>
 	<h4><?php echo 'took: ' . round(($timer['time'] * 1000), 4) . 'ms and increased allocated memory by ' . round($timer['memory'] / 2048, 4) . ' MB'; ?></h4>
 </body>
 
