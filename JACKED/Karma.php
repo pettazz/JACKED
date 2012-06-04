@@ -174,7 +174,7 @@
     }
 
     class AlreadyVotedException extends Exception{
-        protected $message = 'Source has already voted on this target.'
+        protected $message = 'Source has already voted on this target.';
     }
 
 ?>
