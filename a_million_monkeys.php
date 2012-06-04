@@ -42,12 +42,11 @@
 		for($i = 1; $i <= 200; $i++){
 			$em = $markov->generate(10, 30);
 			$details = array(
-				'email' => $em . '@gmail.com',
 				'first_name' => ucfirst($markov->generate(7, 20)),
 				'last_name' => ucfirst($markov->generate(8, 30))
 			);
 			try{
-				$guid = $JACKED->Flock->createUser($markov->generate(7, 30), 'lol', $details);
+				$guid = $JACKED->Flock->createUser($em . '@gmail.com', $markov->generate(7, 30), 'lol', $details);
 				$authors[] = $guid;
 				echo 'added User: <strong>' . $details['first_name'] . ' ' . $details['last_name'] . '</strong>(' . $guid . ')<br />';
 			}catch(ExistingUserException $e){
