@@ -91,7 +91,7 @@
         * target, Source, weight), false if none exist
         */
         public function getAllVotesForSource($source){
-            return $this->MySQL->getRows($this->config->dbt_votes, 'Source = \'' . $source . '\'');
+            return $this->JACKED->MySQL->getRows($this->config->dbt_votes, 'Source = \'' . $source . '\'');
         }
 
         /**
@@ -101,7 +101,7 @@
         * @return int Total value of all votes saved for target @guid
         */
         public function getScore($guid){
-            $done = $this->MySQL->get(
+            $done = $this->JACKED->MySQL->get(
                 "function:SUM(weight) AS score", 
                 $this->config->dbt_votes, 
                 'target = \'' . $guid . '\''
@@ -120,7 +120,7 @@
         * @return int Total value of all positive votes saved for target @guid
         */
         public function getUpvotes($guid){
-            $done = $this->MySQL->get(
+            $done = $this->JACKED->MySQL->get(
                 "function:SUM(weight) AS score", 
                 $this->config->dbt_votes, 
                 'target = \'' . $guid . '\' AND weight > 0'
@@ -139,7 +139,7 @@
         * @return int Total value of all negative votes saved for target @guid
         */
         public function getDownvotes($guid){
-            $done = $this->MySQL->get(
+            $done = $this->JACKED->MySQL->get(
                 "function:SUM(weight) AS score", 
                 $this->config->dbt_votes, 
                 'target = \'' . $guid . '\' AND weight < 0'
@@ -159,7 +159,7 @@
         * @return int Total value of all votes saved for target @guid before @timestamp
         */
         public function getScoreAtTimestamp($guid, $timestamp){
-            $done = $this->MySQL->get(
+            $done = $this->JACKED->MySQL->get(
                 "function:SUM(weight) AS score", 
                 $this->config->dbt_votes, 
                 'target = \'' . $guid . '\' AND timestamp <= ' . $timestamp
