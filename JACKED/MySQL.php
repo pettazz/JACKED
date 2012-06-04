@@ -231,7 +231,7 @@
             $table = $this->sanitize($table);
             $cond = $cond;
             if(stripos($field, "function:") === 0){
-                $val = substr($val, 9); //"function:" ends at 9, lol.
+                $field = substr($field, 9); //"function:" ends at 9, lol.
                 $query = "SELECT " . $field . " FROM `" . $table . "`";
             }else
                 $query = "SELECT `" . $field . "` FROM `" . $table . "`";
