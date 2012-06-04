@@ -51,6 +51,7 @@
 				echo 'added User: <strong>' . $details['first_name'] . ' ' . $details['last_name'] . '</strong>(' . $guid . ')<br />';
 			}catch(ExistingUserException $e){
 				echo 'duplicate username, trying again...<br />';
+				$i--;
 			}
 		}
 
