@@ -6,6 +6,6 @@
     $settings['db_user'] = 'jacked';
     $settings['db_host'] = 'localhost';
 
-    $settings['use_memcache'] = true;
+    $settings['use_memcache'] = false;
 
 ?>
