@@ -15,7 +15,7 @@
 
 <body>
 	<?php
-		echo '<h2>This is ' . $blog::getModuleName() . ' version ' $blog::getModuleVersion() . '</h2>';
+		echo '<h2>This is ' . $blog::getModuleName() . ' version ' . $blog::getModuleVersion() . '</h2>';
 
 		$eys->setMark('getposts');
 		$posts = $blog->getPosts();
