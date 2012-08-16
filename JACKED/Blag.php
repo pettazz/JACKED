@@ -1,6 +1,6 @@
 <?php
 
-    class Blag extends JACKEDContentModule{
+    class Blag extends JACKEDModule{
         /*
                 http://xkcd.com/148/
 
