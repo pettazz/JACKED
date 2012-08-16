@@ -1,5 +1,5 @@
 <?php
-    class JACKED{
+    class JACKED extends JACKEDModule{
         const moduleName = "JACKED Core";
         const moduleVersion = 3.5;
     
