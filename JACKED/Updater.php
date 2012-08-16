@@ -35,7 +35,7 @@
         * @param $name String [optional] The name of the backup tarball to restore. Defaults to the most recent.
         * @return Boolean Whether the restore was completed successfully.
         */
-        private function createBackup($name = false){
+        private function restoreBackup($name = false){
             if(!is_dir(JACKED_MODULES_ROOT . 'backups')){
                 return false;
             }

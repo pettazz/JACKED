@@ -6,7 +6,7 @@
 	    require('jacked_conf.php');
 	    $JACKED = new JACKED(array("Blag", "Flock", "MySQL", "EYS"));
 	    
-	    $JACKED->importLib('MarkovGenerator');
+	    $JACKED->loadLibrary('MarkovGenerator');
 
 		ini_set('memory_limit', '50M'); // only needed to create the table
 

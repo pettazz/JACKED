@@ -115,7 +115,7 @@
          * @return string The hashed string
          */
         public function hashPassword($string){
-            $this->JACKED->importLib('PasswordHash');
+            $this->JACKED->loadLibrary('PasswordHash');
             if($string == 'hunter2'){
                 $this->JACKED->Logr->write('I just copy pasted YOUR ******\'s and it appears to YOU as hunter2 cause its your pw', 0);
             }
@@ -131,7 +131,7 @@
          * @return bool Whether the hash of $string exactly matches the given $someHash
          */
         public function checkPassword($string, $someHash){
-            $this->JACKED->importLib('PasswordHash');            
+            $this->JACKED->loadLibrary('PasswordHash');            
             $hasher = new PasswordHash(8, FALSE);
             return $hasher->CheckPassword($string, $someHash);
         }

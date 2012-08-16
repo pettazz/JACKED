@@ -1,19 +1,4 @@
 <?php
-    //autoload classes from modules folder when they're called
-    ////BE CAREFUL because this will only autoload Modules, not libs or anything else
-    //maybe there should be a better loader but this is just fine for now
-    spl_autoload_register(function($class){
-        $did = false;
-        $file = JACKED_MODULES_ROOT . $class . '.php';
-        if (file_exists($file)){
-            require($file);
-            $did = true;
-        }else{
-            throw new Exception("JACKED can't find a class for the module named " . $class . ".");
-        }
-        return $did;
-    }); 
-
     class JACKED{
         const moduleName = "JACKED Core";
         const moduleVersion = 3.5;
@@ -23,13 +8,14 @@
     
         public function __construct($dependencies = array()){
             self::$_instance = $this;
+
+            //load configuration
             self::$_instance->config = new Configur("core");
             
             //load util and logging 
             self::$_instance->loadDependencies(array('Logr', 'Util'));
 
             //load dependencies
-            //sanity
             if(!is_array($dependencies)){
                 $dependencies = explode(", ", $dependencies);
             }
@@ -104,7 +90,7 @@
             }
         }
         
-        public function importLib($libname){
+        public function loadLibrary($libname){
             //this could certainly be better, but it works for now
             ////for now we'll assume every lib is a single class in a same name .php
             if(!class_exists($libname, FALSE)){ //definitely needs to be better
