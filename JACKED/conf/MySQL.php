@@ -1,10 +1,14 @@
 <?php
 
+    $settings = array(
+        'db_user' => 'jacked',
+        'db_name' => 'jacked',
+        'db_host' => 'localhost'
+    );
+
     include(JACKED_SECRET_FILE);
     
-    $settings['db_name'] = 'jacked';
-    $settings['db_user'] = 'jacked';
-    $settings['db_host'] = 'localhost';
+    $settings['db_pass'] = $db_password;
 
     $settings['use_memcache'] = false;
 
