@@ -16,6 +16,7 @@
             
             $this->JACKED = $JACKED;
             $this->JACKED->loadDependencies(self::getModuleDependencies());
+            $this->fireEvent('moduleLoad', array('moduleName' => self::getModuleName()));
         }
 
         public static function getModuleName(){
