@@ -14,7 +14,7 @@
         public function __construct($JACKED){
             JACKEDModule::__construct($JACKED);
 
-            private $this->registeredModels = array();
+            $this->registeredModels = array();
 
             //import the correct SyrupDriver based on the driver name
             include($this->config->driver_root . $this->config->storage_driver_name . '.php');
