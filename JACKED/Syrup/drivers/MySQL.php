@@ -17,7 +17,9 @@
 
         public function __destruct(){
             if($this->isLinkOpen()){
-                mysql_close($this->_mysql_link);
+                try{
+                    mysql_close($this->_mysql_link);
+                }catch(Exception $e{}
                 $this->_mysql_link = NULL;
             }
         }
