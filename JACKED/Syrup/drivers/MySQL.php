@@ -11,8 +11,6 @@
         private $_logr;
 
         public function __construct($config, $logr){
-            parent::__construct();
-
             $this->_config = $config;
             $this->_logr = $logr;
         }
