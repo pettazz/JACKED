@@ -16,7 +16,7 @@
 
         public function __construct($isNew = true){
             parent::__construct();
-            
+
             $this->_isNew = $isNew;
             $this->_isDirty = false; 
 
@@ -38,7 +38,7 @@
             if(strpos($key, '_') !== 0){
                 if(array_key_exists($key, $this->fields)){
                     if($this->$key->_isPrimaryKey){
-                        throw new PrimaryKeyUnmodifiableException($key)
+                        throw new PrimaryKeyUnmodifiableException($key);
                     }else{
                         $this->$key->setValue($value);
                         $this->_isDirty = true;
