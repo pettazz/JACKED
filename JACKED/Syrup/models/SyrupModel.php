@@ -54,7 +54,7 @@
         public function __get($key){
             //see above __set() jankiness comment. also applies here.
             if(strpos($key, '_') !== 0){
-                if(array_key_exists($key, $this->fields)){
+                if(array_key_exists($key, $this->_fields)){
                     return $this->$key->getValue();
                 }else{
                     throw new UnknownModelFieldException($key);
