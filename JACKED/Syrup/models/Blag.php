@@ -4,9 +4,17 @@
 
         const tableName = 'BlagPost';
 
+        public $guid;
+        public $author;
+        public $posted;
+        public $alive;
+        public $title;
+        public $headline;
+        public $content;
+
         public function __construct($config, $logr){
             parent::__construct($config, $logr);
-            
+
             $this->$guid = new SyrupField(SyrupField::VARCHAR, 64, false, NULL, 'PRI');
             $this->$author = new SyrupField(SyrupField::VARCHAR, 64, false, NULL, 'FK');
             $this->$posted = new SyrupField(SyrupField::INT, 11, false);
