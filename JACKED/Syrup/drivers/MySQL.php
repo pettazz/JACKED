@@ -197,7 +197,7 @@
         }
 
         public function count($criteria = array()){
-            $query = "SELECT COUNT(" . $this->getPrimaryKeyName() . ") AS count FROM " . static::tableName . " WHERE " . getWhereClause($criteria);
+            $query = "SELECT COUNT(" . $this->getPrimaryKeyName() . ") AS count FROM " . static::tableName . " WHERE " . self::getWhereClause($criteria);
             return $this->query($query);
         }
 
