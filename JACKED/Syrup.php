@@ -60,7 +60,7 @@
             try{
                 include($this->config->model_root . $moduleName . '.php');
             }catch(Exception $e){
-                throw new UnknownModelException($moduleName);
+                throw new UnknownModelException($moduleName, 0, $e);
             }
             
             $className = $moduleName . 'Model';
