@@ -15,6 +15,8 @@
         private $_isDirty;
 
         public function __construct($isNew = true){
+            parent::__construct();
+            
             $this->_isNew = $isNew;
             $this->_isDirty = false; 
 
