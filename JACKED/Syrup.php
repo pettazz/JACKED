@@ -17,8 +17,8 @@
             $this->registeredModels = array();
 
             //import the base classes and correct SyrupDriver based on the driver name
-            include($this->config->model_root . 'SyrupModel.php');
             include($this->config->driver_root . 'SyrupDriverInterface.php');
+            include($this->config->model_root . 'SyrupModel.php');
             include($this->config->driver_root . $this->config->storage_driver_name . '.php');
 
             //turn on auto-registration if it's enabled
