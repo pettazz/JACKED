@@ -146,7 +146,7 @@
 
             //not restricting to recognized types yet, maybe in the future 
             $this->type = $type;
-            if(in_array($type, $this->requiredLengthTypes) && !$length){
+            if(in_array($type, $requiredLengthTypes) && !$length){
                 throw new MissingRequiredFieldParameterException('length');
             }
             $this->length = $length;
