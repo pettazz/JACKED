@@ -20,13 +20,6 @@
             include($this->config->driver_root . 'SyrupDriverInterface.php');
             include($this->config->driver_root . $this->config->storage_driver_name . '.php');
             include($this->config->model_root . 'SyrupModel.php');
-
-            //turn on auto-registration if it's enabled
-            /*if($this->config->lazy_register_all === true){
-                $JACKED->attachToEvent('moduleLoaded', function($data){
-                    $this->registerModule($data['moduleName']);
-                });
-            }*/
         }
 
         /**
