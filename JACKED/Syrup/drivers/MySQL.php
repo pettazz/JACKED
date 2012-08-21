@@ -19,7 +19,7 @@
             if($this->isLinkOpen()){
                 try{
                     mysql_close($this->_mysql_link);
-                }catch(Exception $e{}
+                }catch(Exception $e){}
                 $this->_mysql_link = NULL;
             }
         }
