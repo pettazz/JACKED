@@ -36,7 +36,7 @@
             //this is a little janky, assumes all non-field prop names start with a _
             ////and everything else is a field
             if(strpos($key, '_') !== 0){
-                if(array_key_exists($key, $this->fields)){
+                if(array_key_exists($key, $this->_fields)){
                     if($this->$key->_isPrimaryKey){
                         throw new PrimaryKeyUnmodifiableException($key);
                     }else{
