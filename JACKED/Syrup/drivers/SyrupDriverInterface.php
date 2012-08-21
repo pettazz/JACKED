@@ -21,13 +21,13 @@
             return count($objects) == 1 ? $objects[0] : null;
         }
 
-        public static function find($criteria = array(), $order = null, $limit = null, $offset = 0);
+        abstract public function find($criteria = array(), $order = null, $limit = null, $offset = 0);
 
-        public static function count($criteria = array());
+        abstract public function count($criteria = array());
 
-        public function save();
+        abstract public function save();
 
-        public function delete();
+        abstract public function delete();
 
     } 
 

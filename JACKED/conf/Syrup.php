@@ -8,10 +8,10 @@
         'lazy_register_all' => false,
 
         //location of the model classes, relative to JACKED_MODULES_ROOT
-        'model_root' => 'Syrup/models/'
+        'model_root' => 'Syrup/models/',
 
         //location of the driver classes, relative to JACKED_MODULES_ROOT
-        'class_root' => 'Syrup/classes/',
+        'driver_root' => 'Syrup/drivers/',
 
         //storage engine driver to use
         //// TODO: multiple drivers and/or swapping
@@ -21,11 +21,11 @@
         'driverConfig' => array(
 
             //database name
-            'db_name' => 'jacked'
+            'db_name' => 'jacked',
             //databae user
-            'db_user' => 'jacked'
+            'db_user' => 'jacked',
             //database host
-            'db_host' => 'localhost'
+            'db_host' => 'localhost',
             //password is in included file
         )
             

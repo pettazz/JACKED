@@ -181,22 +181,24 @@
             return $this->mysqlQuery($query, $link);
         }
 
-        public static function find($criteria = array(), $order = null, $limit = null, $offset = 0){
+        public function find($criteria = array(), $order = null, $limit = null, $offset = 0){
             foreach($criteria as $field=>$value)
             $query = "SELECT * FROM " . static::tableName;
             $query .= " WHERE " . self::getWhereClause($criteria);
             if($order){
-                $query .= " ORDER BY " . $order['field'] . $order['direction']
+                $query .= " ORDER BY " . $order['field'] . $order['direction'];
             }
             if($limit){
                 $query .= " LIMIT " . $limit;
             }
-            if($offset) .= " OFFSET " . $offset;
+            if($offset){
+                $query .= " OFFSET " . $offset;
+            }
 
             return $this->query($query);
         }
 
-        public static function count($criteria = array()){
+        public function count($criteria = array()){
             $query = "SELECT COUNT(" . $this->getPrimaryKeyName() . ") AS count FROM " . static::tableName . " WHERE " . getWhereClause($criteria);
             return $this->query($query);
         }
