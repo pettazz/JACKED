@@ -22,17 +22,6 @@
             $this->_isNew = $isNew;
             $this->_isDirty = false; 
 
-            //internally collect all fields and determine PRI key
-            foreach(get_class_vars(get_class($this)) as $field => $val){
-                //see __set() jankiness comment
-                if(strpos($field, '_') !== 0){
-                    if($this->$field->isPrimaryKey()){
-                        $this->_primaryKey = array("name" => $field, "field" => $this->$field);
-                    }
-                    $this->fields[$field] = $this->$field;
-                }
-            }
-
             $this->_constructing = false;
         }
 
@@ -40,6 +29,9 @@
             //constructor needs to be able to set anything it damn well pleases
             if($this->_constructing){
                 $this->$key = $value;
+                if(is_subclass_of($this->$key, 'SyrupField') && $this->$key->isPrimaryKey()){
+                    $this->_primaryKey = array('name' => $key, 'field' => $this->$key)
+                }
             }elseif(strpos($key, '_') !== 0){
                 //this is a little janky, assumes all non-field prop names start with a _
                 ////and everything else is a field
