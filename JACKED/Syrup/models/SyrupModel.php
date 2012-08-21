@@ -171,7 +171,7 @@
                     break;
             }
             $this->null = ($null? true : false);
-            if($this->null && !$default){
+            if($this->null && $default !=== NULL){
                 throw new MissingRequiredFieldParameterException('default');
             }
             $this->default = $default;
