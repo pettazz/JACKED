@@ -14,6 +14,8 @@
         private $_isNew;
         private $_isDirty;
 
+        private $_constructing = true;
+
         public function __construct($config, $logr, $isNew = true){
             parent::__construct($config, $logr);
 
@@ -30,12 +32,17 @@
                     $this->fields[$field] = $this->$field;
                 }
             }
+
+            $this->_constructing = false;
         }
 
         public function __set($key, $value){
-            //this is a little janky, assumes all non-field prop names start with a _
-            ////and everything else is a field
-            if(strpos($key, '_') !== 0){
+            //constructor needs to be able to set anything it damn well pleases
+            if($this->_constructing){
+                $this->$key = $value;
+            }elseif(strpos($key, '_') !== 0){
+                //this is a little janky, assumes all non-field prop names start with a _
+                ////and everything else is a field
                 if(array_key_exists($key, $this->_fields)){
                     if($this->$key->_isPrimaryKey){
                         throw new PrimaryKeyUnmodifiableException($key);
