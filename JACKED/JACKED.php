@@ -1,4 +1,19 @@
 <?php
+    //autoload classes from modules folder when they're called
+    ////BE CAREFUL because this will only autoload Modules, not libs or anything else
+    //maybe there should be a better loader but this is just fine for now
+    spl_autoload_register(function($class){
+        $did = false;
+        $file = JACKED_MODULES_ROOT . $class . '.php';
+        if (file_exists($file)){
+            require($file);
+            $did = true;
+        }else{
+            throw new Exception("JACKED can't find a class for the module named " . $class . ".");
+        }
+        return $did;
+    }); 
+
     class JACKED extends JACKEDModule{
         const moduleName = "JACKED Core";
         const moduleVersion = 3.5;

@@ -10,11 +10,6 @@
     define('JACKED_CONFIG_ROOT', '/var/www/jacked-prod/JACKED/conf/');
     define('JACKED_LIB_ROOT', '/var/www/jacked-prod/JACKED/lib/');
     define('JACKED_SECRET_FILE', '/var/www/mysql_jacked.php');
-    
-    //allow Modules to be autoloaded
-    set_include_path(get_include_path() . PATH_SEPARATOR . JACKED_MODULES_ROOT);
-    spl_autoload_extensions('.php');
-    spl_autoload_register();
 
     //load JACKED
     try{
