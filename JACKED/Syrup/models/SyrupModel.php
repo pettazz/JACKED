@@ -30,7 +30,7 @@
             if($this->_constructing){
                 $this->$key = $value;
                 if(is_subclass_of($this->$key, 'SyrupField') && $this->$key->isPrimaryKey()){
-                    $this->_primaryKey = array('name' => $key, 'field' => $this->$key)
+                    $this->_primaryKey = array('name' => $key, 'field' => $this->$key);
                 }
             }elseif(strpos($key, '_') !== 0){
                 //this is a little janky, assumes all non-field prop names start with a _
