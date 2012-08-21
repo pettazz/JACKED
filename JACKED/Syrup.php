@@ -21,11 +21,11 @@
             include($this->config->driver_root . $this->config->storage_driver_name . '.php');
 
             //turn on auto-registration if it's enabled
-            if($this->config->lazy_register_all === true){
+            /*if($this->config->lazy_register_all === true){
                 $JACKED->attachToEvent('moduleLoaded', function($data){
                     $this->registerModule($data['moduleName']);
                 });
-            }
+            }*/
         }
 
         /**
@@ -39,7 +39,7 @@
                     $this->registerModule($module);
                     return $this->registeredModels[$module];
                 }catch(Exception $ex){
-                    throw new UnknownModelException($module);
+                    throw new UnknownModelException($module, 0, $ex);
                 }
             }
         }
