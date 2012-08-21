@@ -14,8 +14,8 @@
         private $_isNew;
         private $_isDirty;
 
-        public function __construct($isNew = true){
-            parent::__construct();
+        public function __construct($config, $logr, $isNew = true){
+            parent::__construct($config, $logr);
 
             $this->_isNew = $isNew;
             $this->_isDirty = false; 
