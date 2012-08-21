@@ -29,7 +29,7 @@
             //constructor needs to be able to set anything it damn well pleases
             if($this->_constructing){
                 $this->$key = $value;
-                if(is_subclass_of($this->$key, 'SyrupField') && $this->$key->isPrimaryKey()){
+                if(get_class($this->$key) == 'SyrupField' && $this->$key->isPrimaryKey{
                     $this->_primaryKey = array('name' => $key, 'field' => $this->$key);
                 }
             }elseif(strpos($key, '_') !== 0){
