@@ -12,7 +12,7 @@
     define('JACKED_SECRET_FILE', '/var/www/mysql_jacked.php');
     
     //allow Modules to be autoloaded
-    set_include_path(JACKED_MODULES_ROOT);
+    set_include_path(get_include_path() . PATH_SEPARATOR . JACKED_MODULES_ROOT);
     spl_autoload_extensions('.php');
     spl_autoload_register();
 
