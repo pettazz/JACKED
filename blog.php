@@ -1,7 +1,7 @@
 <?php
 
     require('jacked_conf.php');
-    $JACKED = new JACKED(array("Blag", "Karma", "EYS"));
+    $JACKED = new JACKED(array("Blag", "Karma", "EYS", "Syrup"));
     $blog = $JACKED->Blag;
     $eys = $JACKED->EYS;
     $karma = $JACKED->Karma;
@@ -18,7 +18,8 @@
 		echo '<h2>This is ' . $blog::getModuleName() . ' version ' . $blog::getModuleVersion() . '</h2>';
 
 		$eys->setMark('getposts');
-		$posts = $blog->getPosts();
+        $posts = $JACKED->Syrup->Blag->find(array('alive' => 1));
+		//$posts = $blog->getPosts();
 		$eys->setMark('getposts_end');
 		foreach($posts as $num => $post){
 			echo '<h1>' . $post['title'] . '</h1>';
