@@ -2,10 +2,9 @@
 
     $settings = array(
     
-        //whether to automagically register all meta-content types with all content types
-        ////if true, every Meta-Content Module loaded on a given page will be registered with
-        ////every Content Module, with no explicit registration call.
-        'lazy_register_all' => true,
+        //whether to allow Syrup to attempt to load a Model that has been referened but 
+        ////is not currently registered
+        'lazy_load_all' => true,
 
         //location of the model classes, relative to JACKED_MODULES_ROOT
         'model_root' => 'Syrup/models/',

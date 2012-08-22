@@ -29,11 +29,13 @@
             if(array_key_exists($module, $this->registeredModels)){
                 return $this->registeredModels[$module];
             }else{
-                try{
-                    $this->registerModule($module);
-                    return $this->registeredModels[$module];
-                }catch(Exception $ex){
-                    throw new UnknownModelException($module, 0, $ex);
+                if($this->config->lazy_load_all){
+                    try{
+                        $this->registerModule($module);
+                        return $this->registeredModels[$module];
+                    }catch(Exception $ex){
+                        throw new UnknownModelException($module, 0, $ex);
+                    }
                 }
             }
         }
