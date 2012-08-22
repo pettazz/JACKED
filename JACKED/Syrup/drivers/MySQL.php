@@ -107,25 +107,6 @@
      
             return implode(' AND ', $result);
         }
-        
-        /**
-        * Parse a given MySQL Resource ID into an associative array of the given type.
-        * 
-        * @param $result int MySQL Resource ID to parse.
-        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
-        * @return Array Result data parsed into an associative array.
-        */
-        private function parseResult($result, $result_type = MYSQL_BOTH){
-           $done = array();
-            if($result){
-                while($row = mysql_fetch_array($result, $result_type)){
-                    $done[] = $row;
-                }
-            }
-            if(count($done) == 1)
-                $done = $done[0];
-            return $done;
-        }
 
         /**
         * Get the string value of the last MySQL error on the given link.
