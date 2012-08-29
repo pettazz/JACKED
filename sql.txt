@@ -1,0 +1,62 @@
+JSON:
+
+{   
+    "active = ?": true,
+    "AND": {
+        {
+            "date > ?": 1234567890,
+            "author = ? ": 9
+        },
+        "OR": {
+            "date < ? ": 0987654321,
+            "title LIKE ?": "*hats*"
+        }
+    }
+}
+
+
+
+PHP Array:
+
+array(   
+    "active = ?" => true,
+    "AND" => array(
+        array(
+            "date > ?" => 1234567890,
+            "author = ? " => 9
+        ),
+        "OR" => array(
+            "date < ? " => 0987654321,
+            "title LIKE ?" => "*hats*"
+        )
+    )
+)
+
+
+
+Exploded SQL:
+
+WHERE 
+    active = 'true' 
+    AND (
+        (
+            date > 1234567890 
+            AND 
+            author = 9
+        ) 
+        OR 
+        (
+            date < 0987654321 
+            AND 
+            title LIKE %hats%
+        )
+    )
+
+
+
+SQL:
+
+active = 1 AND ((date > 1234567890 AND author = 9) OR (date < 987654321 AND title LIKE "%hats%"))
+
+
+active = 1 AND ( (date > 1234567890  AND author = 9  ) OR (date < 987654321 title LIKE %hats% ) )

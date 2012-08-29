@@ -36,7 +36,7 @@
         }
         
         /**
-        * Opens a new link to MySQL. If $setDefault is true and link creation fails, the module is disabled.
+        * Opens a new link to MySQL.
         * 
         * @param $setDefault Boolean [optional] Whether to make the new link the default link. Defaults to true.
         * @return int MySQL Link ID that was just opened.
@@ -86,6 +86,30 @@
         private static function paginator($howMany, $page){
             return " LIMIT " . ($howMany * ($page - 1)) . ", " . $howMany;
         }
+
+        private function parseWhereCriteria($criteria){
+            $result = "";
+            foreach($criteria as $key => $value){
+                if(trim($key) == "OR" || trim($key) == "AND"){
+                    $result .= trim($key) . " (" . $this->parseWhereCriteria($value) . ") ";
+                }else if(is_array($value)){
+                    $results = array();
+                    foreach($value as $innerkey => $innerval){
+                        $results[] = $this->parseWhereCriteria(array($innerkey => $innerval));
+                    }
+                    $result .= " ( " . implode(" AND ", $results) . " ) ";
+                }else{
+                    if(is_numeric($value)){
+                        $value = strval($value);
+                    }else if(is_bool($value)){
+                        $value = ($value)? '1' : '0';
+                    }
+                    $result .= str_replace(array('*', '?'), array('%', str_replace('*', '%', $value)), trim($key)) . " ";
+                }
+            }
+
+            return $result;
+        }
         
         /**
         * Generates the WHERE clause of a query based on an array of field/value pairs.
@@ -93,19 +117,13 @@
         * @param $criteria Array String field/value pairs.
         * @return String MySQL WHERE clause.
         */
-        private static function getWhereClause($criteria){
-            $result = array();
- 
-            foreach($criteria as $column => $value){
-                if(strpos($value, '*') !== false){
-                    $result[] = "$column LIKE " . str_replace('*', '%', $value);
-                }else{
-                    $result[] = "$column = " . $value;
-                }
-                //TODO: Relations and you know stuff like OR and functions
+        private function getWhereClause($criteria){
+            //accept JSON formatted criteria
+            if(is_string($criteria)){
+                $criteria = json_decode($criteria);
             }
-     
-            return implode(' AND ', $result);
+
+            return "WHERE " . $this->parseWhereCriteria($criteria);
         }
 
         /**
