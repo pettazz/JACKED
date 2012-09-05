@@ -12,7 +12,7 @@
         */
         public static function validateEmail($email)
         {
-            return eregi('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[_a-z0-9-]+(\.[_a-z0-9-]+)*(\.[a-z]{2,4})$', $email);
+            return (bool)filter_var($email, FILTER_VALIDATE_EMAIL);
         }
 
         /**
@@ -29,7 +29,7 @@
             }
             foreach($haystack as $v){
                 if(is_array($v) || is_object($v)){
-                    $result = array_key_exists_recursive($needle, $v);
+                    $result = self::array_key_exists_recursive($needle, $v);
                 }
                 if($result){
                     return $result;
