@@ -156,44 +156,49 @@
         * @param $level Int [optional] The error level of the message to print. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
         */
         public static function printMessage($msg, $callee = NULL, $level = 1){
-            if($callee == NULL){
-                list($callee) = debug_backtrace();
-            }
+            if(php_sapi_name() == 'cli'){
+                //this is actual stdout, not rendering to a webpage, so no html output
+                echo '[' . microtime(true) . '] [' . strtoupper(self::levelName($level)) . '] [' . $callee['file'] . ' @ line: ' . $callee['line'] . '] ' . $msg . "\n";
+            }else{
+                if($callee == NULL){
+                    list($callee) = debug_backtrace();
+                }
 
-            //set some style stuff for different levels
-            switch($level){
-                case 0:
-                    $color = "3366FF";
-                    $label = "LOL: ";
-                    break;
-                case 1:
-                    $color = "0000FF";
-                    $label = "Notice: ";
-                    break;
-                case 2:
-                    $color = "CC6600";
-                    $label = "Warning: ";
-                    break;
-                case 3:
-                    $color = "FF3300";
-                    $label = "Severe: ";
-                    break;
-                case 4:
-                    $color = "FF0000";
-                    $label = "Fatal: ";
-                    break;
-            }
+                //set some style stuff for different levels
+                switch($level){
+                    case 0:
+                        $color = "3366FF";
+                        $label = "LOL: ";
+                        break;
+                    case 1:
+                        $color = "0000FF";
+                        $label = "Notice: ";
+                        break;
+                    case 2:
+                        $color = "CC6600";
+                        $label = "Warning: ";
+                        break;
+                    case 3:
+                        $color = "FF3300";
+                        $label = "Severe: ";
+                        break;
+                    case 4:
+                        $color = "FF0000";
+                        $label = "Fatal: ";
+                        break;
+                }
 
-            echo '<fieldset style="background: #fefefe !important; border:2px ' . $color . ' solid; padding:5px">';
-            try{
-                echo '<legend style="background:lightgrey; padding:5px;">'. $label . $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
-            }catch(Exception $e){
-                echo '<legend style="background:lightgrey; padding:5px;">Logr Message</legend>';
-            }
-            echo '<pre><br />'. $msg;
+                echo '<fieldset style="background: #fefefe !important; border:2px ' . $color . ' solid; padding:5px">';
+                try{
+                    echo '<legend style="background:lightgrey; padding:5px;">'. $label . $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
+                }catch(Exception $e){
+                    echo '<legend style="background:lightgrey; padding:5px;">Logr Message</legend>';
+                }
+                echo '<pre><br />'. $msg;
 
-            echo "</pre>";
-            echo "</fieldset>";
+                echo "</pre>";
+                echo "</fieldset>";
+            }
         }
 
         /**
@@ -225,9 +230,6 @@
         * @param $skipLocation String [optional] A specific log location to ignore in this write (use to stop infinite recursion)
         */
         public function write($msg, $level = 1, $stacktrace = NULL, $skipLocation = NULL){
-            if(defined('JACKED_ENABLE_LOGGING') && JACKED_ENABLE_LOGGING === false){
-                return NULL;
-            }
             if($stacktrace == NULL){
                 $stacktrace = debug_backtrace();
             }
