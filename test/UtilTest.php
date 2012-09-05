@@ -1,6 +1,6 @@
 <?php
-    require('test/jacked_test_conf.php');
-    
+    require('jacked_test_conf.php');
+
     require_once 'PHPUnit/Autoload.php';
      
     class UtilTest extends PHPUnit_Framework_TestCase{
