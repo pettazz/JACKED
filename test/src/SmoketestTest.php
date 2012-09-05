@@ -1,5 +1,5 @@
 <?php
-    require_once 'PHPUnit/Autoload.php';
+    require_once('PHPUnit/Autoload.php');
      
     class ArrayTest extends PHPUnit_Framework_TestCase{
         public function testNewArrayIsEmpty(){

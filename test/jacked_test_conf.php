@@ -9,7 +9,7 @@
     define('JACKED_MODULES_ROOT', 'JACKED/');
     define('JACKED_CONFIG_ROOT', 'JACKED/conf/');
     define('JACKED_LIB_ROOT', 'JACKED/lib/');
-    define('JACKED_SECRET_FILE', 'test/mysql_jacked.php');
+    define('JACKED_SECRET_FILE', 'test/mysql_test_conf.php');
 
     define('JACKED_ENABLE_LOGGING', false);
 
