@@ -1,5 +1,5 @@
 <?php
-    require('../jacked_conf.php');
+    require('jacked_conf.php');
     $JACKED = new JACKED();
 
     require_once 'PHPUnit/Autoload.php';
