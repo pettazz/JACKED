@@ -44,6 +44,15 @@
                     break;
             }
 
+            //If core debug is enabled, include stdout logging
+            if($JACKED->config->debug > 0){
+                $this->locations[] = 'stdout';
+            }
+
+            if(defined('JACKED_ENABLE_LOGGING') && JACKED_ENABLE_LOGGING === false){
+                return $this;
+            }
+            
             foreach($this->config->locations as $loc => $data){
                 switch($loc){
                     case 'file':
@@ -77,10 +86,6 @@
                         $this->locations[] = 'stdout';
                         break;
                 }
-            }
-            //If core debug is enabled, include stdout logging
-            if($JACKED->config->debug > 0){
-                $this->locations[] = 'stdout';
             }
         }
         
@@ -220,6 +225,9 @@
         * @param $skipLocation String [optional] A specific log location to ignore in this write (use to stop infinite recursion)
         */
         public function write($msg, $level = 1, $stacktrace = NULL, $skipLocation = NULL){
+            if(defined('JACKED_ENABLE_LOGGING') && JACKED_ENABLE_LOGGING === false){
+                return NULL;
+            }
             if($stacktrace == NULL){
                 $stacktrace = debug_backtrace();
             }
