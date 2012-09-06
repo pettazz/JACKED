@@ -99,9 +99,12 @@
 		 * @return  void
 		 * @access  public
 		 */
-		function MarkovLetterChain ( $order = 1 )
+		function MarkovLetterChain ( $order = 1, $load_source = false )
 		{
 			$this->_order = $order;
+			if($load_source){
+				$this->feed(file_get_contents(JACKED_LIB_ROOT . 'Markov-Source.txt'));
+			}
 		}
 
 		/**
