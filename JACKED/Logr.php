@@ -158,7 +158,9 @@
         public static function printMessage($msg, $callee = NULL, $level = 1){
             if(php_sapi_name() == 'cli'){
                 //this is actual stdout, not rendering to a webpage, so no html output
-                echo '[' . microtime(true) . '] [' . strtoupper(self::levelName($level)) . '] [' . $callee['file'] . ' @ line: ' . $callee['line'] . '] ' . $msg . "\n";
+                echo '[' . microtime(true) . '] [' . strtoupper(self::levelName($level)) . '] ';
+                echo '[' . $callee['file'] . ' @ line: ' . $callee['line'] . '] ';
+                echo $msg . "\n";
             }else{
                 if($callee == NULL){
                     list($callee) = debug_backtrace();
@@ -232,6 +234,12 @@
         public function write($msg, $level = 1, $stacktrace = NULL, $skipLocation = NULL){
             if($stacktrace == NULL){
                 $stacktrace = debug_backtrace();
+            }
+            if(!array_key_exists('line', $stacktrace[0])){
+                $stacktrace[0]['line'] = 'unknown';
+            }
+            if(!array_key_exists('file', $stacktrace[0])){
+                $stacktrace[0]['file'] = 'unknown';
             }
             
             foreach($this->locations as $loc){
