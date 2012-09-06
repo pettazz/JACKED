@@ -45,7 +45,7 @@
             return self::$_instance;
         }
 
-        private function isModuleRegistered($name, $version = false){
+        public function isModuleRegistered($name, $version = false){
             $instance = self::getInstance();
             if(property_exists($instance, $name)){
                 if($version){
