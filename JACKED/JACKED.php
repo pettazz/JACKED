@@ -97,7 +97,7 @@
                         }else{
                             $instance->$module = new Derper();
                             try{
-                                $instance->Logr->write('Optional module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 3, $e-getTrace());
+                                $instance->Logr->write('Optional module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 3, $e->getTrace());
                             }catch(Exception $ex){}
                         }
                     }
