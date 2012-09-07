@@ -19,6 +19,7 @@
         const moduleVersion = 3.5;
     
         protected static $_instance = null;
+        private $loadedLibraries = array();
         public $config;
     
         public function __construct($dependencies = array()){
@@ -107,15 +108,17 @@
         
         public function loadLibrary($libname){
             //this could certainly be better, but it works for now
-            ////for now we'll assume every lib is a single class in a same name .php
-            if(!class_exists($libname, FALSE)){ //definitely needs to be better
+            ////for now we'll assume every lib is a single .php file in JACKED_LIB_ROOT
+            ///TODO: have some kind of lib loading standard config file within a lib that explains which files to load, etc
+            $instance = self::getInstance();
+            if(!in_array($libname, $instance->loadedLibraries)){
                 $did = false;
                 $file = JACKED_LIB_ROOT . $libname . '.php';
-                if (file_exists($file)){
-                    require($file);
+                if(file_exists($file)){
+                    include_once($file);
+                    array_push($instance->loadedLibraries, $libname);
                     $did = true;
                 }else{
-                    $instance = self::getInstance();
                     $instance->Logr->write('Library ' . $libname . ' couldn\'t be loaded: File does not exist.', 4);
                     throw new Exception("JACKED can't find a library named " . $libname . ".");
                 }
