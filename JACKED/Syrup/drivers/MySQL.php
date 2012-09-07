@@ -183,7 +183,7 @@
         public function find($criteria = array(), $order = null, $limit = null, $offset = 0){
             foreach($criteria as $field=>$value)
             $query = "SELECT * FROM " . static::tableName;
-            $query .= " WHERE " . self::getWhereClause($criteria);
+            $query .= " " . self::getWhereClause($criteria);
             if($order){
                 $query .= " ORDER BY " . $order['field'] . $order['direction'];
             }
@@ -198,7 +198,7 @@
         }
 
         public function count($criteria = array()){
-            $query = "SELECT COUNT(" . $this->getPrimaryKeyName() . ") AS count FROM " . static::tableName . " WHERE " . self::getWhereClause($criteria);
+            $query = "SELECT COUNT(" . $this->getPrimaryKeyName() . ") AS count FROM " . static::tableName . " " . self::getWhereClause($criteria);
             $done = $this->query($query);
             return $done[0]['count'];
         }
