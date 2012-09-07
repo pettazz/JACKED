@@ -1,8 +1,6 @@
 <?php
     require_once('test/jacked_test_conf.php');
 
-    require_once('PHPUnit/Autoload.php');
-     
     class UtilTest extends PHPUnit_Framework_TestCase{
         public function setUp(){
             $this->JACKED = new JACKED();
