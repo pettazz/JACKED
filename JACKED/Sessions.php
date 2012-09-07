@@ -7,6 +7,11 @@
         
         public function __construct($JACKED){
             JACKEDModule::__construct($JACKED);
+
+            //Sessions are useless in cli, as is most of JACKED, so we can generally assume CLI means this is a phpunit test run
+            if(php_sapi_name() == 'cli'){
+                return $this;
+            }
             
             //start the session
             $did = session_set_save_handler(
