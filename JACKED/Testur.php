@@ -11,10 +11,9 @@
             JACKEDModule::__construct($JACKED);
 
             $JACKED->loadLibrary('MarkovGenerator');
-            ini_set('memory_limit', '50M'); // only needed to create the table
+            ini_set('memory_limit', '500M'); // only needed to create the table
 
-            $this->markov = new MarkovLetterChain(6);
-            $this->markov->feed( file_get_contents('JACKED/lib/source.txt'));
+            $this->markov = new MarkovLetterChain(6, true);
             $this->markov->root(2);
         }
 
@@ -60,14 +59,14 @@
         */
         public function generateFlockUser($password = NULL){
             $email = $this->markov->generate(10, 30) . '@gmail.com';
-            $username = $markov->generate(7, 30);
+            $username = $this->markov->generate(7, 30);
             $password = ($password)? $password : 'lol';
             $details = array(
                 'first_name' => ucfirst($this->markov->generate(7, 20)),
                 'last_name' => ucfirst($this->markov->generate(8, 30))
             );
             try{
-                $guid = $JACKED->Flock->createUser($email, $username, $password, $details);
+                $guid = $this->JACKED->Flock->createUser($email, $username, $password, $details);
                 $details['email'] = $email;
                 $details['guid'] = $guid;
                 $details['password'] = $password;
