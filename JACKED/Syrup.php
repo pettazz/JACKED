@@ -58,7 +58,9 @@
         */
         private function registerModule($moduleName){
             try{
-                include($this->config->model_root . $moduleName . '.php');
+                if(!class_exists($moduleName . 'Model', false)){
+                    include($this->config->model_root . $moduleName . '.php');
+                }
             }catch(Exception $e){
                 throw new UnknownModelException($moduleName, 0, $e);
             }
