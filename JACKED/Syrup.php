@@ -17,11 +17,11 @@
             $this->registeredModels = array();
 
             //import the base classes and correct SyrupDriver based on the driver name
-            if(!class_exists('SyrupDriverInterface')){
+            if(!class_exists('SyrupDriverInterface', false)){
                 include($this->config->driver_root . 'SyrupDriverInterface.php');
                 include($this->config->driver_root . $this->config->storage_driver_name . '.php');
             }
-            if(!class_exists('SyrupModel')){
+            if(!class_exists('SyrupModel', false)){
                 include($this->config->model_root . 'SyrupModel.php');
             }
         }
