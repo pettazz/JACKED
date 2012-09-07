@@ -22,17 +22,24 @@
             $this->_isNew = $isNew;
             $this->_isDirty = false; 
 
+            //the heart of jankiness
+            foreach(get_class_vars(get_class($this)) as $fieldName => $fieldVal){
+                //the mayor of jankville
+                if(strpos($fieldName, '_') !== 0 && is_array($fieldVal)){
+                    $reflection = new ReflectionClass('SyrupField');
+                    $this->$fieldName = $reflection->newInstanceArgs($fieldVal);
+                    array_push($this->_fields, $fieldName);
+                    if($this->$fieldName->isPrimaryKey){
+                        $this->_primaryKey = array('name' => $fieldName, 'field' => $this->$fieldName);
+                    }
+            }
             $this->_constructing = false;
+
         }
 
         public function __set($key, $value){
             //constructor needs to be able to set anything it damn well pleases
-            if($this->_constructing){
-                $this->$key = $value;
-                if(get_class($this->$key) == 'SyrupField' && $this->$key->isPrimaryKey){
-                    $this->_primaryKey = array('name' => $key, 'field' => $this->$key);
-                }
-            }elseif(strpos($key, '_') !== 0){
+            if(strpos($key, '_') !== 0){
                 //this is a little janky, assumes all non-field prop names start with a _
                 ////and everything else is a field
                 if(array_key_exists($key, $this->_fields)){
@@ -53,7 +60,9 @@
         public function __get($key){
             //see above __set() jankiness comment. also applies here.
             if(strpos($key, '_') !== 0){
-                if(array_key_exists($key, $this->_fields)){
+                if($this->_constructing){
+                    return $this->$key;
+                }elseif(array_key_exists($key, $this->_fields)){
                     return $this->$key->getValue();
                 }else{
                     throw new UnknownModelFieldException($key);
