@@ -32,6 +32,7 @@
                     if($this->$fieldName->isPrimaryKey){
                         $this->_primaryKey = array('name' => $fieldName, 'field' => $this->$fieldName);
                     }
+                }
             }
             $this->_constructing = false;
 
@@ -187,12 +188,12 @@
         }
 
         public function getValue(){
-            return $this->$_value;
+            return $this->_value;
         }
 
         public function setValue($value){
             //TODO: add type restriction checks
-            return $this->_value = $value;
+            $this->_value = $value;
         }
     }
 
