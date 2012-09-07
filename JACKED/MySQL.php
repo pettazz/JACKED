@@ -3,14 +3,16 @@
     class MySQL extends JACKEDModule{
         const moduleName = 'MySQL';
         const moduleVersion = 2.7;
-        public static $dependencies = array('Memcacher' => array('required' => false));
+        public static $dependencies = array(); //array('Memcacher' => array('required' => false));
         
         private $mysql_link = NULL;
         
         public function __destruct(){
             if($this->isLinkOpen()){
-                mysql_close($this->mysql_link);
-                $this->mysql_link = NULL;
+                try{
+                    mysql_close($this->_mysql_link);
+                }catch(Exception $e){}
+                $this->_mysql_link = NULL;
             }
         }
 
