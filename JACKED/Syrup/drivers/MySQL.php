@@ -233,13 +233,15 @@
         public function delete(){
             if(!$this->_isNew){
                 $query = "DELETE FROM " . static::tableName . " WHERE " . $this->getPrimaryKeyName() . " = '" . $this->_primaryKey['field']  . "'";
+                $done = $this->query($query);
+            }else{
+                $done = true;
             }
 
-            /*foreach(get_object_vars($this) as $var){
-                $this->$var = NULL;
-            }*/
+            foreach($this->getFields() as $field){
+                $this->$field = NULL;
+            }
 
-            $done = $this->query($query);
             $this->_isNew = true;
 
             return $done;
