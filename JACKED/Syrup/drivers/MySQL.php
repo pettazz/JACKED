@@ -193,8 +193,14 @@
             if($offset){
                 $query .= " OFFSET " . $offset;
             }
+            $data = $this->query($query);
+            $results = array();
+            foreach($data as $row){
+                $classname = get_class($this);
+                $results[] = new $classname($row);
+            }
 
-            return $this->query($query);
+            return $results;
         }
 
         public function count($criteria = array()){
