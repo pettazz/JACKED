@@ -19,7 +19,7 @@
 	    
 	    'stopwords' => 'I, a, about, an, are, as, at, be, by, com, de, en, for, from, how, in, is, it, la, of, on, or, that, the, this, to, was, what, when, where, who, why, will, with, und, the, www',
 	    
-	    'debug' => 1
+	    'debug' => 0
 	
 	);
 
