@@ -55,7 +55,14 @@
         }
 
         public function test_findOne(){
-            $this->assertTrue(true);
+            $data = $this->createPost();
+            $data2 = $this->createPost();
+            $data3 = $this->createPost();
+
+            $post = $this->JACKED->Syrup->Blag->findOne(array('alive' => 1), array('field' => 'posted', 'direction' => 'DESC'));
+            $this->assertEquals(1, count($post));
+
+            $this->assertEquals($post->guid, $data3['guid']);
         }
 
         public function test_findBy(){
@@ -71,7 +78,7 @@
 
             $data2 = $this->createPost();
             $result2 = $this->JACKED->Syrup->Blag->findByalive(1);
-            $this->assertEquals(count($result2), 2);
+            $this->assertEquals(2, count($result2));
 
             $result3 = $this->JACKED->Syrup->Blag->findByAliveAndGuid(1, $data['guid']);
             $result3 = $result3[0];
