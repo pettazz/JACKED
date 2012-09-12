@@ -9,10 +9,18 @@
         private $_mysql_link = NULL;
         private $_config;
         private $_logr;
+        private $_util;
 
-        public function __construct($config, $logr){
+        private $_modelName = '';
+        private $_tableName = '';
+
+        public function __construct($config, $logr, $util, $modelName){
             $this->_config = $config;
             $this->_logr = $logr;
+            $this->_util = $util;
+
+            $this->_modelName = $modelName;
+            $this->_tableName = $modelName::tableName;
         }
 
         public function __destruct(){
@@ -156,7 +164,7 @@
                 $value = false;
             }else if(mysql_num_rows($result) > 0){
                 $value = array();
-                while($row = mysql_fetch_array($result, MYSQL_BOTH)){
+                while($row = mysql_fetch_array($result, MYSQL_ASSOC)){
                     $value[] = array_map("stripslashes", $row);
                 }
                 mysql_free_result($result);
@@ -175,14 +183,14 @@
         * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        public function query($query, $link = NULL){
-            $query = $this->sanitize($query);
+        private function query($query, $link = NULL){
+            //$query = $this->sanitize($query);
             return $this->mysqlQuery($query, $link);
         }
 
         public function find($criteria = array(), $order = null, $limit = null, $offset = 0){
             foreach($criteria as $field=>$value)
-            $query = "SELECT * FROM " . static::tableName;
+            $query = "SELECT * FROM " . $this->_tableName;
             $query .= " " . self::getWhereClause($criteria);
             if($order){
                 $query .= " ORDER BY " . $order['field'] . $order['direction'];
@@ -197,16 +205,30 @@
             $results = array();
             foreach($data as $row){
                 $classname = get_class($this);
-                $results[] = new $classname($row);
+                $results[] = $this->load($row, false);
             }
 
             return $results;
         }
 
         public function count($criteria = array()){
-            $query = "SELECT COUNT(" . $this->getPrimaryKeyName() . ") AS count FROM " . static::tableName . " " . self::getWhereClause($criteria);
+            $query = "SELECT COUNT(*) AS count FROM " . $this->_tableName . " " . self::getWhereClause($criteria);
             $done = $this->query($query);
             return $done[0]['count'];
+        }
+
+        public function create($data = NULL){
+            $modelName = $this->_modelName;
+            if($data){
+                return $this->load($data, true);
+            }else{
+                return new $modelName($this->_config, $this->_logr, $this->_util);
+            }
+        }
+
+        private function load($data, $isNew = false){
+            $modelName = $this->_modelName;
+            return new $modelName($this->_config, $this->_logr, $this->_util, $data, $isNew);
         }
 
         public function save(){
@@ -214,13 +236,13 @@
                 if($this->_isNew){
                     $insertFields = array();
                     $insertValues = array();
-                    foreach($this->getFields() as $name => $val){
-                        $insertFields[] = $name;
-                        $insertValues[] = $val;
+                    foreach($this->getFields() as $field){
+                        $insertFields[] = $field;
+                        $insertValues[] = $this->sanitize($this->$field->getValue());
                     }
-                    $query = "INSERT INTO " . static::tableName . " (`" . implode('`, `', $insertFields) . "`) VALUES ('" . implode('\', \'', $insertValues) . "')";
+                    $query = "INSERT INTO " . $this->_tableName . " (`" . implode('`, `', $insertFields) . "`) VALUES ('" . implode("', '", $insertValues) . "')";
                 }else{
-                    $query = "UPDATE " . static::tableName . " SET ";
+                    $query = "UPDATE " . $this->_tableName . " SET ";
                     foreach($this->getFields() as $name => $val){
                         $query .= "`$name` = '$val'";
                     }
@@ -238,7 +260,7 @@
 
         public function delete(){
             if(!$this->_isNew){
-                $query = "DELETE FROM " . static::tableName . " WHERE " . $this->getPrimaryKeyName() . " = '" . $this->_primaryKey['field']  . "'";
+                $query = "DELETE FROM " . $this->_tableName . " WHERE " . $this->getPrimaryKeyName() . " = '" . $this->_primaryKey['field']  . "'";
                 $done = $this->query($query);
             }else{
                 $done = true;

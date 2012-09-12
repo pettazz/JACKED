@@ -16,26 +16,38 @@
 
         private $_constructing = true;
 
-        public function __construct($config, $logr, $isNew = true){
-            parent::__construct($config, $logr);
-
-            $this->_isNew = $isNew;
-            $this->_isDirty = false; 
+        public function __construct($config, $logr, $util, $data = NULL, $isNew = true){
+            parent::__construct($config, $logr, $util, get_class($this));
 
             //the heart of jankiness
             foreach(get_class_vars(get_class($this)) as $fieldName => $fieldVal){
                 //the mayor of jankville
                 if(strpos($fieldName, '_') !== 0 && is_array($fieldVal)){
+                    //create a new instance of the field with an array as constructor arguments 
                     $reflection = new ReflectionClass('SyrupField');
                     $this->$fieldName = $reflection->newInstanceArgs($fieldVal);
+
                     array_push($this->_fields, $fieldName);
                     if($this->$fieldName->isPrimaryKey){
                         $this->_primaryKey = array('name' => $fieldName, 'field' => $this->$fieldName);
+                    }
+                    //autogen fields
+                    if(in_array('UUID', $this->$fieldName->extra)){
+                        $this->$fieldName->setValue($util->uuid4());
                     }
                 }
             }
             $this->_constructing = false;
 
+            $this->_isNew = $isNew;
+            $this->_isDirty = false; 
+
+            if($data && is_array($data)){
+                foreach($data as $dataFieldName => $dataFieldValue){
+                    $this->$dataFieldName->setValue($dataFieldValue);
+                }
+                $this->_isDirty = true; 
+            }
         }
 
         public function __set($key, $value){
@@ -43,8 +55,8 @@
             if(strpos($key, '_') !== 0){
                 //this is a little janky, assumes all non-field prop names start with a _
                 ////and everything else is a field
-                if(array_key_exists($key, $this->_fields)){
-                    if($this->$key->_isPrimaryKey){
+                if(in_array($key, $this->_fields)){
+                    if($this->$key->isPrimaryKey){
                         throw new PrimaryKeyUnmodifiableException($key);
                     }else{
                         $this->$key->setValue($value);
@@ -63,7 +75,7 @@
             if(strpos($key, '_') !== 0){
                 if($this->_constructing){
                     return $this->$key;
-                }elseif(array_key_exists($key, $this->_fields)){
+                }elseif(in_array($key, $this->_fields)){
                     return $this->$key->getValue();
                 }else{
                     throw new UnknownModelFieldException($key);
@@ -177,7 +189,7 @@
                 throw new MissingRequiredFieldParameterException('default');
             }
             $this->default = $default;
-            $this->extra = $extra;
+            $this->extra = $extra? $extra : array();
             $this->comment = $comment;
 
             if($this->default){

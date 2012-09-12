@@ -64,9 +64,8 @@
             }catch(Exception $e){
                 throw new UnknownModelException($moduleName, 0, $e);
             }
-            
-            $className = $moduleName . 'Model';
-            $this->registeredModels[$moduleName] = new $className($this->config->driverConfig, $this->JACKED->Logr);
+            $modelName = $moduleName . 'Model';
+            $this->registeredModels[$moduleName] = new SyrupDriver($this->config->driverConfig, $this->JACKED->Logr, $this->JACKED->Util, $modelName);
         }
     }
 

@@ -23,7 +23,7 @@
         private function createPost(){
             $content = '';
             for($x = 0; $x <= rand(0, 5); $x++){
-                $content .= $this->JACKED->Testur->generateParagraph();
+                $content .= $this->JACKED->Testur->generateSentence();
             }
             $posted = rand(1022967819, time());
             $author = $this->JACKED->Testur->generateFlockUser();
@@ -41,14 +41,16 @@
         }
 
 
-
         public function test_find(){
             $data = $this->createPost();
-            $post = $this->JACKED->Syrup->Blag->find(array('alive' => 1));
-            $this->assertFalse(!$post);
+            $posts = $this->JACKED->Syrup->Blag->find(array('alive' => 1));
+            $this->assertEquals(1, count($posts));
+            $this->assertFalse(!$posts);
             foreach($data as $key => $val){
-                print_r($post->$key);
-                $this->assertEquals($val, $post->$key);
+                $post = $posts[0];
+                if($key !== 'author'){
+                    $this->assertEquals($val, $post->$key);
+                }
             }
         }
 
@@ -58,10 +60,37 @@
 
         public function test_count(){
             $this->assertEquals(0, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
+
+            $data = $this->createPost();
+            $this->assertEquals(1, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
+
+            $data = $this->createPost();
+            $data = $this->createPost();
+            $this->assertEquals(3, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
         }
 
         public function test_saveNew(){
-            $this->assertTrue(true);
+            $newpost = $this->JACKED->Syrup->Blag->create();
+            $author = $this->JACKED->Testur->generateFlockUser();
+            $newpost->author = $author['guid'];
+            $newpost->title = "JOE BIDEN";
+            $newpost->headline = "MATH GENUIS";
+            $timestamp = time();
+            $newpost->posted = $timestamp;
+            $newpost->content = "HEY EVERYONE!\n\n\nLOL!";
+            $newpost->save();
+
+            $this->assertNotNull($newpost->guid);
+
+            $rows = $this->JACKED->MySQL->getRows('BlagPost');
+            $row = $rows[0];
+            
+            $this->assertEquals($row['guid'], $newpost->guid);
+            $this->assertEquals($row['author'], $author['guid']);
+            $this->assertEquals($row['title'], "JOE BIDEN");
+            $this->assertEquals($row['headline'], "MATH GENUIS");
+            $this->assertEquals($row['posted'], $timestamp);
+            $this->assertEquals($row['content'], "HEY EVERYONE!\n\n\nLOL!");
         }
 
         public function test_saveExisting(){

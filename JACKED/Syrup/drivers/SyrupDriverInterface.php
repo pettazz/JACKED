@@ -25,6 +25,8 @@
 
         abstract public function count($criteria = array());
 
+        abstract public function create($data = NULL);
+
         abstract public function save();
 
         abstract public function delete();
