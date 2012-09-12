@@ -95,15 +95,15 @@
             return " LIMIT " . ($howMany * ($page - 1)) . ", " . $howMany;
         }
 
-        private function parseWhereCriteria($criteria){
+        private static function parseWhereCriteria($criteria){
             $result = "";
             foreach($criteria as $key => $value){
                 if(trim($key) == "OR" || trim($key) == "AND"){
-                    $result .= trim($key) . " (" . $this->parseWhereCriteria($value) . ") ";
+                    $result .= trim($key) . " (" . self::parseWhereCriteria($value) . ") ";
                 }else if(is_array($value)){
                     $results = array();
                     foreach($value as $innerkey => $innerval){
-                        $results[] = $this->parseWhereCriteria(array($innerkey => $innerval));
+                        $results[] = self::parseWhereCriteria(array($innerkey => $innerval));
                     }
                     $result .= " ( " . implode(" AND ", $results) . " ) ";
                 }else{
@@ -112,7 +112,14 @@
                     }else if(is_bool($value)){
                         $value = ($value)? '1' : '0';
                     }
-                    $result .= str_replace(array('*', '?'), array('%', str_replace('*', '%', $value)), trim($key)) . " ";
+
+                    if(strpos($key, '?') === false){
+                        //support shortcuts for key = value notation
+                        $result = "$key = '" . trim($value) . "'";
+                    }else{
+                        //otherwise use the replace ? in key method
+                        $result .= str_replace(array('*', '?'), array('%', str_replace('*', '%', "'" . $value . "'")), trim($key)) . " ";
+                    }
                 }
             }
 
@@ -125,13 +132,13 @@
         * @param $criteria Array String field/value pairs.
         * @return String MySQL WHERE clause.
         */
-        private function getWhereClause($criteria){
+        private static function getWhereClause($criteria){
             //accept JSON formatted criteria
             if(is_string($criteria)){
                 $criteria = json_decode($criteria);
             }
 
-            return "WHERE " . $this->parseWhereCriteria($criteria);
+            return "WHERE " . self::parseWhereCriteria($criteria);
         }
 
         /**
