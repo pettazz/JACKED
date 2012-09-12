@@ -85,14 +85,8 @@
             }
         }
 
-        public function getFields($skipPrimary = false){
-            if($skipPrimary){
-                $fields = array();
-
-                return $fields;
-            }else{
-                return $this->_fields;
-            }
+        public function getFields(){
+            return $this->_fields;
         }
 
         public function getPrimaryKey(){
