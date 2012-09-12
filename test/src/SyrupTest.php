@@ -142,12 +142,14 @@
             }
         }
 
-        public function test_deleteNew(){
-            $this->assertTrue(true);
-        }
+        public function test_delete(){
+            $data = $this->createPost();
+            $post = $this->JACKED->Syrup->Blag->findOne(array('guid' => $data['guid']));
+            $post->delete();
 
-        public function test_deleteExisting(){
-            $this->assertTrue(true);
+            $rows = $this->JACKED->MySQL->getRows('BlagPost');
+            $returned_rows = (is_array($rows))? count($rows) : 0;
+            $this->assertTrue($returned_rows == 0);
         }
     }
 ?>
