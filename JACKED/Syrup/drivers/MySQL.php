@@ -200,7 +200,7 @@
             $query = "SELECT * FROM " . $this->_tableName;
             $query .= " " . self::getWhereClause($criteria);
             if($order){
-                $query .= " ORDER BY " . $order['field'] . $order['direction'];
+                $query .= " ORDER BY " . $order['field'] . ' ' . $order['direction'];
             }
             if($limit){
                 $query .= " LIMIT " . $limit;
