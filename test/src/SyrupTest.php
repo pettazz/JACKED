@@ -58,6 +58,31 @@
             $this->assertTrue(true);
         }
 
+        public function test_findBy(){
+            $data = $this->createPost();
+            $result = $this->JACKED->Syrup->Blag->findByguid($data['guid']);
+            $result = $result[0];
+
+            foreach($data as $key => $val){
+                if($key !== 'author'){
+                    $this->assertEquals($data[$key], $result->$key);
+                }
+            }
+
+            $data2 = $this->createPost();
+            $result2 = $this->JACKED->Syrup->Blag->findByalive(1);
+            $this->assertEquals(count($result2), 2);
+
+            $result3 = $this->JACKED->Syrup->Blag->findByAliveAndGuid(1, $data['guid']);
+            $result3 = $result3[0];
+
+            foreach($data as $key => $val){
+                if($key !== 'author'){
+                    $this->assertEquals($data[$key], $result3->$key);
+                }
+            }
+        }
+
         public function test_count(){
             $this->assertEquals(0, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
 
@@ -84,7 +109,7 @@
 
             $rows = $this->JACKED->MySQL->getRows('BlagPost');
             $row = $rows[0];
-            
+
             $this->assertEquals($row['guid'], $newpost->guid);
             $this->assertEquals($row['author'], $author['guid']);
             $this->assertEquals($row['title'], "JOE BIDEN");
