@@ -96,7 +96,8 @@
         }
 
         public function getPrimaryKey(){
-            return $this->_primaryKey;
+            $key = $this->_primaryKey;
+            return $key['field'];
         }
 
         public function getPrimaryKeyName(){

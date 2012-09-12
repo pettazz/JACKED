@@ -126,10 +126,27 @@
         }
 
         public function test_saveExisting(){
+            $data = $this->createPost();
+            $post = $this->JACKED->Syrup->Blag->findOne(array('guid' => $data['guid']));
+            $data['title'] = 'HEY GUISE!'; 
+            $post->title = 'HEY GUISE!';
+            $post->save();
+
+            $rows = $this->JACKED->MySQL->getRows('BlagPost');
+            $row = $rows[0];
+
+            foreach($data as $key => $val){
+                if($key !== 'author'){
+                    $this->assertEquals($data[$key], $row[$key]);
+                }
+            }
+        }
+
+        public function test_deleteNew(){
             $this->assertTrue(true);
         }
 
-        public function test_delete(){
+        public function test_deleteExisting(){
             $this->assertTrue(true);
         }
     }

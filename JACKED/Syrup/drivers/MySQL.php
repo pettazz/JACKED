@@ -254,10 +254,13 @@
                     $query = "INSERT INTO " . $this->_tableName . " (`" . implode('`, `', $insertFields) . "`) VALUES ('" . implode("', '", $insertValues) . "')";
                 }else{
                     $query = "UPDATE " . $this->_tableName . " SET ";
-                    foreach($this->getFields() as $name => $val){
-                        $query .= "`$name` = '$val'";
+                    $sets = array();
+                    foreach($this->getFields() as $field){
+                        $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
                     }
-                    $query .= " WHERE " . $this->getPrimaryKeyName() . " = '" . $this->_primaryKey['field']  . "'";
+                    $query .= implode(', ', $sets);
+                    $pkey = $this->getPrimaryKey();
+                    $query .= " WHERE " . $this->getPrimaryKeyName() . " = '" . $pkey->getValue()  . "'";
                 }
 
                 $done = $this->query($query);
@@ -271,7 +274,8 @@
 
         public function delete(){
             if(!$this->_isNew){
-                $query = "DELETE FROM " . $this->_tableName . " WHERE " . $this->getPrimaryKeyName() . " = '" . $this->_primaryKey['field']  . "'";
+                $pkey = $this->getPrimaryKey();
+                $query = "DELETE FROM " . $this->_tableName . " WHERE " . $this->getPrimaryKeyName() . " = '" . $pkey->getValue()  . "'";
                 $done = $this->query($query);
             }else{
                 $done = true;
