@@ -98,7 +98,7 @@
 
             $data = $this->createPost();
             $data = $this->createPost();
-            $this->assertEquals(3, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
+            $this->assertEquals(3, $this->JACKED->Syrup->Blag->count());
         }
 
         public function test_saveNew(){

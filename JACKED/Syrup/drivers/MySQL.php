@@ -220,7 +220,10 @@
         }
 
         public function count($criteria = array()){
-            $query = "SELECT COUNT(*) AS count FROM " . $this->_tableName . " " . self::getWhereClause($criteria);
+            $query = "SELECT COUNT(*) AS count FROM " . $this->_tableName;
+            if($criteria){
+                $query .= " " . self::getWhereClause($criteria);
+            }
             $done = $this->query($query);
             return $done[0]['count'];
         }
