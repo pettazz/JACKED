@@ -203,11 +203,12 @@
             }
             $data = $this->query($query);
             $results = array();
-            foreach($data as $row){
-                $classname = get_class($this);
-                $results[] = $this->load($row, false);
+            if($data && count($data) > 0){
+                foreach($data as $row){
+                    $classname = get_class($this);
+                    $results[] = $this->load($row, false);
+                }
             }
-
             return $results;
         }
 
