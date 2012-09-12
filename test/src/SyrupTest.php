@@ -20,12 +20,12 @@
             $this->JACKED->MySQL->query('DELETE FROM User WHERE 1');
         }
 
-        private function createPost(){
+        private function createPost($timestamp = NULL){
             $content = '';
             for($x = 0; $x <= rand(0, 5); $x++){
                 $content .= $this->JACKED->Testur->generateSentence();
             }
-            $posted = rand(1022967819, time());
+            $posted = $timestamp? $timestamp : rand(1022967819, time());
             $author = $this->JACKED->Testur->generateFlockUser();
             $details = array(
                 'guid' => $this->JACKED->Util->uuid4(),
@@ -55,9 +55,9 @@
         }
 
         public function test_findOne(){
-            $data = $this->createPost();
-            $data2 = $this->createPost();
-            $data3 = $this->createPost();
+            $data = $this->createPost(1);
+            $data2 = $this->createPost(2);
+            $data3 = $this->createPost(3);
 
             $post = $this->JACKED->Syrup->Blag->findOne(array('alive' => 1), array('field' => 'posted', 'direction' => 'DESC'));
             $this->assertEquals(1, count($post));
