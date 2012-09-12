@@ -1,5 +1,7 @@
 <?php
 
+    date_default_timezone_set('America/New_York');
+
     class Testur extends JACKEDModule{
         const moduleName = 'Testur';
         const moduleVersion = 1.0;
