@@ -2,8 +2,8 @@
 
     abstract class SyrupDriverInterface{
         
-        public static function __callStatic($method, $params){
-            if (!preg_match('/^(find|findOne|count)By(w+)$/', $method, $matches)) {
+        public function __call($method, $params){
+            if (!preg_match('/^(find|findOne|count)By([a-zA-Z0-9]+)$/', $method, $matches)) {
                 throw new Exception("Call to undefined method {$method}");
             }
      
@@ -11,13 +11,13 @@
             $criteriaKeys = array_map('strtolower', $criteriaKeys);
             $criteriaValues = array_slice($params, 0, count($criteriaKeys));
             $criteria = array_combine($criteriaKeys, $criteriaValues);
-     
+
             $method = $matches[1];
-            return static::$method($criteria);
+            return $this->$method($criteria);
         }
 
-        public static function findOne($criteria = array(), $order = null){
-            $objects = static::find($criteria, $order, 1, 0);
+        public function findOne($criteria = array(), $order = null){
+            $objects = $this->find($criteria, $order, 1, 0);
             return count($objects) == 1 ? $objects[0] : null;
         }
 
