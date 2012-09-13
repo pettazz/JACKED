@@ -204,7 +204,7 @@
         * @param $type String The type of this field (one of the class constants defined in this class).
         * @param $length int [optional] Length of this field. Required by some types.
         * @param $null Boolean [optional] Whether this field allows NULL values. Defaults to True.
-        * @param $default mixed [optional] The default value for this field if none is specified. Required if @null is True. Defaults to none.
+        * @param $default mixed [optional] The default value for this field if none is specified.
         * @param $key String [optional] The type of key that this field is. Currently one of: PK (Primary Key), FK (Foreign Key)
         * @param $extra Array [optional] List of extra data about this field. Currently one of: UUID (This field is a UUID and will have a uuid generated if none is specified)
         * @param $comment String [optional] Plain text comments to be stored in this field for human-readable documentation.
@@ -235,10 +235,7 @@
                     break;
             }
             $this->null = (($null === false)? false : true);
-            if($this->null && $default === NULL){
-                throw new MissingRequiredFieldParameterException('default');
-            }
-            $this->default = $default;
+            $this->default = $default? $default : false;
             $this->extra = $extra? $extra : array();
             $this->comment = $comment;
 
