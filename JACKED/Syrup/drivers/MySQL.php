@@ -95,6 +95,12 @@
             return " LIMIT " . ($howMany * ($page - 1)) . ", " . $howMany;
         }
 
+        /**
+        * Helper for getWhereClause to recursively parse criteria data into a string.
+        * 
+        * @param $criteria Array String field/value pairs.
+        * @return String Representation of @criteria as a String usable in a MySQL WHERE clause.
+        */
         private static function parseWhereCriteria($criteria){
             $result = "";
             foreach($criteria as $key => $value){
@@ -195,6 +201,15 @@
             return $this->mysqlQuery($query, $link);
         }
 
+        /**
+        * Find all objects matching the given criteria, with optional ordering, limits, and offset.
+        * 
+        * @param $criteria Array [optional] Criteria for searching data objects. Defaults to all objects.
+        * @param $order Array [optional] Two keys to specify ordering: 'field' field name to order by, 'direction' ASC or DESC. Defaults to none.
+        * @param $limit int [optional] Limit results to this number. Defaults to no limit.
+        * @param $offset int [optional] Start returning results at this offset. Ex: 5 rows are returned, offset 3 would return rows 3 and 4 (4th and 5th) Defaults to 0.
+        * @return Array|Boolean List of data objects returned from the data source. Empty array for no results. False if an error occurred.
+        */
         public function find($criteria = array(), $order = null, $limit = null, $offset = 0){
             foreach($criteria as $field=>$value)
             $query = "SELECT * FROM " . $this->_tableName;
@@ -219,6 +234,12 @@
             return $results;
         }
 
+        /**
+        * Counts the number of objects matching @criteria
+        * 
+        * @param $criteria Array [optional] Criteria for searching data objects. Defaults to all objects.
+        * @return int Number of matching objects.
+        */
         public function count($criteria = array()){
             $query = "SELECT COUNT(*) AS count FROM " . $this->_tableName;
             if($criteria){
@@ -228,6 +249,12 @@
             return $done[0]['count'];
         }
 
+        /**
+        * Creates a new data object instance
+        * 
+        * @param $data Array [optional] Field values to be set upon creation. Defaults to each field's default value.
+        * @return SyrupModel The new instance.
+        */
         public function create($data = NULL){
             $modelName = $this->_modelName;
             if($data){
@@ -237,11 +264,23 @@
             }
         }
 
+        /**
+        * Load the given data into a data object, new or existing.
+        * 
+        * @param $data Array Field values to set.
+        * @param $isNew Boolean True = the instance will represent a new data object that has not been saved to the data source, False = loading an existing data object.
+        * @return SyrupModel The newly created instance.
+        */
         private function load($data, $isNew = false){
             $modelName = $this->_modelName;
             return new $modelName($this->_config, $this->_logr, $this->_util, $data, $isNew);
         }
 
+        /**
+        * Saves the existing state of this data object to the data source.
+        * 
+        * @return Boolean Whether the save was completed successfully.
+        */
         public function save(){
             if($this->_isDirty){
                 if($this->_isNew){
@@ -272,6 +311,11 @@
             }
         }
 
+        /**
+        * Deletes the data object from the data source.
+        * 
+        * @return Boolean Whether the delete was completed successfully.
+        */
         public function delete(){
             if(!$this->_isNew){
                 $pkey = $this->getPrimaryKey();

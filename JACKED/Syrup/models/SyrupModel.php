@@ -16,6 +16,17 @@
 
         private $_constructing = true;
 
+        /**
+        * Create a new SyrupModel instance. Fields are defined as protected class properties in the Model's class definition, as 
+        * arrays of the values to be passed to the SyrupField constructor, in order (positional, not keyword). 
+        * 
+        * @param $config Configur A JACKED Configur instance containing the configuration for this Driver.
+        * @param $logr Logr A JACKED Logr instance.
+        * @param $util Util A JACKED Util instance.
+        * @param $data Array [optional] Field values to be set upon creation. Defaults to each field's default value.
+        * @param $isNew Boolean True = the instance will represent a new data object that has not been saved to the data source, False = loading an existing data object.
+        * @return SyrupModel The newly created instance.
+        */
         public function __construct($config, $logr, $util, $data = NULL, $isNew = true){
             parent::__construct($config, $logr, $util, get_class($this));
 
@@ -50,6 +61,14 @@
             }
         }
 
+        /**
+        * Set an inaccessible property of this SyrupModel. All fields are inaccessible outside the object's inheritance, 
+        * so we detect if this is an attempt to set a Field and calls the field's setValue() method. All non-field properties
+        * begin with an underscore (_) so we assume that anything without one is a Field.
+        * 
+        * @param $key String Property name to be set.
+        * @param $value mixed Property value to be set.
+        */
         public function __set($key, $value){
             //constructor needs to be able to set anything it damn well pleases
             if(strpos($key, '_') !== 0){
@@ -70,6 +89,14 @@
             }
         }
 
+        /**
+        * Get an inaccessible property of this SyrupModel. All fields are inaccessible outside the object's inheritance, 
+        * so we detect if this is an attempt to get a Field and calls the field's getValue() method. All non-field properties
+        * begin with an underscore (_) so we assume that anything without one is a Field.
+        * 
+        * @param $key String Property name to be retrieved.
+        * @return mixed The value of the requested property.
+        */
         public function __get($key){
             //see above __set() jankiness comment. also applies here.
             if(strpos($key, '_') !== 0){
@@ -85,15 +112,30 @@
             }
         }
 
+        /**
+        * Get all the fields that this Model contains.
+        * 
+        * @return Array List of all field names in this Model.
+        */
         public function getFields(){
             return $this->_fields;
         }
 
+        /**
+        * Get the Primary Key for this Model.
+        * 
+        * @return Array Two keys "name" => name of the PK field, "field" => SyrupField instance of the PK field.
+        */
         public function getPrimaryKey(){
             $key = $this->_primaryKey;
             return $key['field'];
         }
 
+        /**
+        * Get the field name of the Primary Key for this Model.
+        * 
+        * @return String Name of the PK field.
+        */
         public function getPrimaryKeyName(){
             $key = $this->_primaryKey;
             return $key['name'];
@@ -155,6 +197,19 @@
 
         private $_value;
         
+
+        /**
+        * Create a new SyrupField instance. 
+        * 
+        * @param $type String The type of this field (one of the class constants defined in this class).
+        * @param $length int [optional] Length of this field. Required by some types.
+        * @param $null Boolean [optional] Whether this field allows NULL values. Defaults to True.
+        * @param $default mixed [optional] The default value for this field if none is specified. Required if @null is True. Defaults to none.
+        * @param $key String [optional] The type of key that this field is. Currently one of: PK (Primary Key), FK (Foreign Key)
+        * @param $extra Array [optional] List of extra data about this field. Currently one of: UUID (This field is a UUID and will have a uuid generated if none is specified)
+        * @param $comment String [optional] Plain text comments to be stored in this field for human-readable documentation.
+        * @return SyrupField The newly created instance.
+        */
         public function __construct($type, $length = NULL, $null = NULL, $default = NULL, $key = NULL, $extra = NULL, $comment = NULL){
             $requiredLengthTypes = array(
                 SyrupField::TINYINT, SyrupField::INT, SyrupField::BIGINT, SyrupField::FLOAT, SyrupField::DOUBLE, SyrupField::DECIMAL, SyrupField::CHAR, SyrupField::VARCHAR, SyrupField::ENUM
@@ -179,7 +234,7 @@
                     //nothin
                     break;
             }
-            $this->null = ($null? true : false);
+            $this->null = (($null === false)? false : true);
             if($this->null && $default === NULL){
                 throw new MissingRequiredFieldParameterException('default');
             }
@@ -194,10 +249,20 @@
             }
         }
 
+        /**
+        * Get the value contained in this field.
+        * 
+        * @return mixed Value that this field contains.
+        */
         public function getValue(){
             return $this->_value;
         }
 
+        /**
+        * Set the value contained in this field
+        * 
+        * @param $value mixed The value to set.
+        */
         public function setValue($value){
             //TODO: add type restriction checks
             $this->_value = $value;
