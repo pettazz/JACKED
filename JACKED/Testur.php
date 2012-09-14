@@ -57,9 +57,10 @@
         * Creates a randomly generated Flock user
         * 
         * @param $password String [optional] Password for new user. Defaults to 'lol'.
+        * @param $store Boolean [optional] Whether to store the new user in the database. Defaults to true.
         * @return Array All details of new user 
         */
-        public function generateFlockUser($password = NULL){
+        public function generateFlockUser($password = NULL, $store = true){
             $email = $this->markov->generate(10, 30) . '@gmail.com';
             $username = $this->markov->generate(7, 30);
             $password = ($password)? $password : 'lol';
@@ -67,14 +68,17 @@
                 'first_name' => ucfirst($this->markov->generate(7, 20)),
                 'last_name' => ucfirst($this->markov->generate(8, 30))
             );
-            try{
-                $guid = $this->JACKED->Flock->createUser($email, $username, $password, $details);
-                $details['email'] = $email;
-                $details['guid'] = $guid;
-                $details['password'] = $password;
-            }catch(ExistingUserException $e){
-                return $this->generateFlockUser($password);
+            if($store){
+                try{
+                    $guid = $this->JACKED->Flock->createUser($username, $email, $password, $details);
+                    $details['guid'] = $guid;
+                }catch(ExistingUserException $e){
+                    return $this->generateFlockUser($password);
+                }
             }
+            $details['email'] = $email;
+            $details['username'] = $username;
+            $details['password'] = $password;
 
             return $details;
         }

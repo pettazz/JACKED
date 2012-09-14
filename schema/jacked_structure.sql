@@ -44,10 +44,10 @@ CREATE TABLE `Application` (
 
 
 
-# Dump of table BlagPost
+# Dump of table Blag
 # ------------------------------------------------------------
 
-CREATE TABLE `BlagPost` (
+CREATE TABLE `Blag` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `author` varchar(64) NOT NULL DEFAULT '',
   `posted` int(11) NOT NULL,

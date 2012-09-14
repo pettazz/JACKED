@@ -9,6 +9,7 @@
         public $_contentType = 'object';
 
         private $_fields = array();
+        private $_relations = array();
         private $_primaryKey = array();
 
         private $_isNew;
@@ -41,6 +42,16 @@
                     array_push($this->_fields, $fieldName);
                     if($this->$fieldName->isPrimaryKey){
                         $this->_primaryKey = array('name' => $fieldName, 'field' => $this->$fieldName);
+                    }
+                    if(is_array($this->$fieldName->relation)){
+                        $type = key($this->$fieldName->relation);
+                        $this->_relations[$fieldName] = array('type' => $type, 'field' => $this->$fieldName->relation[$type]);
+                        //we're going to need the models for the relations as well
+                        $moduleName = explode('.', $this->$fieldName->relation[$type]);
+                        $moduleName = $moduleName[0];
+                        if(!class_exists($moduleName . 'Model', false)){
+                            include($config['model_root'] . $moduleName . '.php');
+                        }
                     }
                     //autogen fields
                     if(in_array('UUID', $this->$fieldName->extra)){
@@ -78,7 +89,11 @@
                     if($this->$key->isPrimaryKey){
                         throw new PrimaryKeyUnmodifiableException($key);
                     }else{
-                        $this->$key->setValue($value);
+                        if(is_object($value) && is_subclass_of($value, 'SyrupModel')){
+                            $this->$key = $value;
+                        }else{
+                            $this->$key->setValue($value);
+                        }
                         $this->_isDirty = true;
                     }
                 }else{
@@ -103,13 +118,34 @@
                 if($this->_constructing){
                     return $this->$key;
                 }elseif(in_array($key, $this->_fields)){
-                    return $this->$key->getValue();
+                    if(is_object($this->$key) && get_class($this->$key) == 'SyrupField'){
+                        return $this->$key->getValue();
+                    }else{
+                        return $this->$key;
+                    }
                 }else{
                     throw new UnknownModelFieldException($key);
                 }
             }else{
                 return $this->$key;
             }
+        }
+
+        /**
+        * Get a list of all the field names this Model defines.
+        *
+        * @return Array List of string names of fields.
+        */
+        public static function getFieldNames(){
+            $names = array();
+            $props = get_class_vars(get_called_class());
+            foreach($props as $prop => $val){
+                //static jankiness even
+                if(strpos($prop, '_') !== 0){
+                    $names[] = $prop;
+                }
+            }
+            return $names;
         }
 
         /**
@@ -139,6 +175,20 @@
         public function getPrimaryKeyName(){
             $key = $this->_primaryKey;
             return $key['name'];
+        }
+
+        /**
+        * Get the relations defined by the fields in this Model.
+        * 
+        * @param $fieldName String Specific field to get relation info for. Defaults to NULL = get all relations for the model.
+        * @return Array List of all relation arrays defined by this Model.
+        */
+        public function getRelations($fieldName = NULL){
+            if($fieldName){
+                return $this->_relations[$fieldName];
+            }else{
+                return $this->_relations;
+            }
         }
 
     }
@@ -188,6 +238,7 @@
         public $length;
         public $null;
         public $key;
+        public $relation;
         public $default;
         public $extra;
         public $comment;
@@ -206,11 +257,12 @@
         * @param $null Boolean [optional] Whether this field allows NULL values. Defaults to True.
         * @param $default mixed [optional] The default value for this field if none is specified.
         * @param $key String [optional] The type of key that this field is. Currently one of: PK (Primary Key), FK (Foreign Key)
+        * @param $relation Array [optional] Relation this field represents. Key represents type (hasOne, hasMany), value represents foreign field (TableName.field_name). 
         * @param $extra Array [optional] List of extra data about this field. Currently one of: UUID (This field is a UUID and will have a uuid generated if none is specified)
         * @param $comment String [optional] Plain text comments to be stored in this field for human-readable documentation.
         * @return SyrupField The newly created instance.
         */
-        public function __construct($type, $length = NULL, $null = NULL, $default = NULL, $key = NULL, $extra = NULL, $comment = NULL){
+        public function __construct($type, $length = NULL, $null = NULL, $default = NULL, $key = NULL, $relation = NULL, $extra = NULL, $comment = NULL){
             $requiredLengthTypes = array(
                 SyrupField::TINYINT, SyrupField::INT, SyrupField::BIGINT, SyrupField::FLOAT, SyrupField::DOUBLE, SyrupField::DECIMAL, SyrupField::CHAR, SyrupField::VARCHAR, SyrupField::ENUM
             );
@@ -234,6 +286,7 @@
                     //nothin
                     break;
             }
+            $this->relation = $relation;
             $this->null = (($null === false)? false : true);
             $this->default = $default? $default : false;
             $this->extra = $extra? $extra : array();

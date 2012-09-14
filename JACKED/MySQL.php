@@ -35,7 +35,7 @@
         */
         private function openLink($setDefault = true){
             try{
-                $link = mysql_connect($this->config->db_host, $this->config->db_user, $this->config->db_pass);
+                $link = mysql_connect($this->config->db_host, $this->config->db_user, $this->config->db_pass, true);
                 mysql_select_db($this->config->db_name);
                 if($setDefault){
                     $this->mysql_link = $link;

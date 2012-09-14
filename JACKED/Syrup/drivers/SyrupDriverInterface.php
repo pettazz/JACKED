@@ -25,10 +25,11 @@
         * 
         * @param $criteria Array [optional] Criteria for searching data objects. Defaults to all objects.
         * @param $order Array [optional] Two keys to specify ordering: 'field' field name to order by, 'direction' ASC or DESC. Defaults to none.
+        * @param $followRelations [optional] Whether to find objects specified by relations. Defaults to true.
         * @return SyrupModel|Boolean The object returned from the data source, or False if no matches were found or an error occurred.
         */
-        public function findOne($criteria = array(), $order = null){
-            $objects = $this->find($criteria, $order, 1, 0);
+        public function findOne($criteria = array(), $order = null, $followRelations = true){
+            $objects = $this->find($criteria, $order, 1, 0, $followRelations);
             return count($objects) == 1 ? $objects[0] : null;
         }
 
@@ -39,9 +40,10 @@
         * @param $order Array [optional] Two keys to specify ordering: 'field' field name to order by, 'direction' ASC or DESC. Defaults to none.
         * @param $limit int [optional] Limit results to this number. Defaults to no limit.
         * @param $offset int [optional] Start returning results at this offset. Ex: 5 rows are returned, offset 3 would return rows 3 and 4 (4th and 5th) Defaults to 0.
+        * @param $followRelations [optional] Whether to find objects specified by relations. Defaults to true.
         * @return Array|Boolean List of data objects returned from the data source. Empty array for no results. False if an error occurred.
         */
-        abstract public function find($criteria = array(), $order = null, $limit = null, $offset = 0);
+        abstract public function find($criteria = array(), $order = null, $limit = null, $offset = 0, $followRelations = true);
 
         /**
         * Counts the number of objects matching @criteria

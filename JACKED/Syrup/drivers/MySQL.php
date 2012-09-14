@@ -50,7 +50,7 @@
         * @return int MySQL Link ID that was just opened.
         */
         private function openLink($setDefault = true){
-            $link = mysql_connect($this->_config['db_host'], $this->_config['db_user'], $this->_config['db_pass']);
+            $link = mysql_connect($this->_config['db_host'], $this->_config['db_user'], $this->_config['db_pass'], true);
             mysql_select_db($this->_config['db_name']);
             if($setDefault){
                 $this->_mysql_link = $link;
@@ -99,9 +99,10 @@
         * Helper for getWhereClause to recursively parse criteria data into a string.
         * 
         * @param $criteria Array String field/value pairs.
+        * @param $tableName String Name of the table referred to by criteria fields. 
         * @return String Representation of @criteria as a String usable in a MySQL WHERE clause.
         */
-        private static function parseWhereCriteria($criteria){
+        private static function parseWhereCriteria($criteria, $tableName = false){
             $result = "";
             foreach($criteria as $key => $value){
                 if(trim($key) == "OR" || trim($key) == "AND"){
@@ -121,7 +122,7 @@
 
                     if(strpos($key, '?') === false){
                         //support shortcuts for key = value notation
-                        $result = "$key = '" . trim($value) . "'";
+                        $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "'";
                     }else{
                         //otherwise use the replace ? in key method
                         $result .= str_replace(array('*', '?'), array('%', str_replace('*', '%', "'" . $value . "'")), trim($key)) . " ";
@@ -136,15 +137,16 @@
         * Generates the WHERE clause of a query based on an array of field/value pairs.
         * 
         * @param $criteria Array String field/value pairs.
+        * @param $tableName String Name of the table referred to by criteria fields.
         * @return String MySQL WHERE clause.
         */
-        private static function getWhereClause($criteria){
+        private static function getWhereClause($criteria, $tableName = false){
             //accept JSON formatted criteria
             if(is_string($criteria)){
                 $criteria = json_decode($criteria);
             }
 
-            return "WHERE " . self::parseWhereCriteria($criteria);
+            return "WHERE " . self::parseWhereCriteria($criteria, $tableName);
         }
 
         /**
@@ -208,12 +210,45 @@
         * @param $order Array [optional] Two keys to specify ordering: 'field' field name to order by, 'direction' ASC or DESC. Defaults to none.
         * @param $limit int [optional] Limit results to this number. Defaults to no limit.
         * @param $offset int [optional] Start returning results at this offset. Ex: 5 rows are returned, offset 3 would return rows 3 and 4 (4th and 5th) Defaults to 0.
+        * @param $followRelations [optional] Whether to find objects specified by relations. Defaults to true.
         * @return Array|Boolean List of data objects returned from the data source. Empty array for no results. False if an error occurred.
         */
-        public function find($criteria = array(), $order = null, $limit = null, $offset = 0){
-            foreach($criteria as $field=>$value)
-            $query = "SELECT * FROM " . $this->_tableName;
-            $query .= " " . self::getWhereClause($criteria);
+        public function find($criteria = array(), $order = null, $limit = null, $offset = 0, $followRelations = true){
+            if($followRelations && $this->getRelations()){
+                $tables = array($this->_tableName);
+                $fields = array();
+                foreach($this->getRelations() as $localField => $relationData){
+                    if($relationData['type'] == 'hasOne'){
+                        $rel = explode('.', $relationData['field']);
+                        $relTable = $rel[0];
+                        $tables[] = $relTable;
+                        $relModel = $relTable . 'Model';
+                        
+                        foreach($relModel::getFieldNames() as $field){
+                            $fields[] = $relTable . '.' . $field;
+                        }
+
+                        $relFieldName = $rel[1];
+                        $joinClause = " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.' . $localField . ' ';
+                    }else{
+                        $this->_logr->write('Only hasOne relations are supported right now.', Logr::LEVEL_WARNING, NULL);
+                    }
+                }
+                $localModel = $this->_tableName . 'Model';
+                foreach($localModel::getFieldNames() as $localField){
+                    $fields[] = $this->_tableName . '.' . $localField;
+                }
+
+                $query = 'SELECT ';
+                foreach($fields as $fieldName){
+                    $query .= $fieldName . ' AS \'' . $fieldName . '\', ';
+                }
+                $query = rtrim($query, ', ');
+                $query .= ' FROM ' . $this->_tableName . $joinClause;
+            }else{
+                $query = "SELECT * FROM " . $this->_tableName;
+            }
+            $query .= " " . self::getWhereClause($criteria, $this->_tableName);
             if($order){
                 $query .= " ORDER BY " . $order['field'] . ' ' . $order['direction'];
             }
@@ -227,8 +262,41 @@
             $results = array();
             if($data && count($data) > 0){
                 foreach($data as $row){
-                    $classname = get_class($this);
-                    $results[] = $this->load($row, false);
+                    if($followRelations){
+                        $localObject = array();
+                        $foreignObjects = array();
+                        foreach($row as $key => $value){
+                            $fKeyIndex = 0;
+                            $table = substr($key, 0, strpos($key, '.'));
+                            $field = substr($key, strpos($key, '.') + 1);
+                            if($table == $this->_tableName){
+                                $localObject[$field] = $value;
+                            }else{
+                                //check if this table has been seen, TODO: allow multiple entries per table
+                                if(!array_key_exists($table, $foreignObjects)){
+                                    $foreignObjects[$table] = array();
+                                }
+                                $foreignObjects[$table][$field] = $value;
+                            }
+                        }
+                        if($foreignObjects){
+                            $foreignDataObjects = array();
+                            //generate objects for every foreign table entry
+                            foreach($foreignObjects as $table => $data){
+                                $modelName = $table . 'Model';
+                                $foreignDataObjects[$table] = new $modelName($this->_config, $this->_logr, $this->_util, $data, false);
+                            }
+                        }   
+                        $obj = $this->load($localObject, false);
+                        //replace the relation keys with the actual foreign objects
+                        foreach($this->getRelations() as $localField => $relationData){
+                            $relationTableName = substr($relationData['field'], 0, strpos($relationData['field'], '.'));
+                            $obj->$localField = $foreignDataObjects[$relationTableName];
+                        }
+                        $results[] = $obj;
+                    }else{
+                        $results[] = $this->load($row, false);
+                    }
                 }
             }
             return $results;
@@ -288,14 +356,26 @@
                     $insertValues = array();
                     foreach($this->getFields() as $field){
                         $insertFields[] = $field;
-                        $insertValues[] = $this->sanitize($this->$field->getValue());
+                        if(is_object($this->$field) && is_subclass_of($this->$field, 'SyrupModel', false)){
+                            //add the relation key to this field and save the related object
+                            $relData = $this->getRelations($field);
+                            $relField = substr($relData['field'], strpos($relData['field'], '.') + 1);
+                            $insertValues[] = $this->sanitize($this->$field->$relField->getValue());
+                            $this->$field->save();
+                        }else{
+                            $insertValues[] = $this->sanitize($this->$field->getValue());
+                        }
                     }
                     $query = "INSERT INTO " . $this->_tableName . " (`" . implode('`, `', $insertFields) . "`) VALUES ('" . implode("', '", $insertValues) . "')";
                 }else{
                     $query = "UPDATE " . $this->_tableName . " SET ";
                     $sets = array();
                     foreach($this->getFields() as $field){
-                        $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
+                        if(is_object($this->$field) && is_subclass_of($this->$field, 'SyrupModel', false)){
+                            $this->$field->save();
+                        }else{
+                            $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
+                        }
                     }
                     $query .= implode(', ', $sets);
                     $pkey = $this->getPrimaryKey();

@@ -26,6 +26,8 @@
             //database host
             'db_host' => 'localhost',
             //password is in included file
+
+            'model_root' => 'Syrup/models/',
         )
             
     );
