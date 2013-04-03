@@ -50,7 +50,7 @@
                         $moduleName = explode('.', $this->$fieldName->relation[$type]);
                         $moduleName = $moduleName[0];
                         if(!class_exists($moduleName . 'Model', false)){
-                            include($config['model_root'] . $moduleName . '.php');
+                            include(JACKED_MODULES_ROOT . $config['model_root'] . $moduleName . '.php');
                         }
                     }
                     //autogen fields
