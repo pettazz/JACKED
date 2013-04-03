@@ -12,7 +12,7 @@
             $syrupDConf['db_host'] = 'localhost';
             $syrupDConf['db_user'] = 'root';
             $syrupDConf['db_pass'] = '';
-            $syrupDConf['model_root'] = 'JACKED/Syrup/models/';
+            $syrupDConf['model_root'] = 'Syrup/models/';
             $this->JACKED->Syrup->config->driverConfig = $syrupDConf;
         }
 
