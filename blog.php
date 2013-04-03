@@ -34,7 +34,7 @@
 		}
 		$timer = $eys->getDelta('getposts', 'getposts_end');
 	?>
-	<h4><?php echo 'took: ' . round(($timer['time'] * 1000), 4) . 'ms and increased allocated memory by ' . round($timer['memory'] / (1024 ^ 2), 4) . ' MB'; ?></h4>
+	<h4><?php echo 'took: ' . round(($timer['time'] * 1000), 4) . 'ms and increased allocated memory by ' . $timer['memory'] / pow(1024, 2) . ' MB'; ?></h4>
 </body>
 
 </html>
