@@ -18,11 +18,9 @@
 		echo '<h2>This is ' . $blog::getModuleName() . ' version ' . $blog::getModuleVersion() . '</h2>';
 
 		$eys->setMark('getposts');
-        echo memory_get_usage(true);
         $posts = $JACKED->Syrup->Blag->find(array('alive' => 1));
 		//$posts = $blog->getPosts();
 		$eys->setMark('getposts_end');
-        echo memory_get_usage(true);
 		foreach($posts as $num => $post){
 			echo '<h1>' . $post->title . '</h1>';
 			echo '<h2>' . $post->headline . '</h2>';
