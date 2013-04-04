@@ -7,6 +7,13 @@
             
             $this->JACKED->MySQL->config->db_host = 'localhost';
             $this->JACKED->MySQL->config->db_user = 'root';
+
+            $syrupDConf = $this->JACKED->Syrup->config->driverConfig;
+            $syrupDConf['db_host'] = 'localhost';
+            $syrupDConf['db_user'] = 'root';
+            $syrupDConf['db_pass'] = '';
+            $syrupDConf['model_root'] = 'Syrup/models/';
+            $this->JACKED->Syrup->config->driverConfig = $syrupDConf;
         }
 
         public function tearDown(){
@@ -23,7 +30,7 @@
                 if($key == 'author'){
                     //$this->assertEquals($val, $got_post[$key]);
                 }else{
-                    $this->assertEquals($val, $got_post[$key]);
+                    $this->assertEquals($val, $got_post->$key);
                 }
             }
         }
