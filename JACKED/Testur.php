@@ -5,7 +5,7 @@
     class Testur extends JACKEDModule{
         const moduleName = 'Testur';
         const moduleVersion = 1.0;
-        public static $dependencies = array("Flock", "MySQL");
+        public static $dependencies = array("Flock", "MySQL", "Blag");
         
         private $markov;
 
@@ -80,6 +80,34 @@
             $details['username'] = $username;
             $details['password'] = $password;
 
+            return $details;
+        }
+
+        /**
+        * Creates a randomly generated Blag post.
+        * 
+        * @param $timestamp int [optional] The timestamp with which to create the post. Defaults to the current timestamp.
+        * @param $author Array [optional] Deatils of a Flock User to use as the Author. Defaults to generating a new one.
+        * @param $title String [optional] Title of the post to create. Defaults to randomly generated.
+        * @return Array All details of new post
+        */
+        public function createPost($timestamp = NULL, $author = NULL, $title = NULL){
+            $content = '';
+            for($x = 0; $x <= rand(0, 5); $x++){
+                $content .= $this->generateSentence();
+            }
+            $posted = $timestamp? $timestamp : rand(1022967819, time());
+            $author = $author? $author : $this->generateFlockUser();
+            $details = array(
+                'guid' => $this->JACKED->Util->uuid4(),
+                'author' => $author['guid'],
+                'title' => ($title? $title : ucfirst($this->generateSentence(false))),
+                'headline' => ucfirst($this->generateSentence(false)),
+                'posted' => $posted,
+                'content' => $content
+            );
+            $this->JACKED->MySQL->insert('Blag', $details);
+            $details['author'] = $author;
             return $details;
         }
     }

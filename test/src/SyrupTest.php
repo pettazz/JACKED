@@ -3,7 +3,7 @@
      
     class SyrupTest extends PHPUnit_Framework_TestCase{
         public function setUp(){
-            $this->JACKED = new JACKED("Syrup, Testur, MySQL");
+            $this->JACKED = new JACKED("Syrup, Testur, MySQL, Karma");
             
             $this->JACKED->MySQL->config->db_host = 'localhost';
             $this->JACKED->MySQL->config->db_user = 'root';
@@ -21,29 +21,9 @@
             $this->JACKED->MySQL->query('DELETE FROM User WHERE 1');
         }
 
-        private function createPost($timestamp = NULL){
-            $content = '';
-            for($x = 0; $x <= rand(0, 5); $x++){
-                $content .= $this->JACKED->Testur->generateSentence();
-            }
-            $posted = $timestamp? $timestamp : rand(1022967819, time());
-            $author = $this->JACKED->Testur->generateFlockUser();
-            $details = array(
-                'guid' => $this->JACKED->Util->uuid4(),
-                'author' => $author['guid'],
-                'title' => ucfirst($this->JACKED->Testur->generateSentence(false)),
-                'headline' => ucfirst($this->JACKED->Testur->generateSentence(false)),
-                'posted' => $posted,
-                'content' => $content
-            );
-            $this->JACKED->MySQL->insert('Blag', $details);
-            $details['author'] = $author;
-            return $details;
-        }
-
 
         public function test_find(){
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $posts = $this->JACKED->Syrup->Blag->find(array('alive' => 1));
             $this->assertEquals(1, count($posts));
             $this->assertFalse(!$posts);
@@ -61,9 +41,9 @@
         }
 
         public function test_findOne(){
-            $data = $this->createPost(1);
-            $data2 = $this->createPost(2);
-            $data3 = $this->createPost(3);
+            $data = $this->JACKED->Testur->createPost(1);
+            $data2 = $this->JACKED->Testur->createPost(2);
+            $data3 = $this->JACKED->Testur->createPost(3);
 
             $post = $this->JACKED->Syrup->Blag->findOne(array('alive' => 1), array('field' => 'posted', 'direction' => 'DESC'));
             $this->assertEquals(1, count($post));
@@ -72,7 +52,7 @@
         }
 
         public function test_findBy(){
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $result = $this->JACKED->Syrup->Blag->findByguid($data['guid']);
             $result = $result[0];
 
@@ -82,7 +62,7 @@
                 }
             }
 
-            $data2 = $this->createPost();
+            $data2 = $this->JACKED->Testur->createPost();
             $result2 = $this->JACKED->Syrup->Blag->findByalive(1);
             $this->assertEquals(2, count($result2));
 
@@ -99,11 +79,11 @@
         public function test_count(){
             $this->assertEquals(0, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
 
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $this->assertEquals(1, $this->JACKED->Syrup->Blag->count(array('alive' => '1')));
 
-            $data = $this->createPost();
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $this->assertEquals(3, $this->JACKED->Syrup->Blag->count());
         }
 
@@ -175,7 +155,7 @@
         }
 
         public function test_saveExistingWithoutRelation(){
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $post = $this->JACKED->Syrup->Blag->findOne(array('guid' => $data['guid']), NULL, false);
 
             $data['title'] = 'HEY GUISE!'; 
@@ -193,7 +173,7 @@
         }
 
         public function test_saveExistingWithRelation(){
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $post = $this->JACKED->Syrup->Blag->findOne(array('guid' => $data['guid']), NULL);
 
             $data['title'] = 'HEY GUISE!'; 
@@ -221,7 +201,7 @@
         }
 
         public function test_delete(){
-            $data = $this->createPost();
+            $data = $this->JACKED->Testur->createPost();
             $post = $this->JACKED->Syrup->Blag->findOne(array('guid' => $data['guid']), NULL, false);
             $post->delete();
 

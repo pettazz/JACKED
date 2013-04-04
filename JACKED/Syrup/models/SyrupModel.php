@@ -6,7 +6,8 @@
 
     class SyrupModel extends SyrupDriver{
 
-        public $_contentType = 'object';
+        //defaults to a non-magic object type
+        const contentType = Syrup::OBJECT;
 
         private $_fields = array();
         private $_relations = array();
@@ -42,6 +43,11 @@
                     array_push($this->_fields, $fieldName);
                     if($this->$fieldName->isPrimaryKey){
                         $this->_primaryKey = array('name' => $fieldName, 'field' => $this->$fieldName);
+                    }
+
+                    //find and create automagic relations
+                    if(in_array('meta_target_UUID', $this->$fieldName->extra)){
+                        //
                     }
                     if(is_array($this->$fieldName->relation)){
                         $type = key($this->$fieldName->relation);

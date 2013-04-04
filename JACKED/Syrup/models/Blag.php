@@ -3,6 +3,7 @@
     class BlagModel extends SyrupModel{
 
         const tableName = 'Blag';
+        const contentType = Syrup::CONTENT_OBJECT;
 
         protected $guid = array(SyrupField::VARCHAR, 64, false, NULL, 'PRI', NULL, array('UUID'));
         protected $author = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'User.guid'));

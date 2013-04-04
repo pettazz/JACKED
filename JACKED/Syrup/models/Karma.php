@@ -3,12 +3,13 @@
     class KarmaModel extends SyrupModel{
 
         const tableName = 'Karma';
+        const contentType = Syrup::CONTENT_META;
 
-        public $guid = new SyrupField(SyrupField::VARCHAR, 64, false, NULL, 'PRI');
-        public $target = new SyrupField(SyrupField::VARCHAR, 64, false, NULL, 'FK');
-        public $source = new SyrupField(SyrupField::VARCHAR, 64, false, NULL, 'FK');
-        public $weight = new SyrupField(SyrupField::INT, 10);
-        public $guid = new SyrupField(SyrupField::INT, 11);
+        protected $guid = array(SyrupField::VARCHAR, 64, false, NULL, 'PRI', NULL, array('UUID'));
+        protected $target = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', NULL, array('meta_target_UUID'));
+        protected $source = array(SyrupField::VARCHAR, 64, false, NULL);//, 'FK', array('hasOne' => 'User.guid'));
+        protected $weight = array(SyrupField::INT, 10);
+        protected $timestamp = array(SyrupField::INT, 11);
         
     }
     

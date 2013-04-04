@@ -9,6 +9,13 @@
         const moduleVersion = 1.0;
         public static $dependencies = array();
 
+        //constants for public use
+        //non-magic type
+        const OBJECT = 'object';
+        //for defining the automagical relations
+        const CONTENT_OBJECT = 'content'; //will automagically have CONTENT_META data object relations connected
+        const CONTENT_META = 'meta';      //will automagically connect to CONTENT_OBJECTs 
+
         private $registeredModels;
 
         public function __construct($JACKED){
@@ -66,6 +73,8 @@
             }
             $modelName = $moduleName . 'Model';
             $this->registeredModels[$moduleName] = new $modelName($this->config->driverConfig, $this->JACKED->Logr, $this->JACKED->Util, $modelName);
+            $thingy = $this->registeredModels[$moduleName];
+            echo "registered $moduleName with Syrup; type: " . $thingy::contentType;
         }
     }
 

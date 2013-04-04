@@ -2,7 +2,7 @@
 
     $settings = array(
         
-        'dbt_posts' => 'BlagPost', 
+        'dbt_posts' => 'Blag', 
 
         //what to get for author names. one of:
         // full - "Steve Duderson"

@@ -9,7 +9,7 @@
     
         const moduleName = 'Blag';
         const moduleVersion = 1.0;
-        public static $dependencies = array('MySQL', 'Flock');
+        public static $dependencies = array('MySQL', 'Flock', 'Syrup');
         
 
         /**
@@ -20,7 +20,12 @@
         * @return Array List of all post data, false if GUID not found
         */
         public function getPost($guid, $only_active = true){
-            $fields1 = array('guid', 'posted', 'title', 'headline', 'content');
+            $where = array('guid' => $guid);
+            if($only_active){
+                $where['alive'] = 1;
+            }
+            return $this->JACKED->Syrup->Blag->findOne($where);
+            /*$fields1 = array('guid', 'posted', 'title', 'headline', 'content');
             $fields2 = false;
             $cond = $only_active? ' AND `' . $this->config->dbt_posts . '`.`alive` = 1' : '';
             switch($this->config->author_name_type){
@@ -37,13 +42,14 @@
                     $fields2 = array('first_name');
                     break;
             }
-            return $this->JACKED->MySQL->getJoin(
+            $result = $this->JACKED->MySQL->getJoin(
                 $fields1, $fields2, 'INNER', 
                 $this->config->dbt_posts,
                 $this->JACKED->Flock->config->dbt_users,
                 'author', 'guid',
                 '`' . $this->config->dbt_posts . '`.`guid` = \'' . $guid . '\'' .  $cond
             );
+            return $result? $result[0] : false;*/
         }
 
         /**
