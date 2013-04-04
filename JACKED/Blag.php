@@ -25,31 +25,6 @@
                 $where['alive'] = 1;
             }
             return $this->JACKED->Syrup->Blag->findOne($where);
-            /*$fields1 = array('guid', 'posted', 'title', 'headline', 'content');
-            $fields2 = false;
-            $cond = $only_active? ' AND `' . $this->config->dbt_posts . '`.`alive` = 1' : '';
-            switch($this->config->author_name_type){
-                case 'full':
-                    $fields2 = array('last_name', 'first_name');
-                    break;
-                case 'first':
-                    $fields2 = array('first_name');
-                    break;
-                case 'user':
-                    $fields2 = array('username');
-                    break;
-                default:
-                    $fields2 = array('first_name');
-                    break;
-            }
-            $result = $this->JACKED->MySQL->getJoin(
-                $fields1, $fields2, 'INNER', 
-                $this->config->dbt_posts,
-                $this->JACKED->Flock->config->dbt_users,
-                'author', 'guid',
-                '`' . $this->config->dbt_posts . '`.`guid` = \'' . $guid . '\'' .  $cond
-            );
-            return $result? $result[0] : false;*/
         }
 
         /**
@@ -57,41 +32,25 @@
         * 
         * @param $count int [optional] Number of posts to get. 0 will return all. Defaults to 10
         * @param $paged int [optional] Which page of posts to retrieve for paginated results. Defaults to 1
-        * @param $cond String [optional] A WHERE clause to filter posts by. Ex: "`table`.`guid` = 'lol-123'"
+        * @param $cond Array [optional] A list of key value pairs to filter posts by. Ex: array('author' => '53', 'title' => 'LOL, BUTTS')
         * @param $only_active Boolean Whether to only get posts that have not been deactivated. Defaults to true
         * @param $order String [optional] Order by date ascending or descending. One of: 'asc', 'desc'. Defaults to desc  
         * @return Array List of Arrays of data for each post found
         */
         public function getPosts($count = 10, $paged = 1, $cond = false, $only_active = true, $order = 'desc'){
-            $fields1 = array('guid', 'posted', 'title', 'headline', 'content');
-            $fields2 = false;
-            $cond = $cond? $cond . ' AND ': '';
-            $cond .= $only_active? '`' . $this->config->dbt_posts . '`.`alive` = 1' : '';
-            $cond .= ' ORDER BY \'posted\' ' . (($order == 'asc')? 'ASC' : 'DESC');
-            if($count > 0){
-                $cond .= $this->JACKED->MySQL->paginator($count, $paged);
+            $limit = $count;
+            $offset = $count * ($paged - 1);
+            $where = $cond;
+            $order = array('field' => 'posted', 'direction' => $order);
+            if($only_active){
+                if($where){
+                    $where = array('alive' => 1, 'AND' => $where);
+                }else{
+                    $where = array('alive' => 1);
+                }
             }
-            switch($this->config->author_name_type){
-                case 'full':
-                    $fields2 = array('last_name', 'first_name');
-                    break;
-                case 'first':
-                    $fields2 = array('first_name');
-                    break;
-                case 'user':
-                    $fields2 = array('username');
-                    break;
-                default:
-                    $fields2 = array('first_name');
-                    break;
-            }
-            return $this->JACKED->MySQL->getJoin(
-                $fields1, $fields2, 'INNER', 
-                $this->config->dbt_posts,
-                $this->JACKED->Flock->config->dbt_users,
-                'author', 'guid',
-                $cond
-            );
+            
+            return $this->JACKED->Syrup->Blag->find($where, $order, $limit, $offset);
         }
 
         /**
@@ -105,7 +64,7 @@
         * @return Array List of Arrays of data for each post found
         */
         public function getPostsByAuthor($author_guid, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
-            $cond = '`' . $this->config->dbt_posts . '`.`author` = \'' . $author_guid . '\'';
+            $cond = array('author' => $author_guid);
             return $this->getPosts($count, $paged, $cond, $only_active, $order);
         }
 
@@ -122,8 +81,10 @@
         */
         public function getPostsByTimeRange($time_oldest, $time_newest = false, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
             $time_newest = $time_newest? $time_newest : time();
-            $cond = '`' . $this->config->dbt_posts . '`.`posted` >= \'' . $time_oldest . '\' ';
-            $cond .= 'AND `' . $this->config->dbt_posts . '`.`posted` <= \'' . $time_newest . '\'';
+            $cond = array('AND' => array(
+                'posted >= ?' => $time_oldest,
+                'posted <= ?' <= $time_newest)
+            );
             return $this->getPosts($count, $paged, $cond, $only_active, $order);
         }
     }

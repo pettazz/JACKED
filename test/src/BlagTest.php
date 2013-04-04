@@ -37,20 +37,96 @@
 
         
 
-        // public function test_getPosts(){
+        public function test_getPosts(){
+            $fixtures = array();
+            for($i = 0; $i < 3; $i++){
+                $fixtures[$i] = $this->JACKED->Testur->createPost(3 - $i);
+            }
 
-        // }
+            $got_posts = $this->JACKED->Blag->getPosts();
+            $this->assertFalse(!$got_posts);
+            for($i = 0; $i < 3; $i++){
+                $test_post = $got_posts[$i];
+                $post = $fixtures[$i];
+                foreach($post as $key => $val){
+                    if($key == 'author'){
+                        //$this->assertEquals($val, $got_post[$key]);
+                    }else{
+                        $this->assertEquals($val, $test_post->$key);
+                    }
+                }
+            }
+        }
 
         
 
-        // public function test_getPostsByAuthor(){
+        public function test_getPostsByAuthor(){
+            $author_fixtures = array();
+            for($i = 0; $i < 3; $i++){
+                $author_fixtures[$i] = $this->JACKED->Testur->generateFlockUser();
+            }
+            $post_fixtures = array();
+            for($i = 0; $i < 3; $i++){
+                $post_fixtures[$i] = $this->JACKED->Testur->createPost(3 - $i, $author_fixtures[$i]);
+            }
+            
+            for($i = 0; $i < 3; $i++){
+                $got_posts = $this->JACKED->Blag->getPostsByAuthor($author_fixtures[$i]['guid']);
+                $this->assertEquals(1, count($got_posts));
+                $test_post = $got_posts[0];
+                $post = $post_fixtures[$i];
+                foreach($post as $key => $val){
+                    if($key == 'author'){
+                        //$this->assertEquals($val, $got_post[$key]);
+                    }else{
+                        $this->assertEquals($val, $test_post->$key);
+                    }
+                }
+            }
 
-        // }
+            $author = $this->JACKED->Testur->generateFlockUser();
+            $post_fixtures = array();
+            for($i = 0; $i < 3; $i++){
+                $post_fixtures[$i] = $this->JACKED->Testur->createPost(3 - $i, $author);
+            }
+
+            unset($test_post);
+            unset($post);
+            $got_posts = $this->JACKED->Blag->getPostsByAuthor($author['guid']);
+            $this->assertEquals(3, count($got_posts));
+            foreach($post_fixtures as $i => $post){
+                $test_post = $got_posts[$i];
+                foreach($post as $key => $val){
+                    if($key == 'author'){
+                        //$this->assertEquals($val, $got_post[$key]);
+                    }else{
+                        $this->assertEquals($val, $test_post->$key);
+                    }
+                }
+            }
+        }
 
         
 
-        // public function test_getPostsByTimeRange(){
+        public function test_getPostsByTimeRange(){
+            $fixtures = array();
+            for($i = 0; $i < 3; $i++){
+                $fixtures[$i] = $this->JACKED->Testur->createPost(3 - $i);
+            }
 
-        // }
+            $got_posts = $this->JACKED->Blag->getPosts();
+            $this->assertFalse(!$got_posts);
+            for($i = 0; $i < 3; $i++){
+                $test_post = $got_posts[$i];
+                $post = $fixtures[$i];
+                foreach($post as $key => $val){
+                    if($key == 'author'){
+                        //$this->assertEquals($val, $got_post[$key]);
+                    }else{
+                        $this->assertEquals($val, $test_post->$key);
+                    }
+                }
+            }
+        }
     }
 ?>
