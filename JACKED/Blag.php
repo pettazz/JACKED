@@ -81,9 +81,9 @@
         */
         public function getPostsByTimeRange($time_oldest, $time_newest = false, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
             $time_newest = $time_newest? $time_newest : time();
-            $cond = array('AND' => array(
+            $cond = array(
                 'posted >= ?' => $time_oldest,
-                'posted <= ?' <= $time_newest)
+                'AND' => array('posted <= ?' => $time_newest)
             );
             return $this->getPosts($count, $paged, $cond, $only_active, $order);
         }
