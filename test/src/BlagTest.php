@@ -110,15 +110,16 @@
 
         public function test_getPostsByTimeRange(){
             $fixtures = array();
-            for($i = 0; $i < 3; $i++){
-                $fixtures[$i] = $this->JACKED->Testur->createPost(3 - $i);
+            for($i = 1; $i < 21; $i++){
+                $fixtures[$i] = $this->JACKED->Testur->createPost($i);
             }
 
-            $got_posts = $this->JACKED->Blag->getPosts();
-            $this->assertFalse(!$got_posts);
-            for($i = 0; $i < 3; $i++){
-                $test_post = $got_posts[$i];
-                $post = $fixtures[$i];
+            $got_posts = $this->JACKED->Blag->getPostsByTimeRange(3, 12);
+            $posts_group = array_slice($fixtures, 2, 10);
+            $this->assertEquals(10, count($got_posts));
+            for($i = 1; $i < 10; $i++){
+                $test_post = $got_posts[9 - $i];
+                $post = $posts_group[$i];
                 foreach($post as $key => $val){
                     if($key == 'author'){
                         //$this->assertEquals($val, $got_post[$key]);
@@ -127,6 +128,21 @@
                     }
                 }
             }
+
+            $got_posts = $this->JACKED->Blag->getPostsByTimeRange(5, false, 14);
+            $posts_group = array_slice($fixtures, 6, 14);
+            $this->assertEquals(14, count($got_posts));
+            for($i = 0; $i < 13; $i++){
+                $test_post = $got_posts[13 - $i];
+                $post = $posts_group[$i];
+                foreach($post as $key => $val){
+                    if($key == 'author'){
+                        //$this->assertEquals($val, $got_post[$key]);
+                    }else{
+                        $this->assertEquals($val, $test_post->$key);
+                    }
+                }
+            }            
         }
     }
 ?>
