@@ -122,7 +122,7 @@
 
                     if(strpos($key, '?') === false){
                         //support shortcuts for key = value notation
-                        $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "'";
+                        $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "' ";
                     }else{
                         //otherwise use the replace ? in key method
                         $result .= str_replace(array('*', '?'), array('%', str_replace('*', '%', "'" . $value . "'")), trim($key)) . " ";
