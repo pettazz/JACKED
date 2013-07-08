@@ -229,7 +229,7 @@
                         }
 
                         $relFieldName = $rel[1];
-                        $joinClause = " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.' . $localField . ' ';
+                        $joinClause .= " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.' . $localField . ' ';
                     }else{
                         $this->_logr->write('Only hasOne relations are supported right now.', Logr::LEVEL_WARNING, NULL);
                     }
