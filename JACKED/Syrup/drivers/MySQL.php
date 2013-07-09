@@ -217,6 +217,7 @@
             if($followRelations && $this->getRelations()){
                 $tables = array($this->_tableName);
                 $fields = array();
+                $joinClause = '';
                 foreach($this->getRelations() as $localField => $relationData){
                     if($relationData['type'] == 'hasOne'){
                         $rel = explode('.', $relationData['field']);
