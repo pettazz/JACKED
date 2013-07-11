@@ -130,6 +130,26 @@ CREATE TABLE `User` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+# Dump of table Curator
+# ------------------------------------------------------------
+
+CREATE TABLE `Curator` (
+  `guid` varchar(64) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `usage` int(11) DEFAULT 0,
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table CuratorRelation
+# ------------------------------------------------------------
+
+CREATE TABLE `CuratorRelation` (
+  `Curator` varchar(64) NOT NULL DEFAULT '',
+  `target` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Curator`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
