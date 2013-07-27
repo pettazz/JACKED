@@ -69,6 +69,21 @@
         }
 
         /**
+        * Get all the data for a number of posts by a given category
+        * 
+        * @param $category_guid String The GUID of the category.
+        * @param $count int [optional] Number of posts to get. 0 will return all. Defaults to 10
+        * @param $paged int [optional] Which page of posts to retrieve for paginated results. Defaults to 1
+        * @param $only_active Boolean Whether to only get posts that have not been deactivated. Defaults to true
+        * @param $order String [optional] Order by date ascending or descending. One of: 'asc', 'desc'. Defaults to desc  
+        * @return Array List of Arrays of data for each post found
+        */
+        public function getPostsByCategory($category_guid, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
+            $cond = array('category' => $category_guid);
+            return $this->getPosts($count, $paged, $cond, $only_active, $order);
+        }
+
+        /**
         * Get all the data for a number of posts within a given time frame
         * 
         * @param $time_oldest int Oldest timestamp to get.

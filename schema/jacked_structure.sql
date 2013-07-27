@@ -51,10 +51,22 @@ CREATE TABLE `Blag` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `author` varchar(64) NOT NULL DEFAULT '',
   `posted` int(11) NOT NULL,
+  `category` varchar(64) NOT NULL DEFAULT '',
   `alive` tinyint(1) DEFAULT '1',
   `title` varchar(255) NOT NULL DEFAULT '',
   `headline` text,
   `content` text NOT NULL,
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table BlagCategory
+# ------------------------------------------------------------
+
+CREATE TABLE `BlagCategory` (
+  `guid` varchar(64) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

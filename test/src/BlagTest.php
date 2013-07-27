@@ -27,7 +27,7 @@
             $got_post = $this->JACKED->Blag->getPost($post['guid']);
             $this->assertFalse(!$got_post);
             foreach($post as $key => $val){
-                if($key == 'author'){
+                if($key == 'author' || $key == 'category'){
                     //$this->assertEquals($val, $got_post[$key]);
                 }else{
                     $this->assertEquals($val, $got_post->$key);
@@ -49,7 +49,7 @@
                 $test_post = $got_posts[$i];
                 $post = $fixtures[$i];
                 foreach($post as $key => $val){
-                    if($key == 'author'){
+                    if($key == 'author' || $key == 'category'){
                         //$this->assertEquals($val, $got_post[$key]);
                     }else{
                         $this->assertEquals($val, $test_post->$key);
@@ -76,7 +76,7 @@
                 $test_post = $got_posts[0];
                 $post = $post_fixtures[$i];
                 foreach($post as $key => $val){
-                    if($key == 'author'){
+                    if($key == 'author' || $key == 'category'){
                         //$this->assertEquals($val, $got_post[$key]);
                     }else{
                         $this->assertEquals($val, $test_post->$key);
@@ -97,7 +97,7 @@
             foreach($post_fixtures as $i => $post){
                 $test_post = $got_posts[$i];
                 foreach($post as $key => $val){
-                    if($key == 'author'){
+                    if($key == 'author' || $key == 'category'){
                         //$this->assertEquals($val, $got_post[$key]);
                     }else{
                         $this->assertEquals($val, $test_post->$key);
@@ -121,7 +121,7 @@
                 $test_post = $got_posts[9 - $i];
                 $post = $posts_group[$i];
                 foreach($post as $key => $val){
-                    if($key == 'author'){
+                    if($key == 'author' || $key == 'category'){
                         //$this->assertEquals($val, $got_post[$key]);
                     }else{
                         $this->assertEquals($val, $test_post->$key);
@@ -136,7 +136,7 @@
                 $test_post = $got_posts[13 - $i];
                 $post = $posts_group[$i];
                 foreach($post as $key => $val){
-                    if($key == 'author'){
+                    if($key == 'author' || $key == 'category'){
                         //$this->assertEquals($val, $got_post[$key]);
                     }else{
                         $this->assertEquals($val, $test_post->$key);
