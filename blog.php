@@ -27,7 +27,7 @@
             echo '<h4>posted in <em>' . $post->category->name . '</em></h4>';
 			echo '<p>' . $post->content . '</p>';
             if(property_exists($post, 'Curator')){
-                echo "<h4>tagged as: "
+                echo "<h4>tagged as: ";
                 $tagstrings = array();
                 foreach($post->Curator as $tag){
                     $tagsrtrings[] = $tag->name . "(" . $tag->usage . ")";
