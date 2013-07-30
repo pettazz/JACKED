@@ -25,7 +25,7 @@
 			echo '<h1>' . $post->title . '</h1>';
 			echo '<h2>' . $post->headline . '</h2>';
 			echo '<h4>posted by <em>' . $post->author->first_name . ' ' . $post->author->last_name . '</em> on <em>' . date('r', $post->posted) . '</em></h4>';
-            echo '<h4>posted on <em>' . date('r', $post->posted) . '</em></h4>';
+            echo '<h4>posted in <em>' . $post->category->name . '</em></h4>';
 			echo '<p>' . $post->content . '</p>';
 			echo '<h4>' . $karma->getScore($post->guid) . 'points (' . $karma->getUpvotes($post->guid) . ' up; ' . $karma->getDownvotes($post->guid) . ' down)</h4>';
 			echo '<small>' . $post->guid . '</small>';
