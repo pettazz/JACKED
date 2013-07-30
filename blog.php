@@ -1,7 +1,7 @@
 <?php
 
     require('jacked_conf.php');
-    $JACKED = new JACKED(array("Blag" "EYS", "Syrup"));
+    $JACKED = new JACKED(array("Blag", "EYS", "Syrup"));
     $blog = $JACKED->Blag;
     $eys = $JACKED->EYS;
 
