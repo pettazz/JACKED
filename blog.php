@@ -1,10 +1,9 @@
 <?php
 
     require('jacked_conf.php');
-    $JACKED = new JACKED(array("Blag", "Karma", "EYS", "Syrup"));
+    $JACKED = new JACKED(array("Blag" "EYS", "Syrup"));
     $blog = $JACKED->Blag;
     $eys = $JACKED->EYS;
-    $karma = $JACKED->Karma;
 
 ?>
 <!DOCTYPE html>
@@ -27,7 +26,17 @@
 			echo '<h4>posted by <em>' . $post->author->first_name . ' ' . $post->author->last_name . '</em> on <em>' . date('r', $post->posted) . '</em></h4>';
             echo '<h4>posted in <em>' . $post->category->name . '</em></h4>';
 			echo '<p>' . $post->content . '</p>';
-			echo '<h4>' . $karma->getScore($post->guid) . 'points (' . $karma->getUpvotes($post->guid) . ' up; ' . $karma->getDownvotes($post->guid) . ' down)</h4>';
+            if(property_exists($post, 'Curator')){
+                echo "<h4>tagged as: "
+                $tagstrings = array();
+                foreach($post->Curator as $tag){
+                    $tagsrtrings[] = $tag->name . "(" . $tag->usage . ")";
+                }
+                echo implode(", ", $tagstrings);
+                echo "</h4>";
+            }else{
+                echo "<h4>no tags</h4>";
+            }
 			echo '<small>' . $post->guid . '</small>';
 		}
 		$timer = $eys->getDelta('getposts', 'getposts_end');
