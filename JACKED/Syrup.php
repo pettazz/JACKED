@@ -74,7 +74,6 @@
             $modelName = $moduleName . 'Model';
             $this->registeredModels[$moduleName] = new $modelName($this->config->driverConfig, $this->JACKED->Logr, $this->JACKED->Util, $modelName);
             $thingy = $this->registeredModels[$moduleName];
-            echo "registered $moduleName with Syrup; type: " . $thingy::contentType;
         }
     }
 
