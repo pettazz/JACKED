@@ -11,7 +11,8 @@
 	    
 	    'mod_table' => 'jacked_modules',
 	    
-	    
+	    'default_timezone' => 'America/New_York',
+
 	    //for a deprecated function
 	    'salt_length' => 17,
 	    

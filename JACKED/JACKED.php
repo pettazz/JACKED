@@ -36,6 +36,9 @@
                 $dependencies = explode(", ", $dependencies);
             }
             self::$_instance->loadDependencies($dependencies);
+
+            // do some basic php setup stuff
+            date_default_timezone_set(self::$_instance->config->default_timezone);
         }
         
         public static function getInstance(){
