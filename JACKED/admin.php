@@ -40,7 +40,7 @@
             
             $admin = $this->JACKED->MySQL->get('id',
                 $this->config->dbt_users,
-                'user_id = ' . $id
+                'User = \'' . $id . '\''
             );
             
             if($admin){
