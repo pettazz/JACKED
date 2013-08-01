@@ -1,6 +1,6 @@
 <?php
     require('../jacked_conf.php');
-	$JACKED = new JACKED("admin, Vitogo, Sessions");
+	$JACKED = new JACKED("admin, Sessions");
 ?>
 
 <!DOCTYPE html>
