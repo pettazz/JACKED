@@ -414,7 +414,7 @@
                                 }
                             }
                         }else{
-                            if(array_key_exists($field, $this->getRelations())){
+                            if(!empty($this->$field) && array_key_exists($field, $this->getRelations())){
                                 //this field is a relation that hasn't been set, so we ignore it   
                             }else{
                                 $insertFields[] = $field;
@@ -438,7 +438,7 @@
                                 }
                             }
                         }else{
-                            if(array_key_exists($field, $this->getRelations())){
+                            if(!empty($this->$field) && array_key_exists($field, $this->getRelations())){
                                 //this field is a relation that hasn't been set, so we ignore it   
                             }else{
                                 $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
