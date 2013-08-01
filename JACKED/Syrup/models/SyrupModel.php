@@ -46,9 +46,36 @@
                     }
 
                     //find and create automagic relations
-                    if(in_array('meta_target_UUID', $this->$fieldName->extra)){
-                        //
+                    if(in_array('relational_target_UUID', $this->$fieldName->extra)){
+                        // this field is a target for some kind of meta content's relation, like Curator or Karma
+                        // so we want to
+                        // find the info on this relation from our site's Syrup config
+                        if(array_key_exists($this::tableName, $config['auto_relations'])){
+                            $relations = $config['auto_relations'][$this::tableName];
+                            foreach($relations as $relation){
+                                $relationName = $relation['model'];
+                                $relationType = $relation['type'];
+                                if(!class_exists($relationName . 'Model', false)){
+                                    include(JACKED_MODULES_ROOT . $config['model_root'] . $relationName . '.php');
+                                }
+                                $this->$relationName = SyrupField::REL_PLACEHOLDER;
+                                array_push($this->_fields, $relationName);
+                                $this->_relations[$relationName] = array(
+                                    'type' => $relationType . 'Foreign', 
+                                    'field' => $relationName . '.target', 
+                                    'target' => $this::tableName . '.guid', 
+                                );
+                                if(!($relationType == 'hasOne' || $relationType == 'hasMany')){
+                                    //i dunno what else there might be, but "handle it" for now
+                                    $this->_logr->write('Only hasOne and hasMany automagic relations are supported right now.', Logr::LEVEL_WARNING, NULL);
+                                }
+                            }
+                            
+                        }else{
+                            // we have nothing that wants to bind to this, so do nothing
+                        }
                     }
+                    //set up explicit relations
                     if(is_array($this->$fieldName->relation)){
                         $type = key($this->$fieldName->relation);
                         $this->_relations[$fieldName] = array('type' => $type, 'field' => $this->$fieldName->relation[$type]);
@@ -88,7 +115,9 @@
         */
         public function __set($key, $value){
             //constructor needs to be able to set anything it damn well pleases
-            if(strpos($key, '_') !== 0){
+            if($this->_constructing){
+                $this->$key = $value;
+            }elseif(strpos($key, '_') !== 0){
                 //this is a little janky, assumes all non-field prop names start with a _
                 ////and everything else is a field
                 if(in_array($key, $this->_fields)){
@@ -239,6 +268,9 @@
         const TEXT = 'text';
         const LONGTEXT = 'longtext';
         const ENUM = 'enum';
+
+        //this is for use in marking a field that exists only as a placeholder to be filled in by a relationalGet
+        const REL_PLACEHOLDER = 'these are not my pants';
 
         public $type;
         public $length;

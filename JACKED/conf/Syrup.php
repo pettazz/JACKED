@@ -28,6 +28,19 @@
             //password is in included file
 
             'model_root' => 'Syrup/models/',
+        
+
+            // this is a little janky. Define the relations that will be autoloaded, and 
+            // aren't defined explicitly in the models
+            'auto_relations' => array(
+                'Blag' => array(             //list of relations for this model
+                    array(                   //this relation means Blag hasMany Curator(s)
+                        'type' => 'hasMany', //relation type 
+                        'model' => 'Curator' //Model that defines the relationalGet
+                    )
+                )
+            )
+
         )
             
     );

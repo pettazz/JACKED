@@ -141,6 +141,10 @@
         * @return String MySQL WHERE clause.
         */
         private static function getWhereClause($criteria, $tableName = false){
+            if(empty($criteria)){
+                return '';
+            }
+
             //accept JSON formatted criteria
             if(is_string($criteria)){
                 $criteria = json_decode($criteria);
@@ -185,7 +189,10 @@
                 mysql_free_result($result);
             }else{
                 $value = false;
-                $this->_logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL);
+                $err = $this->getError($link);
+                if($err){
+                    $this->_logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL);
+                }
             }
             
             return $value;
@@ -217,22 +224,40 @@
             if($followRelations && $this->getRelations()){
                 $tables = array($this->_tableName);
                 $fields = array();
+                $subqueries = array();
                 $joinClause = '';
                 foreach($this->getRelations() as $localField => $relationData){
-                    if($relationData['type'] == 'hasOne'){
+                    $allowedRelations = array('hasOne', 'hasOneForeign', 'hasManyForeign');
+                    if(in_array($relationData['type'], $allowedRelations)){
                         $rel = explode('.', $relationData['field']);
                         $relTable = $rel[0];
                         $tables[] = $relTable;
                         $relModel = $relTable . 'Model';
-                        
-                        foreach($relModel::getFieldNames() as $field){
-                            $fields[] = $relTable . '.' . $field;
-                        }
-
                         $relFieldName = $rel[1];
-                        $joinClause .= " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.' . $localField . ' ';
+
+                        if($relationData['type'] == 'hasOne'){
+                            foreach($relModel::getFieldNames() as $field){
+                                $fields[] = $relTable . '.' . $field;
+                            }
+                            $joinClause .= " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.' . $localField . ' ';
+                        }elseif($relationData['type'] == 'hasOneForeign'){
+                            foreach($relModel::getFieldNames() as $field){
+                                $fields[] = $relTable . '.' . $field;
+                            }
+                            $joinClause .= " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.guid ';
+                        }elseif($relationData['type'] == 'hasManyForeign'){
+                            $query = 'SELECT ';
+                            foreach($relModel::getFieldNames() as $fieldName){
+                                $query .= $relTable . '.' . $fieldName . ' AS \'' . $fieldName . '\', ';
+                            }
+                            $query = rtrim($query, ', ');
+                            $query .= ' FROM ' . $relTable . ', ' . $relModel::relationTable;
+                            $query .= ' WHERE ' . $relTable . '.guid = ' . $relModel::relationTable . '.' . $relTable;
+                            $query .= ' AND ' . $relModel::relationTable . '.target = \'{!relational_target_UUID}\'';
+                            $subqueries[$relTable] = $query;
+                        }
                     }else{
-                        $this->_logr->write('Only hasOne relations are supported right now.', Logr::LEVEL_WARNING, NULL);
+                        $this->_logr->write('Only hasOne relations in the Model are supported right now.', Logr::LEVEL_WARNING, NULL);
                     }
                 }
                 $localModel = $this->_tableName . 'Model';
@@ -291,8 +316,24 @@
                         $obj = $this->load($localObject, false);
                         //replace the relation keys with the actual foreign objects
                         foreach($this->getRelations() as $localField => $relationData){
-                            $relationTableName = substr($relationData['field'], 0, strpos($relationData['field'], '.'));
-                            $obj->$localField = $foreignDataObjects[$relationTableName];
+                            if(!($relationData['type'] == 'hasManyForeign')){
+                                $relationTableName = substr($relationData['field'], 0, strpos($relationData['field'], '.'));
+                                $obj->$localField = $foreignDataObjects[$relationTableName];
+                            }
+                        }
+                        // replace any placeholders with the results from their subqueries
+                        foreach($subqueries as $relationName => $query){
+                            $relationData = $this->getRelations($relationName);
+                            $query = str_replace('{!relational_target_UUID}', $row[$relationData['target']], $query);
+                            $data = $this->query($query);
+                            $subresult = array();
+                            if($data){
+                                $modelName = $relationName . 'Model';
+                                foreach($data as $row){
+                                    $subresult[] = new $modelName($this->_config, $this->_logr, $this->_util, $row, false);
+                                }
+                            }
+                            $obj->$relationName = $subresult;
                         }
                         $results[] = $obj;
                     }else{
@@ -300,6 +341,7 @@
                     }
                 }
             }
+
             return $results;
         }
 
