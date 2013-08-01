@@ -414,8 +414,12 @@
                                 }
                             }
                         }else{
-                            $insertFields[] = $field;
-                            $insertValues[] = $this->sanitize($this->$field->getValue());
+                            if(array_key_exists($field, $this->getRelations())){
+                                //this field is a relation that hasn't been set, so we ignore it   
+                            }else{
+                                $insertFields[] = $field;
+                                $insertValues[] = $this->sanitize($this->$field->getValue());
+                            }
                         }
                     }
                     $query = "INSERT INTO " . $this->_tableName . " (`" . implode('`, `', $insertFields) . "`) VALUES ('" . implode("', '", $insertValues) . "')";
@@ -425,8 +429,20 @@
                     foreach($this->getFields() as $field){
                         if(is_object($this->$field) && is_subclass_of($this->$field, 'SyrupModel', false)){
                             $this->$field->save();
+                        }else if(is_array($this->$field)){
+                            if(!empty($this->$field)){
+                                foreach($this->$field as $relItem){
+                                    if($relItem->_isDirty){
+                                        $relItem->save();
+                                    }
+                                }
+                            }
                         }else{
-                            $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
+                            if(array_key_exists($field, $this->getRelations())){
+                                //this field is a relation that hasn't been set, so we ignore it   
+                            }else{
+                                $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
+                            }
                         }
                     }
                     $query .= implode(', ', $sets);
