@@ -187,21 +187,7 @@
             );
 
             if($done){
-                require("postmark.php");
-                $postmark = new Postmark("fd9e4960-c857-429c-b927-de65b121d292", "friend-request@vitogo.com", "contact@vitogo.com");
-                
-                ob_start(); include('/home/myvitogo/production_web/JACKED/friendRequest.html'); $html=ob_get_contents(); ob_end_clean();
-
-                $html = str_replace('{{new_friend_name}}', $userData['given_name'], $html);
-                $html = str_replace('{{user_name}}', $friendData['given_name'], $html);
-                $html = str_replace('{{new_friend_avatar_url}}', 'http://vitogo.com' . $userData['photo'], $html);
-
-
-                $result = $postmark->to($friendData['email'])
-                        ->subject("You have a new friend request on Vitogo!")
-                        ->html_message($html)
-                        ->send();
-                
+                // TODO: custom email handler
             }
             return $done;
         }
