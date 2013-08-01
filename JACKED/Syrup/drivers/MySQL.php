@@ -398,14 +398,23 @@
                     $insertFields = array();
                     $insertValues = array();
                     foreach($this->getFields() as $field){
-                        $insertFields[] = $field;
                         if(is_object($this->$field) && is_subclass_of($this->$field, 'SyrupModel', false)){
                             //add the relation key to this field and save the related object
+                            $insertFields[] = $field;
                             $relData = $this->getRelations($field);
                             $relField = substr($relData['field'], strpos($relData['field'], '.') + 1);
                             $insertValues[] = $this->sanitize($this->$field->$relField->getValue());
                             $this->$field->save();
+                        }else if(is_array($this->$field)){
+                            if(!empty($this->$field)){
+                                foreach($this->$field as $relItem){
+                                    if($relItem->_isDirty){
+                                        $relItem->save();
+                                    }
+                                }
+                            }
                         }else{
+                            $insertFields[] = $field;
                             $insertValues[] = $this->sanitize($this->$field->getValue());
                         }
                     }
