@@ -19,4 +19,16 @@
     }catch(Exception $e){
         die("<h1>JACKED could not root itself.</h1> <h4>Check your configuration, dude.</h4> <br /> Here's the actual exception: <p><code>" . $e->getMessage() . "</code></p>");
     }
+    spl_autoload_register(function($class){
+        // overwrite JACKED default loader to not throw exceptions which break phpunit
+        $did = false;
+        $file = JACKED_MODULES_ROOT . $class . '.php';
+        if (file_exists($file)){
+            require($file);
+            $did = true;
+        }else{
+            //throw new Exception("JACKED can't find a class for the module named " . $class . ".");
+        }
+        return $did;
+    });
 ?>
