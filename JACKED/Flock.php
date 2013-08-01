@@ -279,6 +279,7 @@
         public function login($identifier, $password){
             $username = $this->JACKED->MySQL->sanitize($identifier);
             $vals = $this->JACKED->MySQL->getAll('guid, password', $this->config->dbt_users, $this->config->user_identifier_field . "='$username'");
+            $vals = $vals[0];
             
             if($vals['password']){
                 $userID = $vals['guid'];
@@ -303,44 +304,6 @@
                 throw new UserNotFoundException();
             }
         }
-        
-        /**
-         * Login the given user with the given password hash.
-         * 
-         * Uses the auth.Flock Session array
-         *
-         * @param string $username The username to log in with (usually an email)
-         * @param string $hpassword The user's password hash
-         * @throws UserNotFoundException if the given username does not exist
-         * @throws IncorrectPasswordException if the given password does not match the username's login
-         * @return boolean Whether the user is now logged in successfully
-         */
-        /* this was probably a bad idea to begin with. 
-        public function hashedLogin($username, $hpassword){
-            $username = $this->JACKED->MySQL->sanitize($username);
-
-            $vals = $this->JACKED->MySQL->getAll('id, password', $this->config->dbt_users, "email='$username'");
-            
-            if($vals['password']){
-                $userID = $vals['id'];
-                
-                if($hpassword == $vals['password']){
-                    $this->JACKED->Sessions->write("auth.Flock", array(
-                        'loggedIn' => true,
-                        'username'     => $username, 
-                        'email'     => $username, 
-                        'userid'   => $userID,
-                        'sessionID' => md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']),
-                        'hash' => $hpassword
-                    ));
-                    return true;
-                }else{
-                    throw new IncorrectPasswordException();
-                }
-            }else{
-                throw new UserNotFoundException();
-            }
-        }*/
         
         /**
          * Checks the current session to see if a user is logged in
