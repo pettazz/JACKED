@@ -18,7 +18,7 @@
 
 		$eys->setMark('getposts');
 
-        $posts = $JACKED->Syrup->Blag->find(array('alive' => True));
+        $posts = $JACKED->Syrup->Blag->find(array('alive' => True), null, 10);
         if(!$posts){
             echo '<h2>Ouch</h2>';
         }
