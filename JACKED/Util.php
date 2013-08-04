@@ -115,12 +115,13 @@
          * @return string The hashed string
          */
         public function hashPassword($string){
-            $this->JACKED->loadLibrary('PasswordHash');
-            if($string == 'hunter2'){
-                $this->JACKED->Logr->write('I just copy pasted YOUR ******\'s and it appears to YOU as hunter2 cause its your pw', 0);
+            if(function_exists('password_hash')){
+                return password_hash($string, PASSWORD_DEFAULT);
+            }else{
+                $this->JACKED->loadLibrary('PasswordHash');
+                $hasher = new PasswordHash(8, FALSE);
+                return $hasher->HashPassword($string);
             }
-            $hasher = new PasswordHash(8, FALSE);
-            return $hasher->HashPassword($string);
         }
 
         /**
@@ -131,9 +132,13 @@
          * @return bool Whether the hash of $string exactly matches the given $someHash
          */
         public function checkPassword($string, $someHash){
-            $this->JACKED->loadLibrary('PasswordHash');            
-            $hasher = new PasswordHash(8, FALSE);
-            return $hasher->CheckPassword($string, $someHash);
+            if(function_exists('password_verify')){
+                return password_verify($string, $someHash);
+            }else{
+                $this->JACKED->loadLibrary('PasswordHash');            
+                $hasher = new PasswordHash(8, FALSE);
+                return $hasher->CheckPassword($string, $someHash);
+            }
         }
 
     }
