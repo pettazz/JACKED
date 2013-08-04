@@ -52,5 +52,36 @@
             $this->assertFalse($this->JACKED->Util->array_key_exists_recursive(3, $fixture));
             $this->assertFalse($this->JACKED->Util->array_key_exists_recursive('oh wow', $fixture));
         }
+
+        public function test_hashPassword(){
+            //just make sure it doesn't break
+            $this->assertNotNull($this->JACKED->Util->uuid4());
+        }
+
+        public function test_hashPassword(){
+            $password = 'butts123';
+
+            // just force the password hashing function to run and make sure it doesn't error
+            $pHash = $this->JACKED->Util->hashPassword($password);
+            $this->assertNotNull();
+        }
+
+        public function test_hashPassword(){
+            $password = 'butts123';
+
+            // just force the password hashing function to run and make sure it doesn't error
+            $pHash = $this->JACKED->Util->hashPassword($password);
+
+            $this->assertNotNull($pHash);
+        }
+
+        public function test_checkPassword(){
+            $password = 'bananHammock99';
+
+            $pHash = $this->JACKED->Util->hashPassword($password);
+            $result = $this->JACKED->Util->checkPassword($password, $pHash);
+
+            $this->assertTrue($result);
+        }
     }
 ?>
