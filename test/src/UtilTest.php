@@ -53,7 +53,7 @@
             $this->assertFalse($this->JACKED->Util->array_key_exists_recursive('oh wow', $fixture));
         }
 
-        public function test_hashPassword(){
+        public function test_uuidgenerator(){
             //just make sure it doesn't break
             $this->assertNotNull($this->JACKED->Util->uuid4());
         }
