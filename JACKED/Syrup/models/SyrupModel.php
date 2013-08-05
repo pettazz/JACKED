@@ -62,7 +62,7 @@
                                 array_push($this->_fields, $relationName);
                                 $this->_relations[$relationName] = array(
                                     'type' => $relationType . 'Foreign', 
-                                    'field' => $relationName . '.target', 
+                                    'field' => $relationName . '.guid', 
                                     'target' => $this::tableName . '.guid', 
                                 );
                                 if(!($relationType == 'hasOne' || $relationType == 'hasMany')){

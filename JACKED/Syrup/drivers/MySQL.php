@@ -102,15 +102,37 @@
         * @param $tableName String Name of the table referred to by criteria fields. 
         * @return String Representation of @criteria as a String usable in a MySQL WHERE clause.
         */
-        private static function parseWhereCriteria($criteria, $tableName = false){
+        private function parseWhereCriteria($criteria, $tableName = false){
             $result = "";
+            $relations = $this->getRelations();
             foreach($criteria as $key => $value){
-                if(trim($key) == "OR" || trim($key) == "AND"){
-                    $result .= trim($key) . " (" . self::parseWhereCriteria($value) . ") ";
+                if(array_key_exists(trim($key), $relations)){
+                    $relationData = $relations[trim($key)];
+                    $rel = explode('.', $relationData['field']);
+                    $relTable = $rel[0];
+                    $relModel = $relTable . 'Model';
+                    switch($relationData['type']){
+                        case 'hasOne':
+                            $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "' ";
+                            break;
+                        case 'hasOneForeign':
+                            //$result = $relationData['target'] . " = " . $relTable . ".target AND " . $relTable . "." . $relTable . " = '" . trim($value) . "'";
+                            throw new Exception("findby hasOneForeign type is not yet supported.");
+                            break;
+                        case 'hasManyForeign':
+                            $result = $relationData['target'] . " = " . $relModel::relationTable . ".target AND " . $relModel::relationTable . "." . $relTable . " = '" . trim($value) . "'";
+                            break;
+
+                        default:
+                            throw new Exception("Unknown relation type.");
+                            break;
+                    }
+                }else if(trim($key) == "OR" || trim($key) == "AND"){
+                    $result .= trim($key) . " (" . $this->parseWhereCriteria($value) . ") ";
                 }else if(is_array($value)){
                     $results = array();
                     foreach($value as $innerkey => $innerval){
-                        $results[] = self::parseWhereCriteria(array($innerkey => $innerval));
+                        $results[] = $this->parseWhereCriteria(array($innerkey => $innerval));
                     }
                     $result .= " ( " . implode(" AND ", $results) . " ) ";
                 }else{
@@ -140,7 +162,7 @@
         * @param $tableName String Name of the table referred to by criteria fields.
         * @return String MySQL WHERE clause.
         */
-        private static function getWhereClause($criteria, $tableName = false){
+        private function getWhereClause($criteria, $tableName = false){
             if(empty($criteria)){
                 return '';
             }
@@ -150,7 +172,7 @@
                 $criteria = json_decode($criteria);
             }
 
-            return "WHERE " . self::parseWhereCriteria($criteria, $tableName);
+            return "WHERE " . $this->parseWhereCriteria($criteria, $tableName);
         }
 
         /**
@@ -222,7 +244,7 @@
         */
         public function find($criteria = array(), $order = null, $limit = null, $offset = 0, $followRelations = true){
             if($followRelations && $this->getRelations()){
-                $tables = array($this->_tableName);
+                $tables = array();
                 $fields = array();
                 $subqueries = array();
                 $joinClause = '';
@@ -231,9 +253,7 @@
                     if(in_array($relationData['type'], $allowedRelations)){
                         $rel = explode('.', $relationData['field']);
                         $relTable = $rel[0];
-                        $tables[] = $relTable;
                         $relModel = $relTable . 'Model';
-                        $relFieldName = $rel[1];
 
                         if($relationData['type'] == 'hasOne'){
                             foreach($relModel::getFieldNames() as $field){
@@ -250,6 +270,7 @@
                             foreach($relModel::getFieldNames() as $fieldName){
                                 $query .= $relTable . '.' . $fieldName . ' AS \'' . $fieldName . '\', ';
                             }
+                            $tables[] = $relModel::relationTable;
                             $query = rtrim($query, ', ');
                             $query .= ' FROM ' . $relTable . ', ' . $relModel::relationTable;
                             $query .= ' WHERE ' . $relTable . '.guid = ' . $relModel::relationTable . '.' . $relTable;
@@ -270,11 +291,11 @@
                     $query .= $fieldName . ' AS \'' . $fieldName . '\', ';
                 }
                 $query = rtrim($query, ', ');
-                $query .= ' FROM ' . $this->_tableName . $joinClause;
+                $query .= ' FROM ' . implode(', ', $tables) . ', ' . $this->_tableName . $joinClause;
             }else{
                 $query = "SELECT * FROM " . $this->_tableName;
             }
-            $query .= " " . self::getWhereClause($criteria, $this->_tableName);
+            $query .= " " . $this->getWhereClause($criteria, $this->_tableName);
             if($order){
                 $query .= " ORDER BY " . $order['field'] . ' ' . $order['direction'];
             }
@@ -354,7 +375,7 @@
         public function count($criteria = array()){
             $query = "SELECT COUNT(*) AS count FROM " . $this->_tableName;
             if($criteria){
-                $query .= " " . self::getWhereClause($criteria);
+                $query .= " " . $this->getWhereClause($criteria);
             }
             $done = $this->query($query);
             return $done[0]['count'];
