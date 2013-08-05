@@ -63,14 +63,6 @@
 
             // just force the password hashing function to run and make sure it doesn't error
             $pHash = $this->JACKED->Util->hashPassword($password);
-            $this->assertNotNull();
-        }
-
-        public function test_hashPassword(){
-            $password = 'butts123';
-
-            // just force the password hashing function to run and make sure it doesn't error
-            $pHash = $this->JACKED->Util->hashPassword($password);
 
             $this->assertNotNull($pHash);
         }
