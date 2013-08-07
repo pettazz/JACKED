@@ -9,12 +9,10 @@
     <meta charset="utf-8">
     <title><?php echo $JACKED->config->client_name; ?> | JACKED</title>
     
-    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.css" />
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-    <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.4.0/bootstrap-alerts.js"></script>
-    <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.4.0/bootstrap-modal.js"></script>
-    <script type="text/javascript" src="http://twitter.github.com/bootstrap/1.4.0/bootstrap-dropdown.js"></script>
-    <script type="text/javascript" src="http://fgnass.github.com/spin.js/dist/spin.min.js"></script>
+    <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/bootstrap-combined.min.css" />
+    <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/bootstrap.min.js"></script>
+    <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/spin.min.js"></script>
 
     <script type="text/javascript">
         
