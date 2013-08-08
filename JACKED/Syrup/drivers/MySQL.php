@@ -281,7 +281,6 @@
                             foreach($relModel::getFieldNames() as $fieldName){
                                 $query .= $relTable . '.' . $fieldName . ' AS \'' . $fieldName . '\', ';
                             }
-                            $tables[] = $relModel::relationTable;
                             $query = rtrim($query, ', ');
                             $query .= ' FROM ' . $relTable . ', ' . $relModel::relationTable;
                             $query .= ' WHERE ' . $relTable . '.guid = ' . $relModel::relationTable . '.' . $relTable;
@@ -302,7 +301,11 @@
                     $query .= $fieldName . ' AS \'' . $fieldName . '\', ';
                 }
                 $query = rtrim($query, ', ');
-                $query .= ' FROM ' . implode(', ', $tables) . ', ' . $this->_tableName . $joinClause;
+                if($tables){
+                    $query .= ' FROM ' . implode(', ', $tables) . ', ' . $this->_tableName . $joinClause;
+                }else{
+                    $query .= ' FROM ' . $this->_tableName . $joinClause;
+                }
             }else{
                 $query = "SELECT * FROM " . $this->_tableName;
             }
