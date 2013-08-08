@@ -6,7 +6,7 @@
 
     class SyrupDriver extends SyrupDriverInterface{
 
-        private $_mysqli_obj = NULL;
+        protected $_mysqli_obj_internal = NULL;
         private $_config;
         private $_logr;
         private $_util;
@@ -26,9 +26,9 @@
         public function __destruct(){
             if($this->isLinkOpen()){
                 try{
-                    $this->_mysqli_obj->close();
+                    $this->_mysqli_obj_internal->close();
                 }catch(Exception $e){}
-                $this->_mysqli_obj = NULL;
+                $this->_mysqli_obj_internal = NULL;
             }
         }
 
@@ -45,8 +45,8 @@
         * 
         * @return Boolean Whether the link is active.
         */
-        private function isLinkOpen(){
-            return ($this->_mysqli_obj == NULL)? false : true;
+        protected function isLinkOpen(){
+            return ($this->_mysqli_obj_internal == NULL)? false : true;
         }
         
         /**
@@ -55,12 +55,12 @@
         * @param $setDefault Boolean [optional] Whether to make the new link the default link. Defaults to true.
         * @return int The default MySQLi object.
         */
-        private function openLink($setDefault = true){
+        protected function openLink($setDefault = true){
             try{
                 $obj = new mysqli($this->_config['db_host'], $this->_config['db_user'], $this->_config['db_pass'], $this->_config['db_name']);
                 $obj->autocommit(true);
                 if($setDefault){
-                    $this->_mysqli_obj = $obj;
+                    $this->_mysqli_obj_internal = $obj;
                 }
                 return $obj;
             }catch(Exception $e){
@@ -69,11 +69,11 @@
                 }
                 throw $e;
             }
-            if($this->_mysqli_obj->connect_errno > 0){
+            if($this->_mysqli_obj_internal->connect_errno > 0){
                 if($setDefault){
                     $this->isModuleEnabled = false;
                 }
-                throw new Exception($this->_mysqli_obj->connect_error);
+                throw new Exception($this->_mysqli_obj_internal->connect_error);
             }
         }
         
@@ -82,9 +82,9 @@
         * 
         * @return int The default MySQLi object.
         */
-        private function getLink(){
+        protected function getLink(){
             if($this->isLinkOpen()){
-                return $this->_mysqli_obj;
+                return $this->_mysqli_obj_internal;
             }else{
                 return $this->openLink();
             }
@@ -97,7 +97,7 @@
         * @param $value String Value to sanitize.
         * @return String Sanitized version of the input string.
         */
-        private function sanitize($value){
+        protected function sanitize($value){
             return $this->_mysqli_obj->real_escape_string(stripslashes($value));
         }
 
@@ -108,7 +108,7 @@
         * @param $page int Page number to get values for.
         * @return String MySQL LIMIT clause.
         */
-        private static function paginator($howMany, $page){
+        protected static function paginator($howMany, $page){
             return " LIMIT " . ($howMany * ($page - 1)) . ", " . $howMany;
         }
 
@@ -119,7 +119,7 @@
         * @param $tableName String Name of the table referred to by criteria fields. 
         * @return String Representation of @criteria as a String usable in a MySQL WHERE clause.
         */
-        private function parseWhereCriteria($criteria, $tableName = false){
+        protected function parseWhereCriteria($criteria, $tableName = false){
             $result = "";
             $relations = $this->getRelations();
             foreach($criteria as $key => $value){
@@ -179,7 +179,7 @@
         * @param $tableName String Name of the table referred to by criteria fields.
         * @return String MySQL WHERE clause.
         */
-        private function getWhereClause($criteria, $tableName = false){
+        protected function getWhereClause($criteria, $tableName = false){
             if(empty($criteria)){
                 return '';
             }
@@ -197,7 +197,7 @@
         * 
         * @return String Last error message from the database connection identified by the link
         */
-        private function getError(){
+        protected function getError(){
             return $this->_mysqli_obj->error;
         }
 
@@ -208,16 +208,16 @@
         * @param $query String query to perform
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        private function mysqlQuery($query){
+        protected function mysqlQuery($query){
             $this->_logr->write($query, Logr::LEVEL_NOTICE, NULL);
             $result = $this->_mysqli_obj->query($query);
             if($result === true){
                 $value = true;
             }else if($result === false){
                 $value = false;
-            }else if($result->num_rows() > 0){
+            }else if($result->num_rows > 0){
                 $value = array();
-                while($row = $result->fetch_array(MYSQLI_BOTH)){
+                while($row = $result->fetch_array(MYSQLI_ASSOC)){
                     $value[] = array_map("stripslashes", $row);
                 }
                 $result->free();
@@ -238,7 +238,7 @@
         * @param $query String query to perform
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        private function query($query){
+        protected function query($query){
             //$query = $this->sanitize($query);
             return $this->mysqlQuery($query);
         }

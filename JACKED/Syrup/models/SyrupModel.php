@@ -148,8 +148,10 @@
         * @return mixed The value of the requested property.
         */
         public function __get($key){
-            //see above __set() jankiness comment. also applies here.
-            if(strpos($key, '_') !== 0){
+            if($key == '_mysqli_obj'){
+                return $this->getLink();
+            }else if(strpos($key, '_') !== 0){
+                //see above __set() jankiness comment. also applies here.
                 if($this->_constructing){
                     return $this->$key;
                 }elseif(in_array($key, $this->_fields)){
