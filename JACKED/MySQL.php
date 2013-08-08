@@ -133,10 +133,10 @@
         * Parse a given MySQL Resource ID into an associative array of the given type.
         * 
         * @param $result MySQLi Result Object to parse.
-        * @param $result_type int [optional] One of: MYSQLI_ASSOC, MYSQLI_NUM, or MYSQLI_BOTH (default).
+        * @param $result_type int [optional] One of: MYSQLI_ASSOC (default), MYSQLI_NUM, or MYSQLI_BOTH.
         * @return Array Result data parsed into an associative array.
         */
-        public function parseResult($result, $result_type = MYSQLI_BOTH){
+        public function parseResult($result, $result_type = MYSQLI_ASSOC){
            $done = array();
             if($result){
                 while($row = $this->_mysqli_obj->fetch_array($result_type)){
@@ -188,7 +188,7 @@
                 $value = false;
             }else if($result->num_rows > 0){
                 $value = array();
-                while($row = $result->fetch_array(MYSQLI_BOTH)){
+                while($row = $result->fetch_array(MYSQLI_ASSOC)){
                     $value[] = array_map("stripslashes", $row);
                 }
                 $result->free();
