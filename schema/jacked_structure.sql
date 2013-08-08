@@ -159,8 +159,7 @@ CREATE TABLE `Curator` (
 
 CREATE TABLE `CuratorRelation` (
   `Curator` varchar(64) NOT NULL DEFAULT '',
-  `target` varchar(64) NOT NULL DEFAULT '',
-  PRIMARY KEY (`Curator`)
+  `target` varchar(64) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
