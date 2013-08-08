@@ -84,25 +84,47 @@
         }
 
         /**
+        * Creates a randomly generated BlagCategory
+        * 
+        * @param $name String [optional] Name for new category. Defaults to a randomly generated one.
+        * @param $store Boolean [optional] Whether to store the new category in the database. Defaults to true.
+        * @return Array All details of new user 
+        */
+        public function generateBlagCategory($name = NULL, $store = true){
+            $details = array(
+                'guid' => $this->JACKED->Util->uuid4(),
+                'name' => ($name)? $name : $this->markov->generate(7, 20) . ' ' . $this->markov->generate(7, 20)
+            );
+            if($store){
+                $this->JACKED->MySQL->insert('BlagCategory', $details);
+            }
+
+            return $details;
+        }
+
+        /**
         * Creates a randomly generated Blag post.
         * 
         * @param $timestamp int [optional] The timestamp with which to create the post. Defaults to the current timestamp.
         * @param $author Array [optional] Deatils of a Flock User to use as the Author. Defaults to generating a new one.
         * @param $title String [optional] Title of the post to create. Defaults to randomly generated.
+        * @param $category Array [optional] Deatils of a Blag Category to use as the Category. Defaults to generating a new one.
         * @return Array All details of new post
         */
-        public function createPost($timestamp = NULL, $author = NULL, $title = NULL){
+        public function createPost($timestamp = NULL, $author = NULL, $title = NULL, $category = NULL){
             $content = '';
             for($x = 0; $x <= rand(0, 5); $x++){
                 $content .= $this->generateSentence();
             }
             $posted = $timestamp? $timestamp : rand(1022967819, time());
             $author = $author? $author : $this->generateFlockUser();
+            $category = $category? $category : $this->generateBlagCategory();
             $details = array(
                 'guid' => $this->JACKED->Util->uuid4(),
                 'author' => $author['guid'],
                 'title' => ($title? $title : ucfirst($this->generateSentence(false))),
                 'headline' => ucfirst($this->generateSentence(false)),
+                'category' => $category['guid'],
                 'posted' => $posted,
                 'content' => $content
             );
