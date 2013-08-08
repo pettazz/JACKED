@@ -277,6 +277,9 @@
                             }
                             $joinClause .= " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.guid ';
                         }elseif($relationData['type'] == 'hasManyForeign'){
+                            if(array_key_exists($relTable, $criteria)){
+                                $tables[] = $relModel::relationTable;
+                            }
                             $query = 'SELECT ';
                             foreach($relModel::getFieldNames() as $fieldName){
                                 $query .= $relTable . '.' . $fieldName . ' AS \'' . $fieldName . '\', ';
