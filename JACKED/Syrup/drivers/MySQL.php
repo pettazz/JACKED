@@ -6,7 +6,7 @@
 
     class SyrupDriver extends SyrupDriverInterface{
 
-        private $_mysql_link = NULL;
+        private $_mysqli_obj = NULL;
         private $_config;
         private $_logr;
         private $_util;
@@ -26,46 +26,65 @@
         public function __destruct(){
             if($this->isLinkOpen()){
                 try{
-                    mysql_close($this->_mysql_link);
+                    $this->_mysqli_obj->close();
                 }catch(Exception $e){}
-                $this->_mysql_link = NULL;
+                $this->_mysqli_obj = NULL;
+            }
+        }
+
+        public function __get($key){
+            if($key == '_mysqli_obj'){
+                return $this->getLink();
+            }else{
+                return $this->$key;
             }
         }
 
         /**
         * Checks if the MySQL link is open.
         * 
-        * @param $link int [optional] MySQL Link ID to check. Defaults to default link.
         * @return Boolean Whether the link is active.
         */
-        private function isLinkOpen($link = NULL){
-            $link = $link? $link : $this->_mysql_link;
-            return ($this->_mysql_link == NULL)? false : true;
+        private function isLinkOpen(){
+            return ($this->_mysqli_obj == NULL)? false : true;
         }
         
         /**
         * Opens a new link to MySQL.
         * 
         * @param $setDefault Boolean [optional] Whether to make the new link the default link. Defaults to true.
-        * @return int MySQL Link ID that was just opened.
+        * @return int The default MySQLi object.
         */
         private function openLink($setDefault = true){
-            $link = mysql_connect($this->_config['db_host'], $this->_config['db_user'], $this->_config['db_pass'], true);
-            mysql_select_db($this->_config['db_name']);
-            if($setDefault){
-                $this->_mysql_link = $link;
+            try{
+                $obj = new mysqli($this->_config['db_host'], $this->_config['db_user'], $this->_config['db_pass'], $this->_config['db_name']);
+                $obj->autocommit(true);
+                if($setDefault){
+                    $this->_mysqli_obj = $obj;
+                }
+                return $obj;
+            }catch(Exception $e){
+                if($setDefault){
+                    $this->isModuleEnabled = false;
+                }
+                throw $e;
             }
-            return $link;
+            if($this->_mysqli_obj->connect_errno > 0){
+                if($setDefault){
+                    $this->isModuleEnabled = false;
+                }
+                throw new Exception($this->_mysqli_obj->connect_error);
+            }
         }
         
         /**
-        * Returns the default link. If it's not open, opens it then returns the link.
+        * Returns the default object. If it's not open, opens it then returns the new one.
         * 
-        * @return int The default MySQL Link ID.
+        * @return int The default MySQLi object.
         */
         private function getLink(){
             if($this->isLinkOpen()){
-                return $this->_mysql_link;
+                return $this->_mysqli_obj;
             }else{
                 return $this->openLink();
             }
@@ -76,12 +95,10 @@
         * TODO: add even better sanitization
         * 
         * @param $value String Value to sanitize.
-        * @param $link int [optional] MySQL Link ID to use. Defaults to default link. Opens new default if necessary.
         * @return String Sanitized version of the input string.
         */
-        private function sanitize($value, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            return mysql_real_escape_string(stripslashes($value), $link);
+        private function sanitize($value){
+            return $this->_mysqli_obj->real_escape_string(stripslashes($value));
         }
 
         /**
@@ -176,44 +193,39 @@
         }
 
         /**
-        * Get the string value of the last MySQL error on the given link.
+        * Get the string value of the last MySQL error.
         * 
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @return String Last error message from the database connection identified by the link
         */
-        private function getError($link = NULL){
-            $link = $link? $link : $this->getLink();
-            $err = mysql_error($link);
-            return $err;
+        private function getError(){
+            return $this->_mysqli_obj->error;
         }
 
         /**
-        * Perform a MySQL query on the given database connection, and return the result identifier. 
+        * Perform a MySQL query on the given database connection, and return the result object. 
         * For internal use only, doesn't handle any sanitization.
         * 
         * @param $query String query to perform
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        private function mysqlQuery($query, $link = NULL){
-            $link = $link? $link : $this->getLink();
+        private function mysqlQuery($query){
             $this->_logr->write($query, Logr::LEVEL_NOTICE, NULL);
-            $result = mysql_query($query, $link);
+            $result = $this->_mysqli_obj->query($query);
             if($result === true){
                 $value = true;
             }else if($result === false){
                 $value = false;
-            }else if(mysql_num_rows($result) > 0){
+            }else if($result->num_rows() > 0){
                 $value = array();
-                while($row = mysql_fetch_array($result, MYSQL_ASSOC)){
+                while($row = $result->fetch_array(MYSQLI_BOTH)){
                     $value[] = array_map("stripslashes", $row);
                 }
-                mysql_free_result($result);
+                $result->free();
             }else{
                 $value = false;
-                $err = $this->getError($link);
+                $err = $this->getError();
                 if($err){
-                    $this->_logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL);
+                    $this->_logr->write($this->getError(), Logr::LEVEL_WARNING, NULL);
                 }
             }
             
@@ -224,12 +236,11 @@
         * Perform a MySQL query on the given database connection, and return the result identifier. 
         * 
         * @param $query String query to perform
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        private function query($query, $link = NULL){
+        private function query($query){
             //$query = $this->sanitize($query);
-            return $this->mysqlQuery($query, $link);
+            return $this->mysqlQuery($query);
         }
 
         /**
