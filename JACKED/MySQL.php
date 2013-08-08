@@ -5,58 +5,72 @@
         const moduleVersion = 2.7;
         public static $dependencies = array(); //array('Memcacher' => array('required' => false));
         
-        private $mysql_link = NULL;
+        private $_mysqli_obj = NULL;
         
         public function __destruct(){
             if($this->isLinkOpen()){
                 try{
-                    mysql_close($this->_mysql_link);
+                    $this->_mysqli_obj->close();
                 }catch(Exception $e){}
-                $this->_mysql_link = NULL;
+                $this->_mysqli_obj = NULL;
+            }
+        }
+
+        public function __get($key){
+            if($key == '_mysqli_obj'){
+                return $this->getLink();
+            }else{
+                return $this->$key;
             }
         }
 
         /**
         * Checks if the MySQL link is open.
         * 
-        * @param $link int [optional] MySQL Link ID to check. Defaults to default link.
+        * @param $obj MySQLi Object [optional] MySQLi Object to check. Defaults to default link.
         * @return Boolean Whether the link is active.
         */
-        private function isLinkOpen($link = NULL){
-            $link = $link? $link : $this->mysql_link;
-            return ($this->mysql_link == NULL)? false : true;
+        private function isLinkOpen($obj = NULL){
+            $obj = $obj? $obj : $this->_mysqli_obj;
+            return ($this->_mysqli_obj == NULL)? false : true;
         }
         
         /**
         * Opens a new link to MySQL. If $setDefault is true and link creation fails, the module is disabled.
         * 
-        * @param $setDefault Boolean [optional] Whether to make the new link the default link. Defaults to true.
-        * @return int MySQL Link ID that was just opened.
+        * @param $setDefault Boolean [optional] Whether to make the new object the default. Defaults to true.
+        * @return Object MySQLi instance that was just created.
         */
         private function openLink($setDefault = true){
             try{
-                $link = mysql_connect($this->config->db_host, $this->config->db_user, $this->config->db_pass, true);
-                mysql_select_db($this->config->db_name);
+                $obj = new mysqli($this->config->db_host, $this->config->db_user, $this->config->db_pass, $this->config->db_name);
+                $obj->autocommit(true);
                 if($setDefault){
-                    $this->mysql_link = $link;
+                    $this->_mysqli_obj = $obj;
                 }
-                return $link;
+                return $obj;
             }catch(Exception $e){
                 if($setDefault){
                     $this->isModuleEnabled = false;
                 }
                 throw $e;
             }
+            if($this->_mysqli_obj->connect_errno > 0){
+                if($setDefault){
+                    $this->isModuleEnabled = false;
+                }
+                throw new Exception($this->_mysqli_obj->connect_error);
+            }
         }
         
         /**
-        * Returns the default link. If it's not open, opens it then returns the link.
+        * Returns the default object. If it's not open, opens it then returns the new one.
         * 
-        * @return int The default MySQL Link ID.
+        * @return int The default MySQLi object.
         */
         private function getLink(){
             if($this->isLinkOpen()){
-                return $this->mysql_link;
+                return $this->_mysqli_obj;
             }else{
                 return $this->openLink();
             }
@@ -71,12 +85,10 @@
         * TODO: add even better sanitization
         * 
         * @param $value String Value to sanitize.
-        * @param $link int [optional] MySQL Link ID to use. Defaults to default link. Opens new default if necessary.
         * @return String Sanitized version of the input string.
         */
-        public function sanitize($value, $link = NULL){
-            $link = $link? $link : $this->getLink();
-            return mysql_real_escape_string(stripslashes($value), $link);
+        public function sanitize($value){
+            return $this->_mysqli_obj->real_escape_string(stripslashes($value));
         }
 
         /**
@@ -119,14 +131,14 @@
         /**
         * Parse a given MySQL Resource ID into an associative array of the given type.
         * 
-        * @param $result int MySQL Resource ID to parse.
-        * @param $result_type int [optional] One of: MYSQL_ASSOC, MYSQL_NUM, or MYSQL_BOTH (default).
+        * @param $result MySQLi Result Object to parse.
+        * @param $result_type int [optional] One of: MYSQLI_ASSOC, MYSQLI_NUM, or MYSQLI_BOTH (default).
         * @return Array Result data parsed into an associative array.
         */
-        public function parseResult($result, $result_type = MYSQL_BOTH){
+        public function parseResult($result, $result_type = MYSQLI_BOTH){
            $done = array();
             if($result){
-                while($row = mysql_fetch_array($result, $result_type)){
+                while($row = $this->_mysqli_obj->fetch_array($result_type)){
                     $done[] = $row;
                 }
             }
@@ -136,15 +148,12 @@
         }
 
         /**
-        * Get the string value of the last MySQL error on the given link.
+        * Get the string value of the last MySQL error.
         * 
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @return String Last error message from the database connection identified by the link
         */
-        public function getError($link = NULL){
-            $link = $link? $link : $this->getLink();
-            $err = mysql_error($link);
-            return $err;
+        public function getError(){
+            return $this->_mysqli_obj->error;
         }
 
         /**
@@ -153,11 +162,10 @@
         * For internal use only, doesn't handle any sanitization.
         * 
         * @param $query String query to perform
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        private function mysqlQuery($query, $link = NULL, $use_memcache = false){
+        private function mysqlQuery($query, $use_memcache = false){
             if($this->config->use_memcache && $use_memcache){
                 if(!$this->JACKED->Memcacher->isModuleEnabled){
                     //make sure memcache is still up, if it's dead disable it
@@ -171,19 +179,18 @@
                     }
                 }
             }
-            $link = $link? $link : $this->getLink();
             $this->JACKED->Logr->write($query, Logr::LEVEL_NOTICE, NULL, 'MySQL');
-            $result = mysql_query($query, $link);
+            $result = $this->_mysqli_obj->query($query);
             if($result === true){
                 $value = true;
             }else if($result === false){
                 $value = false;
-            }else if(mysql_num_rows($result) > 0){
+            }else if($result->num_rows() > 0){
                 $value = array();
-                while($row = mysql_fetch_array($result, MYSQL_BOTH)){
+                while($row = $result->fetch_array(MYSQLI_BOTH)){
                     $value[] = array_map("stripslashes", $row);
                 }
-                mysql_free_result($result);
+                $result->free();
             }else{
                 $value = false;
             }
@@ -194,9 +201,9 @@
             }
 
             if($value === false){
-                $err = $this->getError($link);
+                $err = $this->getError();
                 if($err){
-                    $this->JACKED->Logr->write($this->getError($link), Logr::LEVEL_WARNING, NULL, 'MySQL');
+                    $this->JACKED->Logr->write($this->getError(), Logr::LEVEL_WARNING, NULL, 'MySQL');
                 }
             }
             return $value;
@@ -207,13 +214,12 @@
         * enabled and $use_memcache is True, it will try to use a cached value of the query, or add/set the results.
         * 
         * @param $query String query to perform
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        public function query($query, $link = NULL, $use_memcache = false){
+        public function query($query, $use_memcache = false){
             $query = $this->sanitize($query);
-            return $this->mysqlQuery($query, $link, $use_memcache);
+            return $this->mysqlQuery($query, $use_memcache);
         }
         
         /**
@@ -224,11 +230,10 @@
         * @param $field string Field name to get value of. Accepts strings beginning with "function:" as MySQL function calls.
         * @param $table string Table name to search
         * @param $cond string [optional] Condition to use for query: "WHERE @$cond". Default will return first row retreived from db.
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Mixed Result data from @$field matching @$cond
         */
-        public function get($field, $table, $cond = null, $link = NULL, $use_memcache = true){
+        public function get($field, $table, $cond = null, $use_memcache = true){
             $field = $this->sanitize($field);
             $table = $this->sanitize($table);
             $cond = $cond;
@@ -239,7 +244,7 @@
                 $query = "SELECT `" . $field . "` FROM `" . $table . "`";
             if($cond)
                 $query .= " WHERE " . $cond;
-            $result = $this->mysqlQuery($query, $link, $use_memcache);
+            $result = $this->mysqlQuery($query, $use_memcache);
             if($result){
                 $result = $result[0][0];
             }
@@ -254,11 +259,10 @@
         * @param $fields string/Array Field names to get value of. String of comma separated field names or array of string field names.
         * @param $table string Table name to search
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields matching @$cond
         */
-        public function getAll($fields, $table, $cond, $link = NULL, $use_memcache = true){
+        public function getAll($fields, $table, $cond, $use_memcache = true){
             $table = $this->sanitize($table);
             $cond = $cond;
             if(is_array($fields)){
@@ -269,7 +273,7 @@
                 $query = "SELECT * FROM `" . $table . "` WHERE " . $cond;
             }
 
-            return $this->mysqlQuery($query, $link, $use_memcache);
+            return $this->mysqlQuery($query, $use_memcache);
         }
         
         /**
@@ -279,16 +283,15 @@
         * 
         * @param $table string Table name to search
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$field matching @$cond
         */
-        public function getRow($table, $cond, $link = NULL, $use_memcache = true){
+        public function getRow($table, $cond, $use_memcache = true){
             $table = $this->sanitize($table);
             $cond = $cond;
             $query = "SELECT * FROM `" . $table . "` WHERE " . $cond . " LIMIT 1";
             
-            $result = $this->mysqlQuery($query, $link, $use_memcache);
+            $result = $this->mysqlQuery($query, $use_memcache);
             return $result[0];
         }
         
@@ -298,15 +301,14 @@
         * 
         * @param $table string Table name to search
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Array of rows from @$field matching @$cond
         */
-        public function getRows($table, $cond = NULL, $link = NULL, $use_memcache = true){
+        public function getRows($table, $cond = NULL, $use_memcache = true){
             $cond = $cond? $cond : '1';
             $query = "SELECT * FROM `" . $this->sanitize($table) . "` WHERE " . $cond;
 
-            return $this->mysqlQuery($query, $link, $use_memcache);
+            return $this->mysqlQuery($query, $use_memcache);
         }
 
         /**
@@ -321,11 +323,10 @@
         * @param $join1 string Field name to join on from the left table
         * @param $join2 string Field name to join on from the right table
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
         * @return Array Result data from @$fields 
         */
-        public function getJoin($fields1 = false, $fields2 = false, $join_type, $table1, $table2, $join1, $join2, $cond = false, $link = NULL, $use_memcache = true){
+        public function getJoin($fields1 = false, $fields2 = false, $join_type, $table1, $table2, $join1, $join2, $cond = false, $use_memcache = true){
             $table1 = $this->sanitize($table1);
             $table2 = $this->sanitize($table2);
             $join1 = $this->sanitize($join1);
@@ -352,7 +353,7 @@
                 $query .= ' WHERE ' . $cond;
             }
 
-            return $this->mysqlQuery($query, $link, $use_memcache);
+            return $this->mysqlQuery($query, $use_memcache);
         }
 
         /**
@@ -361,10 +362,9 @@
         * 
         * @param $table string Table name to insert data into
         * @param $data Array Associative array of data as ('field name' => 'value') to insert.
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @return int The id of the newly inserted row if successful, false on failure
         */
-        public function insert($table, $data, $link = NULL){
+        public function insert($table, $data){
             $link = $link? $link : $this->getLink();
             $table = $this->sanitize($table);
             $fields = array();
@@ -374,9 +374,9 @@
                 $values[] = $this->sanitize($value);
             }
             $query = "INSERT INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            $result = $this->mysqlQuery($query, $link, false);
+            $result = $this->mysqlQuery($query, false);
             if($result){
-                $done = mysql_insert_id($link);
+                $done = $this->_mysqli_obj->insert_id();
             }else{
                 $done = false;
             }
@@ -391,10 +391,9 @@
         * @param $data Array Associative array of ('field name' => 'value') to update. If a field name starts with 'function:' the 
         * value is evaluated as a MySQL function rather than a string, like: function:NOW()
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @return Boolean Whether the update was successful
         */
-        public function update($table, $data, $cond, $link = NULL){
+        public function update($table, $data, $cond){
             $table = $this->sanitize($table);
             $cond = $cond;
             $fields = array();
@@ -410,7 +409,7 @@
             }
             
             $query = "UPDATE $table SET " . implode($pairs, ', ') . " WHERE " . $cond;
-            $result = $this->mysqlQuery($query, $link, false);
+            $result = $this->mysqlQuery($query, false);
             return $result;
         }
         
@@ -421,10 +420,9 @@
         * @param $table string Table name to update
         * @param $data Array Associative array of ('field name' => 'value') to update. 
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @return Boolean Whether the replace was successful
         */
-        public function replace($table, $data, $link = NULL){
+        public function replace($table, $data){
             $table = $this->sanitize($table);
             $fields = array();
             $values = array();
@@ -434,7 +432,7 @@
             }
             
             $query = "REPLACE INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
-            $result = $this->mysqlQuery($query, $link, false);
+            $result = $this->mysqlQuery($query, false);
             return $result;
         }
         
@@ -444,12 +442,11 @@
         * 
         * @param $table string Table name to update
         * @param $cond string Condition to use for query: "WHERE @$cond"
-        * @param $link int [optional] MySQL Resource ID to identify database connection to use. Defaults to default link.
         * @return Boolean Whether the replace was successful
         */
-        public function delete($table, $cond, $link = NULL){
+        public function delete($table, $cond){
             $query = 'DELETE FROM ' . $this->sanitize($table) . ' WHERE ' . $cond;
-            $result = $this->mysqlQuery($query, $link, false);
+            $result = $this->mysqlQuery($query, false);
             return $result;
         }
     }
