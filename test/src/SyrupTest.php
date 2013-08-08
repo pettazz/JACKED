@@ -18,6 +18,7 @@
 
         public function tearDown(){
             $this->JACKED->MySQL->query('DELETE FROM Blag WHERE 1');
+            $this->JACKED->MySQL->query('DELETE FROM BlagCategory WHERE 1');
             $this->JACKED->MySQL->query('DELETE FROM User WHERE 1');
         }
 
@@ -30,7 +31,11 @@
             foreach($data as $key => $val){
                 $post = $posts[0];
                 if($key !== 'author'){
-                    $this->assertEquals($val, $post->$key);
+                    if($key == 'category'){
+                        $this->assertEquals($val, $post->category->guid);
+                    }else{
+                        $this->assertEquals($val, $post->$key);
+                    }
                 }else{
                     unset($val['password']); //TODO: test that password isnt returned
                     foreach($val as $aKey => $aVal){
@@ -53,12 +58,16 @@
 
         public function test_findBy(){
             $data = $this->JACKED->Testur->createPost();
-            $result = $this->JACKED->Syrup->Blag->findByguid($data['guid']);
-            $result = $result[0];
+            $results = $this->JACKED->Syrup->Blag->findByguid($data['guid']);
+            $result = $results[0];
 
             foreach($data as $key => $val){
                 if($key !== 'author'){
-                    $this->assertEquals($data[$key], $result->$key);
+                    if($key == 'category'){
+                        $this->assertEquals($data[$key], $result->$key->guid);
+                    }else{
+                        $this->assertEquals($data[$key], $result->$key);
+                    }
                 }
             }
 
@@ -71,7 +80,11 @@
 
             foreach($data as $key => $val){
                 if($key !== 'author'){
-                    $this->assertEquals($data[$key], $result3->$key);
+                    if($key == 'category'){
+                        $this->assertEquals($data[$key], $result3->$key->guid);
+                    }else{
+                        $this->assertEquals($data[$key], $result3->$key);
+                    }
                 }
             }
         }
