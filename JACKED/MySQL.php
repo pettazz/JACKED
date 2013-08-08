@@ -5,14 +5,14 @@
         const moduleVersion = 2.7;
         public static $dependencies = array(); //array('Memcacher' => array('required' => false));
         
-        private $_mysqli_obj = NULL;
+        private $_mysqli_obj_internal = NULL;
         
         public function __destruct(){
             if($this->isLinkOpen()){
                 try{
-                    $this->_mysqli_obj->close();
+                    $this->_mysqli_obj_internal->close();
                 }catch(Exception $e){}
-                $this->_mysqli_obj = NULL;
+                $this->_mysqli_obj_internal = NULL;
             }
         }
 
@@ -27,12 +27,10 @@
         /**
         * Checks if the MySQL link is open.
         * 
-        * @param $obj MySQLi Object [optional] MySQLi Object to check. Defaults to default link.
         * @return Boolean Whether the link is active.
         */
-        private function isLinkOpen($obj = NULL){
-            $obj = $obj? $obj : $this->_mysqli_obj;
-            return ($this->_mysqli_obj == NULL)? false : true;
+        private function isLinkOpen(){
+            return ($this->_mysqli_obj_internal == NULL)? false : true;
         }
         
         /**
@@ -46,7 +44,7 @@
                 $obj = new mysqli($this->config->db_host, $this->config->db_user, $this->config->db_pass, $this->config->db_name);
                 $obj->autocommit(true);
                 if($setDefault){
-                    $this->_mysqli_obj = $obj;
+                    $this->_mysqli_obj_internal = $obj;
                 }
                 return $obj;
             }catch(Exception $e){
@@ -55,7 +53,7 @@
                 }
                 throw $e;
             }
-            if($this->_mysqli_obj->connect_errno > 0){
+            if($this->_mysqli_obj_internal->connect_errno > 0){
                 if($setDefault){
                     $this->isModuleEnabled = false;
                 }
@@ -70,7 +68,7 @@
         */
         private function getLink(){
             if($this->isLinkOpen()){
-                return $this->_mysqli_obj;
+                return $this->_mysqli_obj_internal;
             }else{
                 return $this->openLink();
             }
@@ -88,6 +86,9 @@
         * @return String Sanitized version of the input string.
         */
         public function sanitize($value){
+            if($this->_mysqli_obj == NULL){
+                echo 'wtf';
+            }
             return $this->_mysqli_obj->real_escape_string(stripslashes($value));
         }
 
@@ -185,7 +186,7 @@
                 $value = true;
             }else if($result === false){
                 $value = false;
-            }else if($result->num_rows() > 0){
+            }else if($result->num_rows > 0){
                 $value = array();
                 while($row = $result->fetch_array(MYSQLI_BOTH)){
                     $value[] = array_map("stripslashes", $row);
@@ -365,7 +366,6 @@
         * @return int The id of the newly inserted row if successful, false on failure
         */
         public function insert($table, $data){
-            $link = $link? $link : $this->getLink();
             $table = $this->sanitize($table);
             $fields = array();
             $values = array();
@@ -376,7 +376,7 @@
             $query = "INSERT INTO $table (`" . implode($fields, '`, `') . "`) VALUES ('" . implode($values, '\', \'') . "')";
             $result = $this->mysqlQuery($query, false);
             if($result){
-                $done = $this->_mysqli_obj->insert_id();
+                $done = $this->_mysqli_obj->insert_id;
             }else{
                 $done = false;
             }
