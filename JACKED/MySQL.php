@@ -164,9 +164,10 @@
         * 
         * @param $query String query to perform
         * @param $use_memcache Boolean [optional] Whether to attempt to use get the value from memcache and/or store the value of the query
+        * @param $result_type int [optional] One of: MYSQLI_ASSOC (default), MYSQLI_NUM, or MYSQLI_BOTH.
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
-        private function mysqlQuery($query, $use_memcache = false){
+        private function mysqlQuery($query, $use_memcache = false, $result_type = MYSQLI_ASSOC){
             if($this->config->use_memcache && $use_memcache){
                 if(!$this->JACKED->Memcacher->isModuleEnabled){
                     //make sure memcache is still up, if it's dead disable it
@@ -188,7 +189,7 @@
                 $value = false;
             }else if($result->num_rows > 0){
                 $value = array();
-                while($row = $result->fetch_array(MYSQLI_ASSOC)){
+                while($row = $result->fetch_array($result_type)){
                     $value[] = array_map("stripslashes", $row);
                 }
                 $result->free();
@@ -245,7 +246,7 @@
                 $query = "SELECT `" . $field . "` FROM `" . $table . "`";
             if($cond)
                 $query .= " WHERE " . $cond;
-            $result = $this->mysqlQuery($query, $use_memcache);
+            $result = $this->mysqlQuery($query, $use_memcache, MYSQL_BOTH);
             if($result){
                 $result = $result[0][0];
             }
