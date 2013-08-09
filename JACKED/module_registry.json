@@ -1,0 +1,94 @@
+{
+    "modules": [
+        {
+            "name": "admin",
+            "version": "2.0",
+            "dependencies": ["MySQL", "Flock", "Sessions"]
+        },
+        {
+            "name": "Blag",
+            "version": "1.0",
+            "dependencies": ["MySQL", "Flock", "Syrup"]
+        },
+        {
+            "name": "Configur",
+            "version": "1.5",
+            "dependencies": []
+        },
+        {
+            "name": "Curator",
+            "version": "1.0",
+            "dependencies": ["MySQL"]
+        },
+        {
+            "name": "EYS",
+            "version": "1.0",
+            "dependencies": []
+        },
+        {
+            "name": "Flock",
+            "version": "1.1",
+            "dependencies": ["MySQL", "Sessions"]
+        },
+        {
+            "name": "Karma",
+            "version": "1.0",
+            "dependencies": ["MySQL", "Flock"]
+        },
+        {
+            "name": "Logr",
+            "version": "1.0",
+            "dependencies": []
+        },
+        {
+            "name": "Lookit",
+            "version": "1.0",
+            "dependencies": ["MySQL", "Flock", "Sessions"]
+        },
+        {
+            "name": "Memcacher",
+            "version": "1.0",
+            "dependencies": []
+        },
+        {
+            "name": "MySQL",
+            "version": "2.7",
+            "dependencies": []
+        },
+        {
+            "name": "Sessions",
+            "version": "2.0",
+            "dependencies": ["MySQL"]
+        },
+        {
+            "name": "Society",
+            "version": "1.0",
+            "dependencies": ["MySQL", "Flock", "Sessions"]
+        },
+        {
+            "name": "Syrup",
+            "version": "1.0",
+            "dependencies": []
+        },
+        {
+            "name": "Testur",
+            "version": "1.0",
+            "dependencies": ["Flock", "MySQL", "Blag"]
+        },
+        {
+            "name": "Updater",
+            "version": "0.1",
+            "dependencies": ["MySQL"]
+        },
+        {
+            "name": "Util",
+            "version": "1.0",
+            "dependencies": []
+        },
+        {
+            "name": "Yapp",
+            "version": "2.1",
+            "dependencies": ["Flock", "MySQL", "Sessions"]
+        }
+    ]
+}
