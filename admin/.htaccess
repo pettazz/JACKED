@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^module/([A-Za-z0-9]+)/?$ index.php?manage_module=$1 [QSA]
