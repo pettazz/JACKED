@@ -11,22 +11,6 @@
             JACKEDModule::__construct($JACKED);
         }
         
-        //get a list of all the installed modules
-        public function getModules(){
-            $modres = $this->JACKED->MySQL->getRows($this->JACKED->config->mod_table);
-            foreach($modres as $row){
-                $modules[$row['shortName']]['moduleName'] = $row['name'];
-                $modules[$row['shortName']]['moduleVersion'] = $row['version'];
-                $modules[$row['shortName']]['moduleDescription'] = $row['description'];
-            }
-            return $modules;
-        }
-        
-        //check whether a given module is installed
-        public function isModuleInstalled($shortName){
-            return !($this->JACKED->MySQL->get('id', $this->JACKED->config->mod_table, 'shortName = "' . $shortName . '"') === false);
-        }
-        
         //Log into JACKED with the given username and password combination
         public function login($username, $password){
             try{
