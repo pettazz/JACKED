@@ -73,7 +73,7 @@
 
         public function isModuleRegistered($name, $version = false){
             $instance = self::getInstance();
-            if(isset(self::$_instance->_moduleRegistry['loaded'][$name])){
+            if(in_array($name, self::$_instance->_moduleRegistry['loaded'])){
                 if($version){
                     $module = $instance->$name;
                     return (float) $module::getModuleVersion() == (float) $version;
@@ -134,13 +134,18 @@
             $instance = self::getInstance();
             return $instance->_moduleRegistry['installed'];
         }
+        
+        public function printmodreg(){
+            $instance = self::getInstance();
+            print_r($instance->_moduleRegistry);
+        }
 
         public function loadLibrary($libname){
             //this could certainly be better, but it works for now
             ////for now we'll assume every lib is a single .php file in JACKED_LIB_ROOT
             ///TODO: have some kind of lib loading standard config file within a lib that explains which files to load, etc
             $instance = self::getInstance();
-            if(!isset($instance->_loadedLibraries[$libname])){
+            if(!in_array($libname, $instance->_loadedLibraries)){
                 $did = false;
                 $file = JACKED_LIB_ROOT . $libname . '.php';
                 if(file_exists($file)){
