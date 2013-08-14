@@ -3,7 +3,7 @@
     $admin_dir = substr(__FILE__, 0, strrpos(__FILE__, '/'));
     if(isset($_GET['manage_module'])){
         $module_admin_home = $admin_dir . '/' . $_GET['manage_module'];
-        if(!$JACKED->admin->isModuleInstalled($_GET['manage_module']) || !file_exists($module_admin_home)){
+        if(!$JACKED->isModuleInstalled($_GET['manage_module']) || !file_exists($module_admin_home)){
             include('404.php');
             require('bodyBottom.php');
             exit();

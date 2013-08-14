@@ -1,10 +1,10 @@
 
-      <footer>
-        <p>&copy; <?php echo $JACKED->config->client_name . ' ' . date('Y'); ?></p>
+          <footer>
+              <p>&copy; <?php echo $JACKED->config->client_name . ' ' . date('Y'); ?></p>
 
-      </footer>
+          </footer>
 
-    </div> <!-- /container -->
+        </div> <!-- /container -->
 
-  </body>
+    </body>
 </html>
