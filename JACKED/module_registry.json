@@ -1,94 +1,94 @@
 {
-    "modules": [
-        {
+    "modules": {
+        "admin": {
             "name": "admin",
             "version": "2.0",
             "dependencies": ["MySQL", "Flock", "Sessions"]
         },
-        {
+        "Blag": {
             "name": "Blag",
             "version": "1.0",
             "dependencies": ["MySQL", "Flock", "Syrup"]
         },
-        {
+        "Configur": {
             "name": "Configur",
             "version": "1.5",
             "dependencies": []
         },
-        {
+        "Curator": {
             "name": "Curator",
             "version": "1.0",
             "dependencies": ["MySQL"]
         },
-        {
+        "EYS": {
             "name": "EYS",
             "version": "1.0",
             "dependencies": []
         },
-        {
+        "Flock": {
             "name": "Flock",
             "version": "1.1",
             "dependencies": ["MySQL", "Sessions"]
         },
-        {
+        "Karma": {
             "name": "Karma",
             "version": "1.0",
             "dependencies": ["MySQL", "Flock"]
         },
-        {
+        "Logr": {
             "name": "Logr",
             "version": "1.0",
             "dependencies": []
         },
-        {
+        "Lookit": {
             "name": "Lookit",
             "version": "1.0",
             "dependencies": ["MySQL", "Flock", "Sessions"]
         },
-        {
+        "Memcacher": {
             "name": "Memcacher",
             "version": "1.0",
             "dependencies": []
         },
-        {
+        "MySQL": {
             "name": "MySQL",
             "version": "2.7",
             "dependencies": []
         },
-        {
+        "Sessions": {
             "name": "Sessions",
             "version": "2.0",
             "dependencies": ["MySQL"]
         },
-        {
+        "Society": {
             "name": "Society",
             "version": "1.0",
             "dependencies": ["MySQL", "Flock", "Sessions"]
         },
-        {
+        "Syrup": {
             "name": "Syrup",
             "version": "1.0",
             "dependencies": []
         },
-        {
+        "Testur": {
             "name": "Testur",
             "version": "1.0",
             "dependencies": ["Flock", "MySQL", "Blag"]
         },
-        {
+        "Updater": {
             "name": "Updater",
             "version": "0.1",
             "dependencies": ["MySQL"]
         },
-        {
+        "Util": {
             "name": "Util",
             "version": "1.0",
             "dependencies": []
         },
-        {
+        "Yapp": {
             "name": "Yapp",
             "version": "2.1",
             "dependencies": ["Flock", "MySQL", "Sessions"]
         }
-    ]
+    }
 }

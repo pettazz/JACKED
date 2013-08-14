@@ -42,7 +42,7 @@
             if(is_readable($registryPath)){
                 try{
                     $registry = json_decode(file_get_contents($registryPath), TRUE);
-                    self::$_instance->_moduleRegistry['installed'] = $registry;
+                    self::$_instance->_moduleRegistry['installed'] = $registry['modules'];
                 }catch(Exception $e){
                     self::$_instance->Logr->write(
                     'The JACKED Module Registry could not be loaded from: ' . $registryPath, 5);
@@ -133,6 +133,11 @@
         public function getInstalledModules(){
             $instance = self::getInstance();
             return $instance->_moduleRegistry['installed'];
+        }
+        
+        public function isModuleInstalled($name){
+            $instance = self::getInstance();
+            return isset($instance->_moduleRegistry['installed'][$name]);
         }
         
         public function printmodreg(){
