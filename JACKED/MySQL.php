@@ -51,7 +51,7 @@
                 if($setDefault){
                     $this->isModuleEnabled = false;
                 }
-                throw $e;
+                $this->JACKED->Logr->write('Unable to create the connection to MySQL: ' . $e->getMessage(), Logr::LEVEL_FATAL, $e->getTrace(), 'MySQL');
             }
             if($this->_mysqli_obj_internal->connect_errno > 0){
                 if($setDefault){
