@@ -149,18 +149,20 @@
         }
 
         /**
-        * Prints a given message to the output (most commonly this will be inline on the page being rendered)
+        * Renders a given message to be printed the output (most commonly this will be inline on the page being rendered)
         * 
         * @param $msg String The message value to print (preformatted)
         * @param $callee Array The callee data for printing the header. Defaults to list($callee) = debug_backtrace();
         * @param $level Int [optional] The error level of the message to print. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
+        * @return String The rendered printable message
         */
-        public static function printMessage($msg, $callee = NULL, $level = 1){
+        public static function generateMessage($msg, $callee = NULL, $level = 1){
+            $result = '';
             if(php_sapi_name() == 'cli'){
                 //this is actual stdout, not rendering to a webpage, so no html output
-                echo '[' . microtime(true) . '] [' . strtoupper(self::levelName($level)) . '] ';
-                echo '[' . $callee['file'] . ' @ line: ' . $callee['line'] . '] ';
-                echo $msg . "\n";
+                $result .= '[' . microtime(true) . '] [' . strtoupper(self::levelName($level)) . '] ';
+                $result .= '[' . $callee['file'] . ' @ line: ' . $callee['line'] . '] ';
+                $result .= $msg . "\n";
             }else{
                 if($callee == NULL){
                     list($callee) = debug_backtrace();
@@ -190,17 +192,30 @@
                         break;
                 }
 
-                echo '<fieldset style="background: #fefefe !important; border:2px ' . $color . ' solid; padding:5px">';
+                $result .= '<fieldset style="background: #fefefe !important; border:2px ' . $color . ' solid; padding:5px">';
                 try{
-                    echo '<legend style="background:lightgrey; padding:5px;">'. $label . $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
+                    $result .= '<legend style="background:lightgrey; padding:5px;">'. $label . $callee['file'] . ' @ line: ' . $callee['line'] . '</legend>';
                 }catch(Exception $e){
-                    echo '<legend style="background:lightgrey; padding:5px;">Logr Message</legend>';
+                    $result .= '<legend style="background:lightgrey; padding:5px;">Logr Message</legend>';
                 }
-                echo '<pre><br />'. $msg;
+                $result .= '<pre><br />'. $msg;
 
-                echo "</pre>";
-                echo "</fieldset>";
+                $result .= "</pre>";
+                $result .= "</fieldset>";
             }
+
+            return $result;
+        }
+
+        /**
+        * Prints a given message to the output (most commonly this will be inline on the page being rendered)
+        * 
+        * @param $msg String The message value to print (preformatted)
+        * @param $callee Array The callee data for printing the header. Defaults to list($callee) = debug_backtrace();
+        * @param $level Int [optional] The error level of the message to print. One of:  LEVEL_FATAL, LEVEL_SEVERE, LEVEL_WARNING, LEVEL_NOTICE (default), LEVEL_LOL
+        */
+        public static function printMessage($msg, $callee = NULL, $level = 1){
+            echo self::generateMessage($msg, $callee, $level);
         }
 
         /**
@@ -274,7 +289,7 @@
                         break;
                     case 'stdout':
                         if($skipLocation != 'stdout'){
-                            self::printMessage($msg, $stacktrace[0]);
+                            self::printMessage($msg, $stacktrace[0], $level);
                         }
                         break;
                 }
@@ -282,6 +297,11 @@
             //if global debug is on and we haven't already printed this
             if($this->JACKED->config->debug > 0 && !in_array('stdout', $this->locations)){
                 self::printMessage($msg, $stacktrace[0]);
+            }
+
+            //fatal errors are fatal
+            if($level == Logr::LEVEL_FATAL){
+                die(Logr::generateMessage($msg, $stacktrace[0], $level));
             }
         }
     }

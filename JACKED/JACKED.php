@@ -45,12 +45,12 @@
                     self::$_instance->_moduleRegistry['installed'] = $registry['modules'];
                 }catch(Exception $e){
                     self::$_instance->Logr->write(
-                    'The JACKED Module Registry could not be loaded from: ' . $registryPath, 5);
+                    'The JACKED Module Registry could not be loaded from: ' . $registryPath, Logr::LEVEL_FATAL);
                     throw $e;
                 }
             }else{
                 self::$_instance->Logr->write(
-                    'The JACKED Module Registry could not be accessed. Check file permissions for: ' . $registryPath, 3);
+                    'The JACKED Module Registry could not be accessed. Check file permissions for: ' . $registryPath, Logr::LEVEL_FATAL);
             }
             //load dependencies
             if(!is_array($dependencies)){
@@ -118,8 +118,9 @@
                     if($modDetails['required']){
                         try{
                             $instance->Logr->write('Required module ' . $module . ' (v' . $modDetails['version'] . ') couldn\'t be loaded: ' . $e->getMessage(), 4, $e->getTrace());
-                        }catch(Exception $ex){}
-                        die('JACKED failed to load required module <strong>' . $module . ' (v' . $modDetails['version'] . ')</strong>. ' . $e->getMessage());
+                        }catch(Exception $ex){
+                            die('JACKED failed to load required module <strong>' . $module . ' (v' . $modDetails['version'] . ')</strong>. ' . $e->getMessage());
+                        }
                     }else{
                         $instance->$module = new Derper();
                         try{
