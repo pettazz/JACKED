@@ -1,11 +1,11 @@
 <div class="hero-unit">
     <div class="row">
         <div class="span5 offset1">
-            <img src="http://dl.dropbox.com/u/139336/BABBYWHAT.png" />
+            <h2>JACKED Admin v2.0</h2>
         </div>
-        <div class="span6 offset2">
+        <div class="span2 offset1">
             <p>This is an example of how to make an admin page. It's pretty fucking easy.</p>
-            <p><a href="/admin/module/admin">&lt;&lt; Admin Admin Home Home</a></p>
         </div>
     </div>
+    <p><a href="/admin/module/admin">&lt;&lt; Admin Module Home</a></p>
 </div>

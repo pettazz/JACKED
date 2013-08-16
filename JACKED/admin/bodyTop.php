@@ -31,6 +31,15 @@
             body{
                 margin-top: 80px;
             }
+            #menuitems > div{
+                padding: 20px;
+                margin: 0px 0px 15px 45px;
+                background: #eee;
+                border-radius: 6px;
+            }
+            footer{
+                margin: 40px;
+            }
         </style>
     </head>
 
@@ -54,24 +63,34 @@
         <div class="navbar-inner">
             <div class="container">
                 <a class="brand" href="<?php echo $JACKED->admin->config->entry_point; ?>">JACKED Admin</a>
-                <ul class="nav">
-                    <li><a href="<?php echo $JACKED->admin->config->entry_point; ?>">Home</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules</a>
+                <button type="button" class="btn btn-navbar collapsed" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li><a href="<?php echo $JACKED->admin->config->entry_point; ?>">Home</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules</a>
 
-                        <ul class="dropdown-menu">
-                        <?php
-                            foreach($mods as $mod){
-                                echo '<li><a href="' . $JACKED->admin->config->entry_point . 'module/' . $mod['name'] . '">' . $mod['name'] . '</a></li>';
-                            }
-                        ?>
-                            <li class="divider"></li>
-                            <li><a href="#">Updates</a></li>
-                            <li><a href="#">Get More</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <p class="pull-right">Logged in as <a href="#"><?php echo $JACKED->Sessions->read('auth.admin.user'); ?></a> <button class="btn" onclick="window.location.href='/JACKED/admin/logout.php'">Logout</button></p>
+                            <ul class="dropdown-menu">
+                            <?php
+                                foreach($mods as $mod){
+                                    echo '<li><a href="' . $JACKED->admin->config->entry_point . 'module/' . $mod['name'] . '">' . $mod['name'] . '</a></li>';
+                                }
+                            ?>
+                                <li class="divider"></li>
+                                <li><a href="#">Updates</a></li>
+                                <li><a href="#">Get More</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <form class="navbar-form pull-right">
+                        <button class="btn" type="submit" onclick="window.location.href='/JACKED/admin/logout.php'" >Logout</button>
+                    </form>
+                    <span class="navbar-text pull-right" style="margin-right:15px;">Logged in as <a href="#"><?php echo $JACKED->Sessions->read('auth.admin.user'); ?></a></span>
+                </div>
             </div>
         </div>
     </div>
