@@ -235,7 +235,7 @@
                 $msg .= print_r($argument, true);
             }
 
-            $this->printMessage($msg, $callee);
+            self::printMessage($msg, $callee);
         }
         
         /**
