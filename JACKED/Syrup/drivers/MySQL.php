@@ -326,7 +326,7 @@
             $results = array();
             if($data && count($data) > 0){
                 foreach($data as $row){
-                    if($followRelations){
+                    if($this->getRelations() && $followRelations){
                         $localObject = array();
                         $foreignObjects = array();
                         foreach($row as $key => $value){
