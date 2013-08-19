@@ -70,7 +70,7 @@
             tags: [<?php
                     if($tags){
                         foreach($tags as $tag){
-                            echo "'" . $tag['name'] . "', ";
+                            echo "'" . addslashes($tag['name']) . "', ";
                         }
                     }
                     ?>],
