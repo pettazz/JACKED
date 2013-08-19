@@ -113,10 +113,8 @@
                 }
                 $done_tag = $this->JACKED->MySQL->delete(
                     $this->config->dbt_tagrels,
-                    array(
-                        'Curator' => $tag,
-                        'target' => $target
-                    )
+                    "Curator = '$tag' AND
+                    target = '$target'"
                 );
                 $done_inc = $this->JACKED->MySQL->update(
                     $this->config->dbt_tags,
