@@ -9,10 +9,10 @@
         <meta charset="utf-8">
         <title><?php echo $JACKED->config->client_name; ?> | JACKED</title>
         
-        <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/bootstrap-combined.min.css" />
-        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/jquery-1.10.2.js"></script>
-        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/bootstrap.min.js"></script>
-        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/spin.min.js"></script>
+        <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/bootstrap-combined.min.css" />
+        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/jquery-1.10.2.js"></script>
+        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/spin.min.js"></script>
 
         <script type="text/javascript">
             
@@ -32,11 +32,18 @@
                 margin-top: 80px;
             }
             #menuitems > div{
+                width: 40%;
                 padding: 20px;
-                margin: 0px 0px 15px 45px;
+                margin: 15px 0px 15px 30px;
                 background: #eee;
                 border-radius: 6px;
+                float: left;
             }
+
+            #editoroverlay{
+                box-shadow: 0px 0px 10px #000;
+            }
+
             footer{
                 margin: 40px;
             }
@@ -70,9 +77,8 @@
                 </button>
                 <div class="nav-collapse collapse">
                     <ul class="nav">
-                        <li><a href="<?php echo $JACKED->admin->config->entry_point; ?>">Home</a></li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules</a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
 
                             <ul class="dropdown-menu">
                             <?php
@@ -87,7 +93,7 @@
                         </li>
                     </ul>
                     <form class="navbar-form pull-right">
-                        <button class="btn" type="submit" onclick="window.location.href='/JACKED/admin/logout.php'" >Logout</button>
+                        <a class="btn primary" href="/JACKED/admin/logout.php">Logout</a>
                     </form>
                     <span class="navbar-text pull-right" style="margin-right:15px;">Logged in as <a href="#"><?php echo $JACKED->Sessions->read('auth.admin.user'); ?></a></span>
                 </div>
