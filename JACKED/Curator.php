@@ -73,6 +73,63 @@
         }
 
         /**
+        * Remove tag(s) of a given name from a target. Tag names that do not exist are ignored.
+        * 
+        * @param $target String The GUID of the target
+        * @param $tags Mixed A single String name of a tag to assign, or an Array list of names
+        * @return Boolean Whether the removal was completed successfully
+        */
+        public function removeTagByName($target, $tagNames){
+            if(!is_array($tagNames)){
+                $tagNames = array($tagNames);
+            }
+
+            $tagIDs = array();
+            foreach($tagNames as $tag){
+                if($this->doesTagExistByName($tag)){
+                    $tagData = $this->getTagByName($tag);
+                    $tagIDs[] = $tagData['guid'];
+                }
+            }
+            return $this->removeTag($target, $tagIDs);
+        }
+
+        /**
+        * Remove tag(s) from a target.
+        * 
+        * @param $target String The GUID of the target
+        * @param $tags Mixed A single String GUID of a tag to assign, or an Array list of GUIDs
+        * @return Boolean Whether the removal was completed successfully
+        */
+        public function removeTag($target, $tags){
+            if(!is_array($tags)){
+                $tags = array($tags);
+            }
+
+            $success = True;
+            foreach($tags as $tag){
+                if(!$this->isTargetTagged($target, $tag)){
+                    throw new TargetNotTaggedException();
+                }
+                $done_tag = $this->JACKED->MySQL->delete(
+                    $this->config->dbt_tagrels,
+                    array(
+                        'Curator' => $tag,
+                        'target' => $target
+                    )
+                );
+                $done_inc = $this->JACKED->MySQL->update(
+                    $this->config->dbt_tags,
+                    array('usage' => 'function:`usage` - 1'),
+                    'guid = "' . $tag . '"'
+                );
+                $success = $success && ($done_tag && $done_inc);
+            }
+            
+            return $success;
+        }
+
+        /**
         * Creates a new tag but does not tag anything with it. 
         * 
         * @param $name String The exact name of the tag to create
@@ -205,6 +262,10 @@
 
     class TagDoesNotExistException extends Exception{
         protected $message = 'The referenced tag does not exist.';
+    }
+
+    class TargetNotTaggedException extends Exception{
+        protected $message = 'The target is not tagged with the referenced tag.';
     }
 
     class TagAlreadyExistsException extends Exception{

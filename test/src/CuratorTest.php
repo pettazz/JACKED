@@ -31,6 +31,21 @@
             $this->assertTrue($check_tagrels[0]['target'] == 'hats');
         }
 
+        public function test_removeTagByName(){
+            $target = 'hats';
+
+            $this->JACKED->Curator->assignTagByName($target, 'butts, lol');
+            $this->JACKED->Curator->removeTagByName($target, 'butts, lol')
+
+            $check_tags = $this->JACKED->MySQL->getRows('Curator');
+            
+            $this->assertTrue($check_tags[0]['name'] == 'butts, lol');
+            $this->assertTrue($check_tags[0]['usage'] == 0);
+
+            $check_tagrels = $this->JACKED->MySQL->getRows('CuratorRelation');
+
+            $this->assertFalse($check_tagrels);
+        }
 
         public function test_assignNewTagsByName(){
             $target1 = 'hats';
