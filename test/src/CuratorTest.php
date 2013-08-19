@@ -35,7 +35,7 @@
             $target = 'hats';
 
             $this->JACKED->Curator->assignTagByName($target, 'butts, lol');
-            $this->JACKED->Curator->removeTagByName($target, 'butts, lol')
+            $this->JACKED->Curator->removeTagByName($target, 'butts, lol');
 
             $check_tags = $this->JACKED->MySQL->getRows('Curator');
             
