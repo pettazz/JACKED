@@ -7,15 +7,9 @@
         </div>
         
         <div class="">
-            <h2>Edit Drafts</h2>
-            <p>Edit, post, or delete saved drafts.</p>
-            <a class="btn large" href="/admin/module/Blag?manage_section=drafts">Drafts</a>
-        </div>
-        
-        <div class="">
-            <h2>Edit Live Posts</h2>
-            <p>Edit, take down, or delete posts that have already gone live.</p>
-            <a class="btn large" href="/admin/module/Blag?manage_section=live">Live Posts</a>
+            <h2>Edit Posts</h2>
+            <p>Edit, post, take down, or delete saved drafts and live posts.</p>
+            <a class="btn large" href="/admin/module/Blag?manage_section=posts">Posts</a>
         </div>
         
         <div class="">
