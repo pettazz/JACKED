@@ -121,16 +121,15 @@
                 //this is a little janky, assumes all non-field prop names start with a _
                 ////and everything else is a field
                 if(in_array($key, $this->_fields)){
-                    if($this->$key->isPrimaryKey){
-                        throw new PrimaryKeyUnmodifiableException($key);
+                    if(is_object($value) && is_subclass_of($value, 'SyrupModel')){
+                        $this->$key = $value;
                     }else{
-                        if(is_object($value) && is_subclass_of($value, 'SyrupModel')){
-                            $this->$key = $value;
-                        }else{
-                            $this->$key->setValue($value);
+                        if($this->$key->isPrimaryKey){
+                            throw new PrimaryKeyUnmodifiableException($key);
                         }
-                        $this->_isDirty = true;
+                        $this->$key->setValue($value);
                     }
+                    $this->_isDirty = true;
                 }else{
                     throw new UnknownModelFieldException($key);
                 }
