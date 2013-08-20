@@ -479,13 +479,13 @@
                             if(array_key_exists($field, $this->getRelations()) && empty($this->$field) || $this->$field == SyrupField::REL_PLACEHOLDER){
                                 //this field is a relation that hasn't been set, so we ignore it   
                             }else{
-                                $sets[] = "`$field` = '" . $this->$field->getValue() . "'";
+                                $sets[] = "`$field` = '" . $this->sanitize($this->$field->getValue()) . "'";
                             }
                         }
                     }
                     $query .= implode(', ', $sets);
                     $pkey = $this->getPrimaryKey();
-                    $query .= " WHERE " . $this->getPrimaryKeyName() . " = '" . $pkey->getValue()  . "'";
+                    $query .= " WHERE " . $this->getPrimaryKeyName() . " = '" . $this->sanitize($pkey->getValue())  . "'";
                 }
 
                 $done = $this->query($query);
