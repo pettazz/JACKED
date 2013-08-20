@@ -227,6 +227,31 @@
             }
         }
 
+        /**
+        * Get an array representation of all this object's fields and their values.
+        * 
+        * @return Array Associative list of all fields and values.
+        */
+        public function repr(){
+            $result = array();
+            foreach($this->getFields() as $fieldName){
+                if(is_object($this->$fieldName)){
+                    if(get_class($this->$fieldName) == 'SyrupField'){
+                        $result[$fieldName] = "SyrupField: " . $this->$fieldName->getValue();
+                    }else{
+                        $result[$fieldName] = get_class($this->$fieldName) . " Object";
+                    }
+                }else{
+                    if(is_array($this->$fieldName)){
+                        $result[$fieldName] = "Array()";
+                    }else{
+                        $result[$fieldName] = $this->$fieldName;
+                    }
+                }
+            }
+            return $result;
+        }
+
     }
 
     class UnknownModelFieldException extends Exception{
