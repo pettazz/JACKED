@@ -10,8 +10,12 @@
 
 	    
 	    //Whether to fail on login attempt if the user is already logged in
-	    'session_unique' => false
+	    'session_unique' => false,
 	    	
+
+	    //image uploader destination directory
+	    // this should be more relevant to a templating module if one ever exists
+	    'imgupload_directory' => JACKED_SITE_ROOT . 'assets/img/lol/'
 	);
 
 ?>

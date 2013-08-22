@@ -6,6 +6,7 @@
     set_error_handler("exception_error_handler");
 
     //define global constants for file locations
+    define('JACKED_SITE_ROOT', '/var/www/jacked-prod/');
     define('JACKED_MODULES_ROOT', '/var/www/jacked-prod/JACKED/');
     define('JACKED_CONFIG_ROOT', '/var/www/jacked-prod/JACKED/conf/');
     define('JACKED_LIB_ROOT', '/var/www/jacked-prod/JACKED/lib/');

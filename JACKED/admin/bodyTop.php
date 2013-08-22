@@ -7,17 +7,24 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title><?php echo $JACKED->config->client_name; ?> | JACKED</title>
+        <title><?php echo $JACKED->config->client_name; ?> | JACKED<?php echo isset($_GET['manage_module'])? '::' . $_GET['manage_module'] : '' ?></title>
         
         <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/bootstrap-combined.min.css" />
         <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/jquery-1.10.2.js"></script>
         <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/spin.min.js"></script>
+        <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/dropzone.min.js"></script>
 
         <script type="text/javascript">
             
             $(document).ready(function(){
                 $(".alert").alert();
+
+                $("#imgupload").click(function(eo){
+                    $('#imguploadModal').modal({
+                        keyboard: true
+                    });
+                });
             });
         </script>
 
@@ -27,6 +34,8 @@
         <![endif]-->
 
         <!-- Le styles -->
+        <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/css/dropzone.css" />
+
         <style type="text/css">
             body{
                 margin-top: 80px;
@@ -65,6 +74,27 @@
         $modules .= $mod['name'] . ' ' . $mod['version'] . ', ';
     }
 ?>
+    
+    <!-- image uploader modal -->
+    <div id="imguploadModal" class="modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Image Uploader</h3>
+        </div>
+
+        <div class="modal-body">
+            <p class="lead">Uploads images directly to the /assets/img/lol/ directory, using the same filename.</p>
+            <form action="<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload"
+              class="dropzone"
+              id="imguploadDropzone"></form>
+        </div>
+
+        <div class="modal-footer">
+            <a data-dismiss="modal" href="#" class="btn btn-primary">Done</a>
+        </div>
+    </div>
+    <!-- end uploader modal -->
+
 
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
@@ -89,6 +119,13 @@
                                 <li class="divider"></li>
                                 <li><a href="#">Updates</a></li>
                                 <li><a href="#">Get More</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
+
+                            <ul class="dropdown-menu">
+                                <li><a id="imgupload" href="#">Upload Images</a></li>
                             </ul>
                         </li>
                     </ul>

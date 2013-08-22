@@ -1,17 +1,22 @@
 <?php
-    require('bodyTop.php');
     $admin_dir = substr(__FILE__, 0, strrpos(__FILE__, '/'));
     if(isset($_GET['manage_module'])){
         $module_admin_home = $admin_dir . '/' . $_GET['manage_module'];
+        require('bodyTop.php');
         if(!$JACKED->isModuleInstalled($_GET['manage_module']) || !file_exists($module_admin_home)){
             include('404.php');
-            require('bodyBottom.php');
+            include('bodyBottom.php');
             exit();
         }else{
             include($module_admin_home . '/index.php');
-            require('bodyBottom.php');
+            include('bodyBottom.php');
             exit();
         }
+    }
+    if(isset($_GET['handler'])){
+        include($admin_dir . '/' . $_GET['handler'] . '-handler.php');
+        include('bodyBottom.php');
+        exit();
     }
 ?>
     
