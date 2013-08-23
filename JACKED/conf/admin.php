@@ -15,7 +15,7 @@
 
 	    //image uploader destination directory
 	    // this should be more relevant to a templating module if one ever exists
-	    'imgupload_directory' => JACKED_SITE_ROOT . 'assets/img/lol/'
+	    'imgupload_directory' => 'assets/img/lol/'
 	);
 
 ?>
