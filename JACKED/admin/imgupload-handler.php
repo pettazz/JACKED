@@ -21,6 +21,7 @@
             move_uploaded_file($tempFile, $targetFile); 
         }catch(Exception $e){
             header('HTTP/1.1 500 Internal Server Error');
+            error_log('JACKED admin imgupload error: ' . $e->getMessage());
             exit();
         }
         header('HTTP/1.1 200 OK');
