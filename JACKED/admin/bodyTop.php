@@ -83,7 +83,7 @@
         </div>
 
         <div class="modal-body">
-            <p class="lead">Uploads images directly to the /assets/img/lol/ directory, using the same filename.</p>
+            <p>Uploaded images are available in <br /><code><?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory; ?></code><br />using their original filename.</p>
             <form action="<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload"
               class="dropzone"
               id="imguploadDropzone"></form>

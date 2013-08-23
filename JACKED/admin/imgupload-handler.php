@@ -11,7 +11,7 @@
     if(!empty($_FILES)){
         try{
             $tempFile = $_FILES['file']['tmp_name'];                     
-            $targetPath = $JACKED->admin->config->imgupload_directory;
+            $targetPath = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory;
             $targetFile = $targetPath . $_FILES['file']['name'];
             if(file_exists($targetFile)){
                 header('HTTP/1.1 409 Conflict');
