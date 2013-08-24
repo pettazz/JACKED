@@ -452,7 +452,7 @@
                                 }
                             }
                         }else{
-                            if(array_key_exists($field, $this->getRelations()) && empty($this->$field) || $this->$field == SyrupField::REL_PLACEHOLDER){
+                            if(array_key_exists($field, $this->getRelations()) && (empty($this->$field) || $this->$field == SyrupField::REL_PLACEHOLDER)){
                                 //this field is a relation that hasn't been set, so we ignore it   
                             }else{
                                 $insertFields[] = $field;
@@ -464,19 +464,32 @@
                 }else{
                     $query = "UPDATE " . $this->_tableName . " SET ";
                     $sets = array();
-                    foreach($this->getFields() as $field){
+                    foreach($this->getFieldNames() as $field){
                         if(is_object($this->$field) && is_subclass_of($this->$field, 'SyrupModel', false)){
                             $this->$field->save();
+                            $relData = $this->getRelations($field);
+                            if($relData && ($relData['type'] == 'hasOne' || $relData['type'] == 'hasOneForeign')){
+                                $key = $this->$field->getPrimaryKey();
+                                $sets[] = "`$field` = '" . $this->sanitize($key->getValue()) . "'";
+                            }
                         }else if(is_array($this->$field)){
                             if(!empty($this->$field)){
+                                $relData = $this->getRelations($field);
                                 foreach($this->$field as $relItem){
                                     if($relItem->_isDirty){
                                         $relItem->save();
                                     }
                                 }
+                                // TODO: make this shit actually work.
+                                // if($relData && ($relData['type'] == 'hasMany' || $relData['type'] == 'hasManyForeign')){
+                                //     $rel = explode('.', $relData['field']);
+                                //     $relModel = $rel[0] . 'Model';
+                                //     $query = "SELECT * FROM " . $relModel::relationTable . " WHERE " . $target . " = " . $this->getPrimaryKey();
+                                //     $currentRelations = $this->query($query);
+                                // }
                             }
                         }else{
-                            if(array_key_exists($field, $this->getRelations()) && empty($this->$field) || $this->$field == SyrupField::REL_PLACEHOLDER){
+                            if(array_key_exists($field, $this->getRelations()) && (empty($this->$field) || $this->$field == SyrupField::REL_PLACEHOLDER)){
                                 //this field is a relation that hasn't been set, so we ignore it   
                             }else{
                                 $sets[] = "`$field` = '" . $this->sanitize($this->$field->getValue()) . "'";

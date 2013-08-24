@@ -221,7 +221,11 @@
         */
         public function getRelations($fieldName = NULL){
             if($fieldName){
-                return $this->_relations[$fieldName];
+                try{
+                    return $this->_relations[$fieldName];
+                }catch(Exception $e){
+                    return FALSE;
+                }
             }else{
                 return $this->_relations;
             }
