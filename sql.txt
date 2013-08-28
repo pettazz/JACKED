@@ -1,15 +1,23 @@
 JSON:
 
 {   
-    "active = ?": true,
     "AND": {
-        {
-            "date > ?": 1234567890,
-            "author = ? ": 9
+        "active = ?": true,
+        "AND": {
+            "AND": {
+                "date > ?": 1234567890,
+                "author = ?": "abc-123"
+            },
+            "OR": {
+                "date < ? ": 0987654321,
+                "title LIKE ?": "*hats*"
+            }
         },
-        "OR": {
-            "date < ? ": 0987654321,
-            "title LIKE ?": "*hats*"
+        "NOT": {
+            "OR": {
+                "author = ?": "some-terrible-author-123",
+                "author = ?": "another-shitty-one-678"
+            }
         }
     }
 }
@@ -19,15 +27,23 @@ JSON:
 PHP Array:
 
 array(   
-    "active = ?" => true,
     "AND" => array(
-        array(
-            "date > ?" => 1234567890,
-            "author = ? " => 9
+        "active = ?" => true,
+        "AND" => array(
+            "AND => array(
+                "date > ?" => 1234567890,
+                "author = ?" => "abc-123"
+            ),
+            "OR" => array(
+                "date < ? " => 0987654321,
+                "title LIKE ?" => "*hats*"
+            )
         ),
-        "OR" => array(
-            "date < ? " => 0987654321,
-            "title LIKE ?" => "*hats*"
+        "NOT" => array(
+            "OR" => array(
+                "author = ?" => "some-terrible-author-123",
+                "author = ?" => "another-shitty-one-678"
+            )
         )
     )
 )
@@ -38,25 +54,30 @@ Exploded SQL:
 
 WHERE 
     active = 'true' 
-    AND (
+    AND 
+    (
         (
             date > 1234567890 
             AND 
-            author = 9
+            author = 'abc-123'
         ) 
-        OR 
+        AND 
         (
             date < 0987654321 
-            AND 
-            title LIKE %hats%
+            OR 
+            title LIKE '%hats%'
         )
+        AND
+            NOT 
+                (  
+                author = 'some-terrible-author-123'
+                OR
+                author = 'another-shitty-one-678'
+                )
     )
 
 
 
 SQL:
 
-active = 1 AND ((date > 1234567890 AND author = 9) OR (date < 987654321 AND title LIKE "%hats%"))
-
-
-active = 1 AND ( (date > 1234567890  AND author = 9  ) OR (date < 987654321 title LIKE %hats% ) )
+WHERE active = 'true' AND ( (date > 1234567890 AND author = 'abc-123' ) AND ( date < 0987654321 OR title LIKE '%hats%' ) AND NOT ( author = 'some-terrible-author-123' OR author = 'another-shitty-one-678' ) )
