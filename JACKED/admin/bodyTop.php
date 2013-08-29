@@ -1,5 +1,5 @@
 <?php
-    require('../jacked_conf.php');
+    require_once('../jacked_conf.php');
 	$JACKED = new JACKED("admin, Sessions");
 ?>
 
