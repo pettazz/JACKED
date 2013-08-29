@@ -115,35 +115,13 @@
         /**
         * Helper for getWhereClause to recursively parse criteria data into a string.
         * 
-        * @param $criteria Array String field/value pairs.
-        * @param $tableName String Name of the table referred to by criteria fields. 
+        * @param $criteria Array String field/value pairs. 
         * @return String Representation of @criteria as a String usable in a MySQL WHERE clause.
         */
-        protected function parseWhereCriteria($criteria, $tableName = false){
+        protected function parseWhereCriteria($criteria){
             $result = "";
-            // $relations = $this->getRelations();
+            $relations = $this->getRelations();
             foreach($criteria as $key => $value){
-                // if(array_key_exists(trim($key), $relations)){
-                //     $relationData = $relations[trim($key)];
-                //     $rel = explode('.', $relationData['field']);
-                //     $relTable = $rel[0];
-                //     $relModel = $relTable . 'Model';
-                //     switch($relationData['type']){
-                //         case 'hasOne':
-                //             $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "' ";
-                //             break;
-                //         case 'hasOneForeign':
-                //             //$result = $relationData['target'] . " = " . $relTable . ".target AND " . $relTable . "." . $relTable . " = '" . trim($value) . "'";
-                //             throw new Exception("findby hasOneForeign type is not yet supported.");
-                //             break;
-                //         case 'hasManyForeign':
-                //             $result = $relationData['target'] . " = " . $relModel::relationTable . ".target AND " . $relModel::relationTable . "." . $relTable . " = '" . trim($value) . "'";
-                //             break;
-
-                //         default:
-                //             throw new Exception("Unknown relation type.");
-                //             break;
-                //     }
                 $ukey = trim(strtoupper($key));
                 if($ukey === 'OR' || $ukey === 'AND'){
                     $innerParts = array();
@@ -162,7 +140,33 @@
                     if(!strpos($key, '.')){
                         $key = $this->_tableName . '.' . $key;
                     }else{
-                        //if the prefix is not our table name, but actually a 
+                        //if the prefix is not our table name, but actually a relational reference, we have some work to do
+                        $prefix = strstr($key, '.', TRUE);
+                        if(!($prefix == $this->_tableName)){
+                            if(array_key_exists($prefix, $relations)){
+                                $relationData = $relations[$prefix];
+                                $rel = explode('.', $relationData['field']);
+                                $relTable = $rel[0];
+                                $relField = $rel[1];
+                                $relKey = $relationData['field'];
+                                $relModel = $relTable . 'Model';
+                                $fieldName = substr(strstr($key, '.'), 1);
+                                switch($relationData['type']){
+                                    case 'hasOne':
+                                    case 'hasOneForeign':
+                                        $key = "( " . $this->_tableName . ".$prefix = $relKey AND $relTable.$fieldName = ? )";
+                                        break;
+                                    case 'hasManyForeign':
+                                        $key = "( " . $relModel::relationTable . ".target = " . $relationData['target'] . " AND " . $relationData['field'] . " = " . $relModel::relationTable . ".$prefix AND $prefix.$fieldName = ? ) ";
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown relation type '" . $relationData['type'] . "' for field prefix: '" . $prefix . "'");
+                                        break;
+                                }
+                            }else{
+                                throw new Exception("Unrecognized field prefix: $prefix");
+                            }
+                        }
                     }
 
                     //prepare quotes around value if needed
@@ -189,10 +193,9 @@
         * Generates the WHERE clause of a query based on an array of field/value pairs.
         * 
         * @param $criteria Array String field/value pairs.
-        * @param $tableName String Name of the table referred to by criteria fields.
         * @return String MySQL WHERE clause.
         */
-        protected function getWhereClause($criteria, $tableName = false){
+        protected function getWhereClause($criteria){
             if(empty($criteria)){
                 return '';
             }
@@ -202,7 +205,7 @@
                 $criteria = json_decode($criteria);
             }
 
-            return "WHERE " . $this->parseWhereCriteria($criteria, $tableName);
+            return "WHERE " . $this->parseWhereCriteria($criteria);
         }
 
         /**
@@ -290,8 +293,12 @@
                             }
                             $joinClause .= " LEFT JOIN $relTable ON " . $relationData['field'] . " = " . $this->_tableName . '.guid ';
                         }elseif($relationData['type'] == 'hasManyForeign'){
-                            if(array_key_exists($relTable, $criteria)){
-                                $tables[] = $relModel::relationTable;
+                            foreach($this->_util->array_keys_recursive($criteria) as $key){
+                                if(!(strpos($key, $relTable) === FALSE)){
+                                    $tables[] = $relModel::relationTable;
+                                    $tables[] = $relModel::tableName;
+                                    break;
+                                }
                             }
                             $query = 'SELECT ';
                             foreach($relModel::getFieldNames() as $fieldName){
