@@ -9,7 +9,7 @@
     
         const moduleName = 'Blag';
         const moduleVersion = 1.0;
-        public static $dependencies = array('MySQL', 'Flock', 'Syrup');
+        public static $dependencies = array('MySQL', 'Syrup');
         
 
         /**
