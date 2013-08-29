@@ -44,7 +44,7 @@
             $order = array('field' => 'posted', 'direction' => $order);
             if($only_active){
                 if($where){
-                    $where = array('alive' => 1, 'AND' => $where);
+                    $where = array('AND' => array_merge(array('alive' => 1), $where));
                 }else{
                     $where = array('alive' => 1);
                 }
