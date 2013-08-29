@@ -64,7 +64,7 @@
         * @return Array List of Arrays of data for each post found
         */
         public function getPostsByAuthor($author_guid, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
-            $cond = array('author' => $author_guid);
+            $cond = array('author.guid' => $author_guid);
             return $this->getPosts($count, $paged, $cond, $only_active, $order);
         }
 
@@ -79,7 +79,7 @@
         * @return Array List of Arrays of data for each post found
         */
         public function getPostsByCategory($category_guid, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
-            $cond = array('category' => $category_guid);
+            $cond = array('category.guid' => $category_guid);
             return $this->getPosts($count, $paged, $cond, $only_active, $order);
         }
 
@@ -97,8 +97,8 @@
         public function getPostsByTimeRange($time_oldest, $time_newest = false, $count = 10, $paged = 1, $only_active = true, $order = 'desc'){
             $time_newest = $time_newest? $time_newest : time();
             $cond = array(
-                'posted >= ?' => $time_oldest,
-                'AND' => array('posted <= ?' => $time_newest)
+                'AND' => array('posted >= ?' => $time_oldest,
+                               'posted <= ?' => $time_newest)
             );
             return $this->getPosts($count, $paged, $cond, $only_active, $order);
         }
