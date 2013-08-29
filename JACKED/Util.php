@@ -37,6 +37,22 @@
             }
             return $result;
         }
+
+        /**
+        * Recursive array_keys, handles nested arrays or objects
+        * 
+        * @param Mixed $haystack Array or Object to get all keys of
+        * @return array Every array key within the multidimensional $haystack
+        */
+        public static function array_keys_recursive($haystack){
+            $keys = array_keys($haystack);
+            foreach($haystack as $v){
+                if(is_array($v) || is_object($v)){
+                    $keys = array_unique(array_merge($keys, self::array_keys_recursive($v)));
+                }
+            }
+            return $keys;
+        }
         
         /**
         * Strips HTML, javascript, comments, and other things we wouldn't want to 

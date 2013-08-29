@@ -32,6 +32,15 @@
             
         }
 
+        public function test_array_keys_recursive(){
+            $fixture = array('one' => array('two' => 2, 'three' => array('four'=> 4, 'three' => 'again')));
+
+            $expected = array('one', 'two', 'three', 'four');
+
+            $this->assertEquals($this->JACKED->Util->array_keys_recursive($fixture), $expected);
+
+        }
+
         public function test_array_key_exists_recursive(){
             $fixture = array(
                 'test' => 3,
