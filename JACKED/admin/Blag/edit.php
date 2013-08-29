@@ -32,7 +32,7 @@
             $postTagsString = rtrim($postTagsString, ',');
         }
     }catch(Exception $e){
-        echo "<h1>FUCK: " . $e->getMessage() . "</h1>";
+        $JACKED->Sessions->write('admin.error.editpost', $e->getMessage());
     }
 
 ?>
@@ -41,15 +41,26 @@
 <script type="text/javascript">
     
     var editor;
+    var editorStorageName = 'JACKED_Blag_edit_<?php echo $guid; ?>';
+    var autoDraftExists = !(localStorage.getItem(editorStorageName) === null);
+
+    if(autoDraftExists){
+        draft = JSON.parse(localStorage.getItem(editorStorageName));
+        draftDate = new Date(draft[editorStorageName]['modified']);
+        if(confirm('You have an existing draft for this post that was autosaved on ' + draftDate.toLocaleString() + '. Would you like to load it or cancel the draft and load the saved post?')){
+
+        }
+
+    }
 
     var opts = {
         container: 'editoroverlay',
         textarea: 'inputContent',
         basePath: '',
         clientSideStorage: true,
-        localStorageName: 'JACKED_Blag_edit_<?php echo $guid; ?>',
+        localStorageName: editorStorageName,
         file: {
-            name: 'JACKED_Blag_edit_<?php echo $guid; ?>',
+            name: editorStorageName,
         },
         useNativeFullscreen: true,
         parser: marked,
@@ -84,16 +95,30 @@
         editor.load();
 
         $("#cancelButton").click(function(eo){
-            editor.unload();
-            $('#inputContent').val('');
-            editor.remove('JACKED_Blag_new');
+            var confirmCancel = confirm('Discard your changes to this post?');
+            if(confirmCancel){
+                window.onbeforeunload = null;
+                editor.unload();
+                $('#inputContent').val('');
+                editor.remove(editorStorageName);
+                localStorage.removeItem(editorStorageName);
+            }else{
+                eo.preventDefault();
+                return false;
+            }
         });
 
         $("#savepost").click(function(eo){
+            window.onbeforeunload = null;
+            editor.remove(editorStorageName);
+            localStorage.removeItem(editorStorageName);
             $("#saveType").val('live');
         });
 
         $("#savedraft").click(function(eo){
+            window.onbeforeunload = null;
+            editor.remove(editorStorageName);
+            localStorage.removeItem(editorStorageName);
             $("#saveType").val('draft'); 
         });
 
@@ -108,6 +133,21 @@
             tokenSeparators: [","]
         });
     });
+
+    var confirmOnPageExit = function(winev){
+        winev = winev || window.event;
+
+        var message = 'You haven\'t saved your post yet. Do you want to leave without saving?';
+
+        // For IE6-8 and Firefox prior to version 4
+        if(winev){
+            winev.returnValue = message;
+        }
+
+        // For Chrome, Safari, IE8+ and Opera 12+
+        return message;
+    };
+    window.onbeforeunload = confirmOnPageExit;
 
 </script>
 

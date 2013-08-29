@@ -4,21 +4,64 @@
 
     $tags = $JACKED->Curator->getAllTags();
 
+    if(isset($_POST['saveType'])){
+        $incomingPost = TRUE;
+        if(isset($_POST['inputCategory'])){
+            $inputCategory = stripslashes($_POST['inputCategory']);
+        }else{
+            $inputCategory = FALSE;
+        }
+        if(isset($_POST['inputHeadline'])){
+            $inputHeadline = stripslashes($_POST['inputHeadline']);
+        }else{
+            $inputHeadline = FALSE;
+        }
+        if(isset($_POST['inputContent'])){
+            $inputContent = stripslashes($_POST['inputContent']);
+        }else{
+            $inputContent = FALSE;
+        }
+        if(isset($_POST['inputTags'])){
+            $inputTags = stripslashes($_POST['inputTags']);
+        }else{
+            $inputTags = FALSE;
+        }
+        if(isset($_POST['inputTitle'])){
+            $inputTitle = stripslashes($_POST['inputTitle']);
+        }else{
+            $inputTitle = FALSE;
+        }
+
+    }else{
+        $incomingPost = FALSE;
+        $inputCategory = FALSE;
+        $inputHeadline = FALSE;
+        $inputContent = FALSE;
+        $inputTags = FALSE;
+        $inputTitle = FALSE;
+    }
+
 ?>
 <link href="/admin/assets/js/select2/select2.css" rel="stylesheet" />
 <script type="text/javascript" src="/admin/assets/js/select2/select2.min.js"></script>
 <script type="text/javascript">
     
     var editor;
+    var editorStorageName = 'JACKED_Blag_new';
+    var autoDraftExists = !(localStorage.getItem(editorStorageName) === null);
+
+    if(<?php echo $incomingPost? 'true' : 'false'; ?> && autoDraftExists){
+        localStorage.removeItem(editorStorageName);
+    }
 
     var opts = {
         container: 'editoroverlay',
         textarea: 'inputContent',
         basePath: '',
         clientSideStorage: true,
-        localStorageName: 'JACKED_Blag_new',
+        localStorageName: editorStorageName,
         file: {
-            name: "JACKED_Blag_new"
+            name: editorStorageName
         },
         useNativeFullscreen: true,
         parser: marked,
@@ -53,16 +96,30 @@
         editor.load();
 
         $("#cancelButton").click(function(eo){
-            editor.unload();
-            $('#inputContent').val('');
-            editor.remove('JACKED_Blag_new');
+            var confirmCancel = confirm('Discard this post?');
+            if(confirmCancel){
+                window.onbeforeunload = null;
+                editor.unload();
+                $('#inputContent').val('');
+                editor.remove(editorStorageName);
+                localStorage.removeItem(editorStorageName);
+            }else{
+                eo.preventDefault();
+                return false;
+            }
         });
 
         $("#savepost").click(function(eo){
+            window.onbeforeunload = null;
+            editor.remove(editorStorageName);
+            localStorage.removeItem(editorStorageName);
             $("#saveType").val('live');
         });
 
         $("#savedraft").click(function(eo){
+            window.onbeforeunload = null;
+            editor.remove(editorStorageName);
+            localStorage.removeItem(editorStorageName);
             $("#saveType").val('draft'); 
         });
 
@@ -78,6 +135,21 @@
         });
     });
 
+    var confirmOnPageExit = function(winev){
+        winev = winev || window.event;
+
+        var message = 'You haven\'t saved your post yet. Do you want to leave without saving?';
+
+        // For IE6-8 and Firefox prior to version 4
+        if(winev){
+            winev.returnValue = message;
+        }
+
+        // For Chrome, Safari, IE8+ and Opera 12+
+        return message;
+    };
+    window.onbeforeunload = confirmOnPageExit;
+
 </script>
 
 <h2>New Post</h2>
@@ -88,21 +160,21 @@
         <div class="control-group">
             <label class="control-label" for="inputTitle">Title</label>
             <div class="controls">
-                <input type="text" class="input-xxlarge" name="inputTitle" id="inputTitle" placeholder="New Post">
+                <input type="text" class="input-xxlarge" name="inputTitle" id="inputTitle" value="<?php echo $inputTitle? $inputTitle : ''; ?>" placeholder="New Post">
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label" for="inputHeadline">Headline/Preview Text</label>
             <div class="controls">
-                <textarea rows="6" class="input-xxlarge" name="inputHeadline" id="inputHeadline">This is where we would put a brief intro or teaser type thing of the article to convince people that it's cool and they should read it. The container won't expand dynamically at all, so these should overall be kept relatively short. Because otherwise the text will overflow down into the tabs below, and my shiny css will actually just truncate it at an awkward point.</textarea>
+                <textarea rows="6" class="input-xxlarge" name="inputHeadline" id="inputHeadline"><?php echo $inputHeadline? $inputHeadline : "This is where we would put a brief intro or teaser type thing of the article to convince people that it's cool and they should read it. The container won't expand dynamically at all, so these should overall be kept relatively short. Because otherwise the text will overflow down into the tabs below, and my shiny css will actually just truncate it at an awkward point."; ?></textarea>
             </div>
         </div>
         
         <div class="control-group">
             <label class="control-label" for="inputContent">Content</label>
             <div class="controls">
-                <textarea rows="6" class="input-xxlarge" style="display:none;" name="inputContent" id="inputContent"></textarea>
+                <textarea rows="6" class="input-xxlarge" style="display:none;" name="inputContent" id="inputContent"><?php echo $inputContent? $inputContent : ''; ?></textarea>
                 <div id="editoroverlay"></div>
             </div>
         </div>
@@ -113,8 +185,13 @@
                 <select name="inputCategory" id="inputCategory">
                     <?php
                         $cats = $JACKED->Syrup->BlagCategory->find();
+                        if($inputCategory){
+                            $selected = $_POST['inputCategory'];
+                        }else{
+                            $selected = FALSE;
+                        }
                         foreach($cats as $cat){
-                            echo '<option value="' . $cat->guid . '">' . $cat->name . "</option>\n";
+                            echo '<option value="' . $cat->guid . '"' . (($inputCategory && $selected && $selected == $cat->guid)? 'selected' : '') . '>' . $cat->name . "</option>\n";
                         }
                     ?>
                 </select>
@@ -124,7 +201,7 @@
         <div class="control-group">
             <label class="control-label" for="inputTags">Tags</label>
             <div class="controls">
-                <input type="text" id="inputTags" name="inputTags" class="input-xxlarge" />
+                <input type="text" id="inputTags" name="inputTags" class="input-xxlarge" value="<?php echo $inputTags? $inputTags : ''; ?>" />
             </div>
         </div>
 
