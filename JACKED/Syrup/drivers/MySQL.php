@@ -121,50 +121,63 @@
         */
         protected function parseWhereCriteria($criteria, $tableName = false){
             $result = "";
-            $relations = $this->getRelations();
+            // $relations = $this->getRelations();
             foreach($criteria as $key => $value){
-                if(array_key_exists(trim($key), $relations)){
-                    $relationData = $relations[trim($key)];
-                    $rel = explode('.', $relationData['field']);
-                    $relTable = $rel[0];
-                    $relModel = $relTable . 'Model';
-                    switch($relationData['type']){
-                        case 'hasOne':
-                            $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "' ";
-                            break;
-                        case 'hasOneForeign':
-                            //$result = $relationData['target'] . " = " . $relTable . ".target AND " . $relTable . "." . $relTable . " = '" . trim($value) . "'";
-                            throw new Exception("findby hasOneForeign type is not yet supported.");
-                            break;
-                        case 'hasManyForeign':
-                            $result = $relationData['target'] . " = " . $relModel::relationTable . ".target AND " . $relModel::relationTable . "." . $relTable . " = '" . trim($value) . "'";
-                            break;
+                // if(array_key_exists(trim($key), $relations)){
+                //     $relationData = $relations[trim($key)];
+                //     $rel = explode('.', $relationData['field']);
+                //     $relTable = $rel[0];
+                //     $relModel = $relTable . 'Model';
+                //     switch($relationData['type']){
+                //         case 'hasOne':
+                //             $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "' ";
+                //             break;
+                //         case 'hasOneForeign':
+                //             //$result = $relationData['target'] . " = " . $relTable . ".target AND " . $relTable . "." . $relTable . " = '" . trim($value) . "'";
+                //             throw new Exception("findby hasOneForeign type is not yet supported.");
+                //             break;
+                //         case 'hasManyForeign':
+                //             $result = $relationData['target'] . " = " . $relModel::relationTable . ".target AND " . $relModel::relationTable . "." . $relTable . " = '" . trim($value) . "'";
+                //             break;
 
-                        default:
-                            throw new Exception("Unknown relation type.");
-                            break;
+                //         default:
+                //             throw new Exception("Unknown relation type.");
+                //             break;
+                //     }
+                $ukey = trim(strtoupper($key));
+                if($ukey === 'OR' || $ukey === 'AND'){
+                    $innerParts = array();
+                    foreach($value as $innerKey => $innerValue){
+                        $innerParts[] = $this->parseWhereCriteria(array($innerKey => $innerValue));
                     }
-                }else if(trim($key) == "OR" || trim($key) == "AND"){
-                    $result .= trim($key) . " (" . $this->parseWhereCriteria($value) . ") ";
-                }else if(is_array($value)){
-                    $results = array();
-                    foreach($value as $innerkey => $innerval){
-                        $results[] = $this->parseWhereCriteria(array($innerkey => $innerval));
-                    }
-                    $result .= " ( " . implode(" AND ", $results) . " ) ";
+                    $result .= ' (' . implode($ukey, $innerParts) . ') ';
+                }else if($ukey === 'NOT'){
+                    $result .= ' NOT (' . $this->parseWhereCriteria($value) . ') ';
                 }else{
+                    if(is_bool($value)){
+                        $value = ($value)? 1 : 0;
+                    }
+
+                    //if there is no table name in the key, inherit it
+                    if(!strpos($key, '.')){
+                        $key = $this->_tableName . '.' . $key;
+                    }else{
+                        //if the prefix is not our table name, but actually a 
+                    }
+
+                    //prepare quotes around value if needed
                     if(is_numeric($value)){
-                        $value = strval($value);
-                    }else if(is_bool($value)){
-                        $value = ($value)? '1' : '0';
+                        $preparedValue = '' . $value;
+                    }else{
+                        $preparedValue = "'" . trim($value) . "'";
                     }
 
                     if(strpos($key, '?') === false){
                         //support shortcuts for key = value notation
-                        $result = ($tableName? $tableName . '.' : '') . "$key = '" . trim($value) . "' ";
+                        $result = " $key = $preparedValue ";
                     }else{
                         //otherwise use the replace ? in key method
-                        $result .= str_replace(array('*', '?'), array('%', str_replace('*', '%', "'" . $value . "'")), trim($key)) . " ";
+                        $result .= ' ' . str_replace(array('*', '?'), array('%', str_replace('*', '%', $preparedValue)), trim($key)) . " ";
                     }
                 }
             }
@@ -312,7 +325,7 @@
             }else{
                 $query = "SELECT * FROM " . $this->_tableName;
             }
-            $query .= " " . $this->getWhereClause($criteria, $this->_tableName);
+            $query .= " " . $this->getWhereClause($criteria);
             if($order){
                 $query .= " ORDER BY " . $order['field'] . ' ' . $order['direction'];
             }
