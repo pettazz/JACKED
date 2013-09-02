@@ -9,7 +9,7 @@
         <meta charset="utf-8">
         <title><?php echo $JACKED->config->client_name; ?> | JACKED<?php echo isset($_GET['manage_module'])? '::' . $_GET['manage_module'] : '' ?></title>
         
-        <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/bootstrap-combined.min.css" />
+        <link rel="stylesheet" href="<?php echo $JACKED->admin->config->entry_point; ?>assets/css/bootstrap.css" />
         <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/jquery-1.10.2.js"></script>
         <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/spin.min.js"></script>
