@@ -484,7 +484,7 @@
                 }else{
                     $query = "UPDATE " . $this->_tableName . " SET ";
                     $sets = array();
-                    foreach($this->getFieldNames() as $field){
+                    foreach($this->getFields() as $field){
                         if(is_object($this->$field) && is_subclass_of($this->$field, 'SyrupModel', false)){
                             $this->$field->save();
                             $relData = $this->getRelations($field);
@@ -495,17 +495,34 @@
                         }else if(is_array($this->$field)){
                             if(!empty($this->$field)){
                                 $relData = $this->getRelations($field);
+                                $relKeys = array();
                                 foreach($this->$field as $relItem){
                                     if($relItem->_isDirty){
                                         $relItem->save();
                                     }
+                                    // $keyName = $relItem->getPrimaryKeyName();
+                                    // $relKeys[$relItem->$keyName->getValue()] = TRUE;
                                 }
-                                // TODO: make this shit actually work.
+                                
+                                //these should probably be separate but I can't think of any reason why they'd be different right now
                                 // if($relData && ($relData['type'] == 'hasMany' || $relData['type'] == 'hasManyForeign')){
+                                //     print_r($relKeys);
+
                                 //     $rel = explode('.', $relData['field']);
                                 //     $relModel = $rel[0] . 'Model';
-                                //     $query = "SELECT * FROM " . $relModel::relationTable . " WHERE " . $target . " = " . $this->getPrimaryKey();
+                                //     $target = explode('.', $relData['target']);
+                                //     $targetField = $target[1];
+                                //     $query = "SELECT * FROM " . $relModel::relationTable . " WHERE target = '" . $this->$targetField->getValue() . "'";
+                                //     echo $query;
                                 //     $currentRelations = $this->query($query);
+                                //     if($currentRelations && !empty($currentRelations)){
+                                //         foreach($currentRelations as $exRel){
+                                //             echo $exRel['target'];
+                                //             if(isset($relKeys[$exRel['target']])){
+                                //                 echo 'lol';
+                                //             }
+                                //         }
+                                //     }
                                 // }
                             }
                         }else{
