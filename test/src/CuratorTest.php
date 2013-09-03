@@ -23,6 +23,7 @@
             $check_tags = $this->JACKED->MySQL->getRows('Curator');
             
             $this->assertTrue($check_tags[0]['name'] == 'butts, lol');
+            $this->assertTrue($check_tags[0]['canonicalName'] == 'butts-lol');
             $this->assertTrue($check_tags[0]['usage'] == 1);
 
             $check_tagrels = $this->JACKED->MySQL->getRows('CuratorRelation');
@@ -40,6 +41,7 @@
             $check_tags = $this->JACKED->MySQL->getRows('Curator');
             
             $this->assertTrue($check_tags[0]['name'] == 'butts, lol');
+            $this->assertTrue($check_tags[0]['canonicalName'] == 'butts-lol');
             $this->assertTrue($check_tags[0]['usage'] == 0);
 
             $check_tagrels = $this->JACKED->MySQL->getRows('CuratorRelation');
@@ -60,12 +62,25 @@
 
             $check_tag = $this->JACKED->MySQL->getRows('Curator', 'name = "butts, lol"');
             $this->assertTrue($check_tag[0]['name'] == 'butts, lol');
+            $this->assertTrue($check_tag[0]['canonicalName'] == 'butts-lol');
             $this->assertTrue($check_tag[0]['usage'] == 2);
 
             $check_tagrel = $this->JACKED->MySQL->getRows('CuratorRelation', 'Curator = "' . $check_tag[0]['guid'] . '"');
             $check_guids = array($check_tagrel[0]['target'], $check_tagrel[1]['target']);
             $compare_guids = array($target1, $target2);
             $this->assertTrue($check_guids == $compare_guids);
+        }
+
+        public function test_getTagByCanonicalName(){
+            $target = 'hats';
+
+            $this->JACKED->Curator->assignTagByName($target, 'butts, lol');
+
+            $check_tags = $this->JACKED->MySQL->getRows('Curator');
+            
+            $this->assertTrue($check_tags[0]['name'] == 'butts, lol');
+            $this->assertTrue($check_tags[0]['canonicalName'] == 'butts-lol');
+            $this->assertTrue($check_tags[0]['usage'] == 1);
         }
 
         public function test_getTagsForTarget(){

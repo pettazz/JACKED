@@ -148,6 +148,7 @@ CREATE TABLE `User` (
 CREATE TABLE `Curator` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
+  `canonicalName` varchar(255) NOT NULL DEFAULT '',
   `usage` int(11) DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

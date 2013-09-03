@@ -13,6 +13,19 @@
         
 
         /**
+        * Get the canonical string name of a given tag name.
+        * 
+        * @param $target String The string to be canonicalized
+        * @return String The canonical version of the given string
+        */
+        public static function canonicalize($str){
+            $str = strtolower(trim($str));
+            $str = preg_replace('/[^a-z0-9-]/', '-', $str);
+            $str = preg_replace('/-+/', "-", $str);
+            return $str;
+        }
+
+        /**
         * Tag a given target object with the given tag name(s). If a tag name does not exist, 
         * we will attempt to create it before tagging. Names must be an exact match.
         * 
@@ -143,7 +156,8 @@
                 $this->config->dbt_tags,
                 array(
                     'guid' => $new_guid,
-                    'name' => $name
+                    'name' => $name,
+                    'canonicalName' => self::canonicalize($name)
                 )
             );
             if($done === false){
@@ -188,6 +202,24 @@
         }
 
         /**
+        * Gets the tag data for a given tag canonical name. Canonical 
+        * name must be an exact match.
+        * 
+        * @param $name String The exact canonical name of the tag to find
+        * @return Array List of all tag data
+        */
+        public function getTagByCanonicalName($canonicalName){
+            if(!$this->doesTagExistByCanonicalName($name)){
+                throw new TagDoesNotExistException();
+            }
+
+            return $this->JACKED->MySQL->getRow(
+                $this->config->dbt_tags, 
+                'canonicalName = "' . $canonicalName . '"'
+            );
+        }
+
+        /**
         * Get a list of all existing tags.
         * 
         * @return Array of Associative arrays of data for every tag
@@ -204,7 +236,7 @@
         */
         public function getTagsForTarget($target){
             return $this->JACKED->MySQL->getJoin(
-                array('guid', 'name', 'usage'),
+                array('guid', 'name', 'canonicalName', 'usage'),
                 false,
                 'LEFT',
                 $this->config->dbt_tags,
@@ -252,6 +284,19 @@
             return ($this->JACKED->MySQL->getRow(
                 $this->config->dbt_tags, 
                 'name = "' . $name . '"'
+            )) ? True : False;
+        }
+
+        /**
+        * Determines whether a tag exists by the canonical string name. 
+        * 
+        * @param $name String The exact canonical name of the tag to search for
+        * @return Boolean Whether the tag exists
+        */
+        public function doesTagExistByCanonicalName($canonicalName){
+            return ($this->JACKED->MySQL->getRow(
+                $this->config->dbt_tags, 
+                'canonicalName = "' . $canonicalName . '"'
             )) ? True : False;
         }
 
