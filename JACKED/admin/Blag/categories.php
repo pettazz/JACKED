@@ -65,7 +65,7 @@
     }
 
 ?>
-<form class="form-horizontal" method="POST" action="/admin/module/Blag">
+<form class="form-horizontal" method="POST" action="<?php echo $JACKED->admin->config->entry_point; ?>module/Blag">
     <fieldset>
         <div class="control-group">
             <label class="control-label" for="inputName">Name</label>
@@ -120,7 +120,7 @@
         echo '            <td>' . $cat->guid . '</td>';
         echo '            <td class="namerow"> <span class="catname">' . $cat->name . '</span> <input type="text" required class="input-large catnameinput" /> </td>';
         echo '            <td class="actionsrow">
-        <form method="POST" action="/admin/module/Blag">
+        <form method="POST" action="' . $JACKED->admin->config->entry_point . 'module/Blag">
             <input type="hidden" name="manage_handler" value="categories-edit-handler" />
             <input type="hidden" name="action" />
             <input type="hidden" name="newname" />

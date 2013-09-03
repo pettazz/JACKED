@@ -1,6 +1,6 @@
 <?php
     require_once('../jacked_conf.php');
-	$JACKED = new JACKED("admin, Sessions");
+    $JACKED = new JACKED("admin, Sessions");
 ?>
 
 <!DOCTYPE html>
@@ -130,7 +130,7 @@
                         </li>
                     </ul>
                     <form class="navbar-form pull-right">
-                        <a class="btn primary" href="/JACKED/admin/logout.php">Logout</a>
+                        <a class="btn primary" href="<?php echo $JACKED->admin->config->entry_point; ?>?handler=logout">Logout</a>
                     </form>
                     <span class="navbar-text pull-right" style="margin-right:15px;">Logged in as <a href="#"><?php echo $JACKED->Sessions->read('auth.admin.user'); ?></a></span>
                 </div>

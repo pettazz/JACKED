@@ -42,8 +42,8 @@
     }
 
 ?>
-<link href="/admin/assets/js/select2/select2.css" rel="stylesheet" />
-<script type="text/javascript" src="/admin/assets/js/select2/select2.min.js"></script>
+<link href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/select2/select2.css" rel="stylesheet" />
+<script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/select2/select2.min.js"></script>
 <script type="text/javascript">
     
     var editor;
@@ -66,9 +66,9 @@
         useNativeFullscreen: true,
         parser: marked,
         theme: {
-            base: '/admin/assets/js/EpicEditor/themes/base/epiceditor.css',
-            preview: '/admin/assets/js/EpicEditor/themes/preview/github.css',
-            editor: '/admin/assets/js/EpicEditor/themes/editor/epic-dark.css'
+            base: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/base/epiceditor.css',
+            preview: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/preview/github.css',
+            editor: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/editor/epic-dark.css'
         },
         button: {
             preview: true,
@@ -154,7 +154,7 @@
 
 <h2>New Post</h2>
 
-<form class="form-horizontal" method="POST" action="/admin/module/Blag">
+<form class="form-horizontal" method="POST" action="<?php echo $JACKED->admin->config->entry_point; ?>module/Blag">
     <input type="hidden" name="manage_handler" value="new-handler" />
     <fieldset>
         <div class="control-group">
@@ -209,7 +209,7 @@
             <input type="hidden" id="saveType" name="saveType" />
             <button id="savepost" type="submit" class="btn btn-success pull-right" style="margin-left:10px">Save and Post</button>
             <button id="savedraft" type="submit" class="btn btn-warning pull-right" style="margin-left:10px">Save as Draft</button>
-            <a id="cancelButton" class="pull-right btn btn-danger" href="/admin/module/Blag">Cancel</a>
+            <a id="cancelButton" class="pull-right btn btn-danger" href="<?php echo $JACKED->admin->config->entry_point; ?>module/Blag">Cancel</a>
         </div>
     </fieldset>
 </form>

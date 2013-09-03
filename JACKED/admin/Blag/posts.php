@@ -69,7 +69,7 @@
             echo '<td>' . $draft->author->username . '</td>';
             echo '<td>' . date("F j Y, g:i a", $draft->posted) . '</td>';
             echo '<td>
-            <form method="POST" action="/admin/module/Blag">
+            <form method="POST" action="' . $JACKED->admin->config->entry_point . 'module/Blag">
                 <input type="hidden" name="manage_handler" value="post-edit-handler" />
                 <input type="hidden" name="guid" value="' . $draft->guid . '" />
                 <input type="hidden" name="editAction" />
@@ -112,7 +112,7 @@
             echo '<td>' . $post->author->username . '</td>';
             echo '<td>' . date("F j Y, g:i a", $post->posted) . '</td>';
             echo '<td>
-            <form method="POST" action="/admin/module/Blag">
+            <form method="POST" action="' . $JACKED->admin->config->entry_point . 'module/Blag">
                 <input type="hidden" name="manage_handler" value="post-edit-handler" />
                 <input type="hidden" name="guid" value="' . $post->guid . '" />
                 <input type="hidden" name="editAction" />

@@ -11,7 +11,7 @@
               
                 <h1>Login</h1>
                       
-                <form class="form-stacked" method="POST" action="/JACKED/admin/login-handler.php">
+                <form class="form-stacked" method="POST" action="<?php echo $JACKED->admin->config->entry_point; ?>/handler/login">
                   
                     <fieldset>
                         <legend></legend>

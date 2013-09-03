@@ -1,5 +1,4 @@
 <?php
-    require('../../jacked_conf.php');
 	$JACKED = new JACKED("admin");
     try{
         $JACKED->admin->logout();

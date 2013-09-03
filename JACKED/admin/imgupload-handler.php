@@ -1,6 +1,5 @@
 <?php
      
-    require('../jacked_conf.php');
     $JACKED = new JACKED("admin");
 
     if(!$JACKED->admin->checkLogin()){

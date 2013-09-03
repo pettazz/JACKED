@@ -29,7 +29,7 @@
       <div class="hero-unit">
         <h1>JACKED</h1>
         <p>Modules installed: <?php echo $modules; ?>and JACKED Core <?php echo $JACKED::moduleVersion; ?>.</p>
-        <p><a class="btn primary large" href="/JACKED/admin/logout.php">Logout</a></p>
+        <p><a class="btn primary large" href="<?php echo $JACKED->admin->config->entry_point; ?>?handler=logout">Logout</a></p>
 
       </div>
 
