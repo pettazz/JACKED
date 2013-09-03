@@ -4,7 +4,7 @@
 
         const tableName = 'Blag';
 
-        protected $guid = array(SyrupField::VARCHAR, 64, false, NULL, 'PRI', NULL, array('UUID', 'relational_target_UUID'));
+        protected $guid = array(SyrupField::VARCHAR, 64, false, NULL, 'PRI', NULL, array('UID', 'relational_target_UUID'));
         protected $author = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'User.guid'));
         protected $posted = array(SyrupField::INT, 11, false);
         protected $category = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'BlagCategory.guid'));

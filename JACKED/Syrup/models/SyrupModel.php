@@ -86,9 +86,19 @@
                             include(JACKED_MODULES_ROOT . $config['model_root'] . $moduleName . '.php');
                         }
                     }
-                    //autogen fields
-                    if(in_array('UUID', $this->$fieldName->extra)){
-                        $this->$fieldName->setValue($util->uuid4());
+                    if(!($data && is_array($data))){
+                        //autogen fields
+                        if(in_array('UUID', $this->$fieldName->extra)){
+                            $this->$fieldName->setValue($util->uuid4());
+                        }
+                        if(in_array('UID', $this->$fieldName->extra)){
+                            $valid = FALSE;
+                            while(!$valid){
+                                $uid = $util->randomString(5);
+                                $valid = !$this->findOne(array($fieldName => $uid));
+                            }   
+                            $this->$fieldName->setValue($uid);
+                        }
                     }
                 }
             }
