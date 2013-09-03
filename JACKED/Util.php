@@ -71,7 +71,6 @@
             return $text;
         }
         
-        //
         /**
         * Emulate strstr()'s before_needle arg in php v < 5.3
         * Returns part of haystack string starting from and including 
@@ -91,9 +90,24 @@
          * @param string $string The string to convert
          * @return string The converted string
          */
-        public static function br2nl($string)
-        {
+        public static function br2nl($string){
             return preg_replace('/\<br(\s*)?\/?\>/i', "\n", $string);
+        }
+
+        /**
+         * Generate a random string of given length using the given charset. Charset defaults to valid hex chars.
+         *
+         * @param $length int The desired length of the random string.
+         * @param $charset STring The set of characters to select from for each character of the random string.
+         * @return string The generated string
+         */
+        function randomString($length, $charset = 'abcdef0123456789'){
+            $result = '';
+            $max = strlen($charset) - 1;
+            while($length--){
+                $result .= $charset[mt_rand(0, $max)];
+            }
+            return $result;
         }
 
         /**
