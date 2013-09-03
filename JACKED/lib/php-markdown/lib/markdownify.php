@@ -86,7 +86,7 @@ class Markdownify {
    *
    * @var bool
    */
-  var $keepHTML = false;
+  var $keepHTML = true;
   /**
    * wrap output, set to 0 to skip wrapping
    *
@@ -208,8 +208,15 @@ class Markdownify {
     'form',
     'area',
     'object',
-    'param',
-    'iframe',
+    'param'
+  );
+  /**
+   * html tags to be left as-is (remaining as html)
+   *
+   * @var array<string>
+   */
+  var $keep = array(
+    'iframe'
   );
   /**
    * Markdown indents which could be wrapped
@@ -316,8 +323,13 @@ class Markdownify {
               $this->lastClosedTag = $this->parser->tagName;
             }
           } else {
-            $this->handleTagToText();
-            $this->lastClosedTag = '';
+            if (in_array($this->parser->tagName, $this->keep)) {
+              $this->output .= $this->parser->node;
+              $this->lastClosedTag = '';
+            }else{
+              $this->handleTagToText();
+              $this->lastClosedTag = '';
+            }
           }
           break;
         default:
