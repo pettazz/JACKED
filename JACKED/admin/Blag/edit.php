@@ -1,5 +1,6 @@
 <?php
     try{
+
         if(trim($_POST['guid']) == ''){
             throw new Exception('No post id defined.');
         }
@@ -33,6 +34,7 @@
         }
     }catch(Exception $e){
         $JACKED->Sessions->write('admin.error.editpost', $e->getMessage());
+        include('posts.php');
     }
 
 ?>
@@ -186,7 +188,7 @@
         <div class="control-group">
             <label class="control-label" for="inputContent">Content</label>
             <div class="controls">
-                <textarea rows="6" class="input-xxlarge" style="display:none;" name="inputContent" id="inputContent"><?php echo ($existingEdit? $post['content'] : $post->content); ?></textarea>
+                <textarea rows="6" class="input-xxlarge" style="display:none;" name="inputContent" id="inputContent"><?php echo ($existingEdit? $post['content'] : $markdown->toMarkdown($post->content)); ?></textarea>
                 <div id="editoroverlay"></div>
             </div>
         </div>

@@ -1,6 +1,11 @@
 <?php
 
     $JACKED->loadDependencies(array('Syrup', 'Curator'));
+
+    echo 'handler-load';
+    require(JACKED_LIB_ROOT . 'php-markdown/markdown.php');
+    $markdown = new Markdown();
+
     if(isset($_POST['editAction'])){
         switch($_POST['editAction']){
             case 'edit':
@@ -43,7 +48,7 @@
                     $existingPost->alive = ($_POST['saveType'] == 'live'? 1 : 0);
                     $existingPost->title = $_POST['inputTitle'];
                     $existingPost->headline = $_POST['inputHeadline'];
-                    $existingPost->content = $_POST['inputContent'];
+                    $existingPost->content = $markdown->toHTML($_POST['inputContent']);
 
                     // three cases for tags
                     // in extags, not in newtags => untag extag->name

@@ -5,6 +5,8 @@
 
     try{
         $JACKED->loadDependencies(array('Syrup', 'Curator'));
+        require(JACKED_LIB_ROOT . 'php-markdown/markdown.php');
+        $markdown = new Markdown();
 
         $post = $JACKED->Syrup->Blag->create();
 
@@ -29,7 +31,7 @@
         $post->alive = ($_POST['saveType'] == 'live'? 1 : 0);
         $post->title = $_POST['inputTitle'];
         $post->headline = $_POST['inputHeadline'];
-        $post->content = $_POST['inputContent'];
+        $post->content = $markdown->toHTML($_POST['inputContent']);
 
         $post->save();
 
