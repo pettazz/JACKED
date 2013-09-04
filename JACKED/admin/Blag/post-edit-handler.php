@@ -2,7 +2,6 @@
 
     $JACKED->loadDependencies(array('Syrup', 'Curator'));
 
-    echo 'handler-load';
     require(JACKED_LIB_ROOT . 'php-markdown/markdown.php');
     $markdown = new Markdown();
 
