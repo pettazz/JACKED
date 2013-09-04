@@ -17,7 +17,8 @@
     }catch(Exception $e){
         echo '<div class="alert alert-error alert-block">
                   <a href="#" class="close" data-dismiss="alert">&times;</a>
-                  <p><strong>Error: </strong>"' . $e->getMessage() .  '" <em>(' . $e->getFile() . ':' . $e->getLine() . ')</em></p>
+                  <p><strong>Error: </strong>"' . $e->getMessage() .  '" <em>(' . $e->getFile() . ':' . $e->getLine() . ')</em>:</p>
+                  <p><pre><code>' . $e->getTraceAsString() . '</code></pre></p>
         </div>';
         include($admin_dir . '/404.php');
     }

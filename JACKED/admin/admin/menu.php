@@ -1,21 +1,15 @@
 <div class="container">
     <div id="menuitems" class="row">
         <div class="">
-            <h2>Menu Item!</h2>
-            <p>Add or edit existing stuff.</p>
-            <a class="btn large" href="/admin/module/admin?manage_section=poo">Manage Poo</a>
+            <h2>Add User</h2>
+            <p>Add a new Admin User.</p>
+            <a class="btn large" href="<?php echo $JACKED->admin->config->entry_point; ?>module/admin?manage_section=new">Create</a>
         </div>
         
         <div class="">
-            <h2>Another menu item!</h2>
-            <p>Add a new stuff.</p>
-            <a class="btn large" href="/admin/module/admin?manage_section=waffles">Add Waffle</a>
-        </div>
-        
-        <div class="">
-            <h2>And some more even.</h2>
-            <p>This works a lot better when it doesn't look terrible.</p>
-            <a class="btn large" href="/admin/module/admin?manage_section=waffles">Add Waffle</a>
+            <h2>Reset Password</h2>
+            <p>Reset another Admin User's password.</p>
+            <a class="btn large" href="<?php echo $JACKED->admin->config->entry_point; ?>module/admin?manage_section=password_reset">Reset</a>
         </div>
     </div>
 </div>
