@@ -20,6 +20,17 @@
         }
 
         /**
+        * Generate a single Markov word. Simple public accessor for markov->generate
+        * 
+        * @param $minLength int [optional] The minimum char length of the word. Default is 1.
+        * @param $maxLength int [optional] The maximum char length of the word. Default is 10.
+        * @return String The generated word
+        */
+        public function generateWord($minLength = 1, $maxLength = 10){
+            return $this->markov->generate(1, 10);
+        }
+
+        /**
         * Generate a Markov Chain sentence
         * 
         * @param $use_punct Boolean [optional] Whether to add a random punctuation mark at the end of the sentence. Defaults to true.
