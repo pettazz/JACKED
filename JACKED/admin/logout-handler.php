@@ -5,5 +5,5 @@
     }catch(Exception $e){
         //so?
     }
-    header('Location: ' . $JACKED->config->base_url . 'admin/');
+    header('Location: ' . $JACKED->admin->config->entry_point);
 ?>
