@@ -475,12 +475,12 @@
          */
         public function updateUserPassword($userguid, $password){
             //this would be a good place to check things like mininum password security stuff
-            return $emailDone = $this->JACKED->MySQL->update(
+            return $this->JACKED->MySQL->update(
                 $this->config->dbt_users,
                 array(
                     'password' => $this->JACKED->Util->hashPassword($password)
                 ),
-                'guid = ' . $userguid
+                "guid = '" . $userguid . "'"
             );
         }
         
