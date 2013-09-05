@@ -9,7 +9,7 @@
         <div class="">
             <h2>Reset Password</h2>
             <p>Reset another Admin User's password.</p>
-            <a class="btn large" href="<?php echo $JACKED->admin->config->entry_point; ?>module/admin?manage_section=password_reset">Reset</a>
+            <a class="btn large" href="<?php echo $JACKED->admin->config->entry_point; ?>module/admin?manage_section=users">Reset</a>
         </div>
     </div>
 </div>
