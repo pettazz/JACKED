@@ -23,7 +23,7 @@
 
         $to = $_POST['inputEmail'];
         $subject = 'Welcome to your ' . $JACKED->config->client_name . ' Admin account';
-        $message = '<h3>Another admin has created an admin account for you.</h3><p>You can login at <a href="' . $login_url . '">' . $login_url . '</a> with the following information.</p><p>Username: <strong>' . $_POST['inputUsername'] . '<strong><br />Password: ' . $_POST['inputPassword'] . '</p>';
+        $message = '<h3>Another admin has created an admin account for you.</h3><p>You can login at <a href="' . $login_url . '">' . $login_url . '</a> with the following information.</p><p>Username: <strong>' . $_POST['inputUsername'] . '</strong><br />Password: ' . $_POST['inputPassword'] . '</strong></p>';
         $headers = 'MIME-Version: 1.0' . "\r\n";
         $headers .= 'Content-Type: text/html; charset=utf-8;' . "\r\n";
         $headers .= 'From: jackedbot' . $JACKED->config->email_url . "\r\n";
