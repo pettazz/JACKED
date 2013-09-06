@@ -220,7 +220,7 @@
         * @return Array List of all rows returned by @query, or false if none were returned or an error occurred.
         */
         public function query($query, $use_memcache = false){
-            $query = $this->sanitize($query);
+            // $query = $this->sanitize($query);
             return $this->mysqlQuery($query, $use_memcache);
         }
         
