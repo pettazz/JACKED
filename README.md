@@ -4,4 +4,4 @@ JACKED is pretty cool dude. eh makes websites run real good and doesn't afraid o
 
 I'll update this never^H^H^H^H^Hsomeday.
 
-WNV customized version.
+This is WNV's own gently customized version.
