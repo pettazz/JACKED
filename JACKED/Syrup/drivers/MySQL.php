@@ -122,66 +122,70 @@
             $result = "";
             $relations = $this->getRelations();
             foreach($criteria as $key => $value){
-                $ukey = trim(strtoupper($key));
-                if($ukey === 'OR' || $ukey === 'AND'){
-                    $innerParts = array();
-                    foreach($value as $innerKey => $innerValue){
-                        $innerParts[] = $this->parseWhereCriteria(array($innerKey => $innerValue));
-                    }
-                    $result .= ' (' . implode($ukey, $innerParts) . ') ';
-                }else if($ukey === 'NOT'){
-                    $result .= ' NOT (' . $this->parseWhereCriteria($value) . ') ';
+                if(is_numeric($key)){
+                    $result .= ' ' . trim($value) . ' ';
                 }else{
-                    if(is_bool($value)){
-                        $value = ($value)? 1 : 0;
-                    }
-
-                    //if there is no table name in the key, inherit it
-                    if(!strpos($key, '.')){
-                        $key = $this->_tableName . '.' . $key;
+                    $ukey = trim(strtoupper($key));
+                    if($ukey === 'OR' || $ukey === 'AND'){
+                        $innerParts = array();
+                        foreach($value as $innerKey => $innerValue){
+                            $innerParts[] = $this->parseWhereCriteria(array($innerKey => $innerValue));
+                        }
+                        $result .= ' (' . implode($ukey, $innerParts) . ') ';
+                    }else if($ukey === 'NOT'){
+                        $result .= ' NOT (' . $this->parseWhereCriteria($value) . ') ';
                     }else{
-                        //if the prefix is not our table name, but actually a relational reference, we have some work to do
-                        $prefix = strstr($key, '.', TRUE);
-                        if(!($prefix == $this->_tableName)){
-                            if(array_key_exists($prefix, $relations)){
-                                $relationData = $relations[$prefix];
-                                $rel = explode('.', $relationData['field']);
-                                $relTable = $rel[0];
-                                $relField = $rel[1];
-                                $relKey = $relationData['field'];
-                                $relModel = $relTable . 'Model';
-                                $fieldName = substr(strstr($key, '.'), 1);
-                                switch($relationData['type']){
-                                    case 'hasOne':
-                                    case 'hasOneForeign':
-                                        $key = "( " . $this->_tableName . ".$prefix = $relKey AND $relTable.$fieldName = ? )";
-                                        break;
-                                    case 'hasManyForeign':
-                                        $key = "( " . $relModel::relationTable . ".target = " . $relationData['target'] . " AND " . $relationData['field'] . " = " . $relModel::relationTable . ".$prefix AND $prefix.$fieldName = ? ) ";
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown relation type '" . $relationData['type'] . "' for field prefix: '" . $prefix . "'");
-                                        break;
+                        if(is_bool($value)){
+                            $value = ($value)? 1 : 0;
+                        }
+
+                        //if there is no table name in the key, inherit it
+                        if(!strpos($key, '.')){
+                            $key = $this->_tableName . '.' . $key;
+                        }else{
+                            //if the prefix is not our table name, but actually a relational reference, we have some work to do
+                            $prefix = strstr($key, '.', TRUE);
+                            if(!($prefix == $this->_tableName)){
+                                if(array_key_exists($prefix, $relations)){
+                                    $relationData = $relations[$prefix];
+                                    $rel = explode('.', $relationData['field']);
+                                    $relTable = $rel[0];
+                                    $relField = $rel[1];
+                                    $relKey = $relationData['field'];
+                                    $relModel = $relTable . 'Model';
+                                    $fieldName = substr(strstr($key, '.'), 1);
+                                    switch($relationData['type']){
+                                        case 'hasOne':
+                                        case 'hasOneForeign':
+                                            $key = "( " . $this->_tableName . ".$prefix = $relKey AND $relTable.$fieldName = ? )";
+                                            break;
+                                        case 'hasManyForeign':
+                                            $key = "( " . $relModel::relationTable . ".target = " . $relationData['target'] . " AND " . $relationData['field'] . " = " . $relModel::relationTable . ".$prefix AND $prefix.$fieldName = ? ) ";
+                                            break;
+                                        default:
+                                            throw new Exception("Unknown relation type '" . $relationData['type'] . "' for field prefix: '" . $prefix . "'");
+                                            break;
+                                    }
+                                }else{
+                                    throw new Exception("Unrecognized field prefix: $prefix");
                                 }
-                            }else{
-                                throw new Exception("Unrecognized field prefix: $prefix");
                             }
                         }
-                    }
 
-                    //prepare quotes around value if needed
-                    if(is_numeric($value)){
-                        $preparedValue = '' . $value;
-                    }else{
-                        $preparedValue = "'" . trim($value) . "'";
-                    }
+                        //prepare quotes around value if needed
+                        if(is_numeric($value)){
+                            $preparedValue = '' . $value;
+                        }else{
+                            $preparedValue = "'" . trim($value) . "'";
+                        }
 
-                    if(strpos($key, '?') === false){
-                        //support shortcuts for key = value notation
-                        $result = " $key = $preparedValue ";
-                    }else{
-                        //otherwise use the replace ? in key method
-                        $result .= ' ' . str_replace(array('*', '?'), array('%', str_replace('*', '%', $preparedValue)), trim($key)) . " ";
+                        if(strpos($key, '?') === false){
+                            //support shortcuts for key = value notation
+                            $result = " $key = $preparedValue ";
+                        }else{
+                            //otherwise use the replace ? in key method
+                            $result .= ' ' . str_replace(array('*', '?'), array('%', str_replace('*', '%', $preparedValue)), trim($key)) . " ";
+                        }
                     }
                 }
             }
