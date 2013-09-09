@@ -175,7 +175,7 @@
             <label class="control-label" for="inputContent">Content</label>
             <div class="controls">
                 <span class="help-block">All content is in Markdown: <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">Syntax Cheat Sheet</a></span><br />
-                <span class="help-block">Use this at the beginning of your content to set the post image header:<br /> <code>&lt;img class="headliner topbar-type" src="/assets/lol/whatever.png" /&gt;</code> <br />And be sure to change the "type" to the post category, like topbar-articles. If this is a comic, this should be the comic image and only content of the post. YouTube Videos can also be added using the iframe embed exactly as copied from YouTube's share.<br /><br />
+                <span class="help-block">Use this at the beginning of your content to set the post image header:<br /> <code>&lt;img class="headliner topbar-type" src="/assets/img/lol/whatever.png" title="Hover text here." /&gt;</code> <br />And be sure to change the "type" to the post category, like topbar-articles. If this is a comic, this should be the comic image and only content of the post. YouTube Videos can also be added using the iframe embed exactly as copied from YouTube's share.<br /><br />
                 <textarea rows="6" class="input-xxlarge" style="display:none;" name="inputContent" id="inputContent"><?php echo $inputContent? $inputContent : ''; ?></textarea>
                 <div id="editoroverlay"></div>
             </div>
