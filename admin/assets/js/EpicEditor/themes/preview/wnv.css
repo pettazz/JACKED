@@ -373,6 +373,9 @@ body {
 }
 
 
+#epiceditor-preview{
+	width: 800px;
+}
 
 #epiceditor-preview img.headliner{
     width: 100%;
