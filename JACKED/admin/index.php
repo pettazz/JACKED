@@ -28,7 +28,7 @@
 
       <div class="hero-unit">
         <h1>JACKED</h1>
-        <p>Modules installed: <?php echo $modules; ?>and JACKED Core <?php echo $JACKED::moduleVersion; ?>.</p>
+        <p>Modules installed: <?php echo $modules; ?>and JACKED Core <?php echo $JACKED::moduleVersion . '-' . exec('git rev-parse --short HEAD'); ?>.</p>
         <p><a class="btn primary large" href="<?php echo $JACKED->admin->config->entry_point; ?>?handler=logout">Logout</a></p>
 
       </div>
