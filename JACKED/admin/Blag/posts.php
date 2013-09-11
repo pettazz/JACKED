@@ -64,7 +64,7 @@
     if($drafts){
         foreach($drafts as $draft){
             echo '<tr>';
-            echo '<td>' . $draft->guid . '</td>';
+            echo '<td><a href="/post/' . $draft->guid . '" target="_blank">' . $draft->guid . '</a></td>';
             echo '<td>' . $draft->title . '</td>';
             echo '<td>' . $draft->author->username . '</td>';
             echo '<td>' . date("F j Y, g:i a", $draft->posted) . '</td>';
@@ -107,7 +107,7 @@
     if($lives){
         foreach($lives as $post){
             echo '<tr>';
-            echo '<td>' . $post->guid . '</td>';
+            echo '<td><a href="/post/' . $post->guid . '" target="_blank">' . $post->guid . '</a></td>';
             echo '<td>' . $post->title . '</td>';
             echo '<td>' . $post->author->username . '</td>';
             echo '<td>' . date("F j Y, g:i a", $post->posted) . '</td>';
