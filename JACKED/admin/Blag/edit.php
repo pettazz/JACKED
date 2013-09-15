@@ -17,7 +17,11 @@
                 'title' => isset($_POST['inputTitle'])? $_POST['inputTitle'] : '',
                 'headline' => isset($_POST['inputHeadline'])? $_POST['inputHeadline'] : '',
                 'content' => isset($_POST['inputContent'])? $_POST['inputContent'] : '',
-                'category' => isset($_POST['inputCategory'])? $_POST['inputCategory'] : ''
+                'category' => isset($_POST['inputCategory'])? $_POST['inputCategory'] : '',
+                'Author' => isset($_POST['inputAuthor'])? $_POST['inputAuthor'] : '',
+                'overrideAuthor' => isset($_POST['inputOverrideAuthor'])? $_POST['inputOverrideAuthor'] : '',
+                'posted' => isset($_POST['inputDate'])? $_POST['inputDate'] : '',
+                'overrideDate' => isset($_POST['inputOverrideDate'])? $_POST['inputOverrideDate'] : ''
             );
             $postTagsString = isset($_POST['inputTags'])? $_POST['inputTags'] : '';
         }else{
@@ -219,6 +223,27 @@
                 <input type="text" id="inputTags" name="inputTags" class="input-xxlarge" value="<?php echo $postTagsString; ?>" />
             </div>
         </div>
+
+        <div class="control-group">
+            <label class="control-label" for="inputAuthor">Author</label>
+            <div class="controls">
+                <input type="text" id="inputAuthor" disabled name="inputAuthor" class="input-xxlarge" value="<?php echo ($existingEdit? $post['Author'] : $post->author->username); ?>" />
+            </div>
+            <div class="controls">
+                <input type="checkbox" id="inputOverrideAuthor" name="inputOverrideAuthor" value="true" <?php echo (($existingEdit && $post['overrideAuthor'] == 'true')? 'checked' : ''); ?> /> Update Author to current user: <span class="label label-info"><?php echo $JACKED->Sessions->read('auth.admin.user'); ?></span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="inputDate">Date/Time Posted</label>
+            <div class="controls">
+                <input type="text" id="inputDate" disabled name="inputDate" class="input-xxlarge" value="<?php echo ($existingEdit? date("F j Y, g:i a", $post['posted']) : date("F j Y, g:i a", $post->posted)); ?>" />
+            </div>
+            <div class="controls">
+                <input type="checkbox" id="inputOverrideDate" name="inputOverrideDate" value="true" <?php echo (($existingEdit && $post['overrideDate'] == 'true')? 'checked' : ''); ?> /> Update posted date and time to Now
+            </div>
+        </div>
+
 
         <div class="form-actions pull-right span9">
             <input type="hidden" id="saveType" name="saveType" />
