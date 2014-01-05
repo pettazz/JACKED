@@ -6,8 +6,6 @@
 
 ?>
 
-<h2>Manage Posts</h2>
-
 <?php
     if($JACKED->Sessions->check('admin.error.edituser')){
         echo '<div class="alert alert-error alert-block">

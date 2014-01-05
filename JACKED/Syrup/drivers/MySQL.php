@@ -170,7 +170,7 @@
                     }
 
                     //prepare quotes around value if needed
-                    if(is_numeric($value)){
+                    if(ctype_digit($value)){
                         $preparedValue = '' . $value;
                     }else{
                         $preparedValue = "'" . trim($value) . "'";

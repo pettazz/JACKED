@@ -67,7 +67,7 @@
         parser: marked,
         theme: {
             base: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/base/epiceditor.css',
-            preview: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/preview/github.css',
+            preview: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/preview/wnv.css',
             editor: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/editor/epic-dark.css'
         },
         button: {
@@ -174,6 +174,7 @@
         <div class="control-group">
             <label class="control-label" for="inputContent">Content</label>
             <div class="controls">
+                <span class="help-block">All content is in Markdown: <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">Syntax Cheat Sheet</a></span><br />
                 <textarea rows="6" class="input-xxlarge" style="display:none;" name="inputContent" id="inputContent"><?php echo $inputContent? $inputContent : ''; ?></textarea>
                 <div id="editoroverlay"></div>
             </div>

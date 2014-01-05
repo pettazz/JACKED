@@ -202,10 +202,7 @@ class Markdownify {
    * @var array<string>
    */
   var $drop = array(
-    'script',
     'head',
-    'style',
-    'form',
     'area',
     'object',
     'param'
@@ -216,7 +213,10 @@ class Markdownify {
    * @var array<string>
    */
   var $keep = array(
-    'iframe'
+    'iframe',
+    'script',
+    'style',
+    'form'
   );
   /**
    * Markdown indents which could be wrapped

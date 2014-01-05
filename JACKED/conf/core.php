@@ -7,6 +7,8 @@
 	    
 	    'base_url' => 'http://jackedmanager.com/',
 
+	    'environment' => 'staging',
+
 	    'module_registry_file' => 'module_registry.json',
 	    
 	    'remote_addr' => isset($_SERVER['REMOTE_ADDR'])? (preg_match('/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', $_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "127.0.0.1") : '127.0.0.1',

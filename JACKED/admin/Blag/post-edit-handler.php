@@ -37,13 +37,17 @@
                         throw new Exception('Post not found.');
                     }
 
-                    $existingPost->author = $JACKED->Syrup->User->findOne(array(
-                        'guid' => $JACKED->Sessions->read('auth.admin.userid')
-                    ));
-                    $existingPost->posted = time();
+                    if(isset($_POST['inputOverrideAuthor']) && $_POST['inputOverrideAuthor'] == 'true'){
+                        $existingPost->author = $JACKED->Syrup->User->findOne(array(
+                            'guid' => $JACKED->Sessions->read('auth.admin.userid')
+                        ));
+                    }
+                    if(isset($_POST['inputOverrideDate']) && $_POST['inputOverrideDate'] == 'true'){
+                        $existingPost->posted = time();
+                    }
                     $existingPost->category = $JACKED->Syrup->BlagCategory->findOne(array(
                         'guid' => $_POST['inputCategory']
-                    ));;
+                    ));
                     $existingPost->alive = ($_POST['saveType'] == 'live'? 1 : 0);
                     $existingPost->title = $_POST['inputTitle'];
                     $existingPost->headline = $_POST['inputHeadline'];

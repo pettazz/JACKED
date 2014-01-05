@@ -56,8 +56,10 @@ CREATE TABLE `Blag` (
   `title` varchar(255) NOT NULL DEFAULT '',
   `headline` text,
   `content` text NOT NULL,
-  PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`guid`),
+  FULLTEXT KEY `title` (`title`),
+  FULLTEXT KEY `content` (`content`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
 
@@ -150,8 +152,9 @@ CREATE TABLE `Curator` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `canonicalName` varchar(255) NOT NULL DEFAULT '',
   `usage` int(11) DEFAULT 0,
-  PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`guid`),
+  FULLTEXT KEY `name` (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
 
