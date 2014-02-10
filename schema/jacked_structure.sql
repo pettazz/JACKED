@@ -113,6 +113,70 @@ CREATE TABLE `Logr` (
 
 
 
+# Dump of table Product
+# ------------------------------------------------------------
+
+CREATE TABLE `Product` (
+  `guid` varchar(64) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `description` text NULL DEFAULT '',
+  `cost` int(8) NULL DEFAULT '0',
+  `active` tinyint(1) DEFAULT '1',
+  `tangible` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`guid`),
+  FULLTEXT KEY `name` (`name`),
+  FULLTEXT KEY `description` (`description`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table Promotion
+# ------------------------------------------------------------
+
+CREATE TABLE `Promotion` (
+  `guid` varchar(64) NOT NULL DEFAULT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `description` text NULL DEFAULT '',
+  `value` int(8) NULL DEFAULT '0',
+  `active` tinyint(1) NULL DEFAULT '1',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table Sale
+# ------------------------------------------------------------
+
+CREATE TABLE `Sale` (
+  `guid` varchar(64) NOT NULL DEFAULT '',
+  `User` varchar(64) NOT NULL DEFAULT '',
+  `Ticket` varchar(64) NOT NULL DEFAULT '',
+  `Product` varchar(64) NOT NULL DEFAULT '',
+  `total` int(8) NOT NULL DEFAULT '0',
+  `quantity` int(5) NOT NULL DEFAULT '1',
+  `payment` ENUM('PAYPAL', 'STRIPE', 'DOGE') NOT NULL,
+  `shipped` tinyint(1) NULL DEFAULT '0',
+  `confirmed` tinyint(1) NULL DEFAULT '0',
+  `tracking` varchar(255) NULL DEFAULT '',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table Ticket
+# ------------------------------------------------------------
+
+CREATE TABLE `Ticket` (
+  `guid` varchar(64) NOT NULL DEFAULT '',
+  `User` varchar(64) NOT NULL DEFAULT '',
+  `Promotion` varchar(64) NOT NULL DEFAULT '',
+  `valid` tinyint(1) NULL DEFAULT '1',
+  `redeemed` tinyint(1) NULL DEFAULT '0',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 # Dump of table sessions
 # ------------------------------------------------------------
 
