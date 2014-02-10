@@ -55,6 +55,11 @@
             "version": "2.7",
             "dependencies": []
         },
+        "Purveyor": {
+            "name": "Purveyor",
+            "version": "1.0",
+            "dependencies": ["Syrup", "Flock"]
+        },
         "Sessions": {
             "name": "Sessions",
             "version": "2.0",
