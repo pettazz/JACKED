@@ -158,6 +158,7 @@ CREATE TABLE `Sale` (
   `shipped` tinyint(1) NULL DEFAULT '0',
   `confirmed` tinyint(1) NULL DEFAULT '0',
   `tracking` varchar(255) NULL DEFAULT '',
+  `external_transaction_id` varchar(255) NULL DEFAULT '',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

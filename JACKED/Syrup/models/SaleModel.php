@@ -14,6 +14,7 @@
         protected $confirmed = array(SyrupField::TINYINT, 1, True, 0);
         protected $shipped = array(SyrupField::TINYINT, 1, True, 0);
         protected $tracking = array(SyrupField::VARCHAR, 255);
+        protected $external_transaction_id = array(SyrupField::VARCHAR, 255);
 
     }
     
