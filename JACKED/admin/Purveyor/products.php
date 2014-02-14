@@ -160,9 +160,9 @@
     $products = $JACKED->Syrup->Product->find();
     foreach($products as $product){
         echo '    <tr>';
-        echo '    <td>' . $product->guid . '</td>';
+        echo '    <td><small>' . $product->guid . '<small></td>';
         echo '            <td class="namerow"> <span class="productname">' . $product->name . '</span> <input type="text" required class="input-large productnameinput" /> </td>';
-        echo '            <td class="costrow"> $<span class="productcost">' . ($product->cost / 100.0) . '</span> <input type="text" required class="input-large productcostinput" /> </td>';
+        echo '            <td class="costrow"> $<span class="productcost">' . ($product->cost / 100.0) . '</span> <input type="text" required class="input-mini productcostinput" /> </td>';
         echo '            <td class="tangiblerow"> <span class="producttangible">' . ($product->tangible? 'Yes' : 'No') . '</span> <input type="checkbox" value="True" class="producttangibleinput" ' . ($product->tangible? 'checked' : '') . ' /> </td>';
         echo '            <td class="actionsrow">
         <form method="POST" action="' . $JACKED->admin->config->entry_point . 'module/Purveyor">
