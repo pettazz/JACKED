@@ -16,6 +16,8 @@
 	    'default_timezone' => 'America/New_York',
 
 	    'apikey_mailchimp' => '',
+
+	    'apikey_mandrill' => '',
 	    
 	    'apikey_google_anal' => 'UA-derp-1',
 	    
