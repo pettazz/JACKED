@@ -9,48 +9,38 @@
         const moduleVersion = 1.0;
         public static $dependencies = array('Syrup', 'Flock');
         
-
         /**
-        * Create a new Promotion for Tickets 
+        * Update a pending payment's status, usually called via IPN
+        * Moolah: https://crypto.zendesk.com/hc/en-gb/articles/200282041-How-do-I-create-a-transaction-
         * 
-        * @param $name String Name of the new Promotion
-        * @param $description String Descriptive text for the new Promotion
-        * @param $value Integer Value (in USD cents) of Tickets associated to this Promotion
-        * @param $active Boolean Whether the new Promotion should be active upon creation. Default: True
-        * @return String GUID of the newly created Promotion
+        * @param $status String New status of the transaction. One of: cancelled|pending|created|complete|part_paid
+        * @param $timestamp int Timestamp of this update
+        * @param $tx String External Transaction ID of the payment
+        * @return Boolean Whether the Payment status update has been accepted
         */
-        public function createPromotion($name, $description, $value, $active = True){
-            $promo = $this->JACKED->Syrup->Promotion->create();
+        public function updatePaymentStatus($status, $timestamp, $tx){
+            $sale = $this->JACKED->Syrup->Sale->find(array('external_transaction_id' => $tx));
 
-            $promo->name = $name;
-            $promo->description = $description;
-            $promo->value = $value;
-            $promo->active = $active;
+            if(!$sale){
+                throw new Exception('No Sale with the given External Transaction ID was found.');
+            }
 
-            $promo->save();
+            $sale = $sale[0];
 
-            return $promo->guid;
+            if($sale->IPN_timestamp > $timestamp){
+                throw new Exception('This Sale has already received a more recent IPN update.');
+            }
+
+            if($status == 'complete'){
+                $sale->confirmed = 1;
+            }
+            $sale->IPN_timestamp = $timestamp;
+
+            $sale->save();
+
+            return True;
         }
 
-        /**
-        * Create a Ticket
-        * 
-        * @param $user String GUID of the Flock User who owns this Ticket
-        * @param $promotion String GUID of the Promotion that this Ticket is a part of
-        * @param $valid Boolean Whether this Ticket is currently valid. Default: True
-        * @return String GUID of the newly created Promotion
-        */
-        public function createTicket($user, $promotion, $valid = True){
-            $tk = $this->JACKED->Syrup->Ticket->create();
-
-            $tk->User = $user;
-            $tk->User = $promotion;
-            $tk->valid = $valid;
-            
-            $tk->save();
-
-            return $tk->guid;
-        }
 
     }
 
