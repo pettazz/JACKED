@@ -4,6 +4,8 @@
 	
 	    'client_name' => 'JACKED',
 	    'email_url' => '@jackedmanager.com',
+
+	    'default_reply_email' => 'hello@jackedmanager.com',
 	    
 	    'base_url' => 'http://localhost/',
 
