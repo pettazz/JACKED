@@ -8,6 +8,13 @@
         const moduleName = 'Purveyor';
         const moduleVersion = 1.0;
         public static $dependencies = array('Syrup', 'Flock');
+
+        public function __construct($JACKED){
+            JACKEDModule::__construct($JACKED);
+
+            $JACKED->loadLibrary('Mindrill');
+            $this->mailer = new Mindrill($JACKED->config->apikey_mandrill);
+        }
         
         /**
         * Update a pending payment's status, usually called via IPN
@@ -41,6 +48,56 @@
             return True;
         }
 
+        /**
+        * Send an email through Mandrill. Simple wrapper for Mindrill.
+        * https://mandrillapp.com/api/docs/messages.JSON.html
+        * 
+        * @param $toEmail String Email address to send mail to
+        * @param $toName String Name to send mail to
+        * @param $fromEmail String Email address to send mail from
+        * @param $fromName String Name to send mail from
+        * @param $subject String Email subject
+        * @param $html String HTML content of email
+        * @param $text String Plaintext content of email. If NULL, $html is stripped and used
+        * @param $params Array Any additional params to add to the Mandrill request
+        * @return Boolean Whether the mail was successfully sent
+        */
+        private function sendMail($toEmail, $toName, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
+            if(!$text){
+                $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html));
+            }
+            $baseParams = array(
+                "message" => array(
+                    "html" => $html,
+                    "text" => $text,
+                    "subject" => $subject,
+                    "from_email" => $fromEmail,
+                    "from_name" => $fromName,
+                    "to" => array(
+                        array(
+                            "email" => $toEmail,
+                            "name" => $toName,
+                            "type" => "to"
+                        )
+                    ),
+                    "headers" => array(
+                        "Reply-To" => $JACKED->config->default_reply_email
+                    ),
+                    "important" => false,
+                    "track_opens" => null,
+                    "track_clicks" => null,
+                    "view_content_link" => false
+                )
+            );
+
+            if($params){
+                $params = array_merge_recursive($baseParams, $params);
+            }else{
+                $params = $baseParams;
+            }
+
+            $this->mailer->call('/messages/send.json', $params);
+        }
 
     }
 
