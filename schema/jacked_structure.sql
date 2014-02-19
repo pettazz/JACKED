@@ -152,11 +152,13 @@ CREATE TABLE `Sale` (
   `User` varchar(64) NOT NULL DEFAULT '',
   `Ticket` varchar(64) NOT NULL DEFAULT '',
   `Product` varchar(64) NOT NULL DEFAULT '',
+  `timestamp` int(10) NOT NULL,
   `total` int(8) NOT NULL DEFAULT '0',
   `quantity` int(5) NOT NULL DEFAULT '1',
   `payment` ENUM('PAYPAL', 'STRIPE', 'DOGE') NOT NULL,
   `shipped` tinyint(1) NULL DEFAULT '0',
   `confirmed` tinyint(1) NULL DEFAULT '0',
+  `IPN_timestamp` int(10) NULL DEFAULT '0',
   `tracking` varchar(255) NULL DEFAULT '',
   `external_transaction_id` varchar(255) NULL DEFAULT '',
   PRIMARY KEY (`guid`)
