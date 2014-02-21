@@ -45,16 +45,15 @@
         * 
         * @param $user String GUID of the Flock User who placed this sale
         * @param $product String GUID of the Product sold
-        * @param $total int Total amount of this sale in Ð or USD cents
         * @param $quantity int Total number of Products in this sale
         * @param $method String Payment method for this sale. One of: DOGE, PAYPAL
         * @param $redirectURL String URL to redirect the user to after payment. GET args are appended:
                                 success (Boolean payment authorized), guid (string Sale GUID on success=true)
         * @param $description String Description of payment (used only for PayPal)
-        * @param $ticket String GUID of a Ticket if used
+        * @param $tickets Array List of GUIDs of Tickets if used
         * @return Array Sale => Sale model object, url => authorization redirect URL
         */
-        public function createSale($user, $product, $total, $quantity, $method, $redirectURL, $description = NULL, $ticket = NULL){
+        public function createSale($user, $product, $quantity, $method, $redirectURL, $description = NULL, $tickets = NULL){
             if(!($method == 'DOGE' || $method == 'PAYPAL')){
                 throw new Exception('Unsupported Payment method.');
             }
@@ -68,26 +67,80 @@
 
             $sale->User = $user;
             $sale->Product = $product;
-            if($ticket){
-                $sale->Ticket = $ticket;
+            $ticketObjects = array();
+            if($tickets){
+                foreach($tickets as $tguid){
+                    $ticket = $this->validateTicket($tguid);
+                    $ticketObjects[] = $ticket;
+                }
             }
             $sale->timestamp = time();
-            $sale->total = $total;
             $sale->quantity = $quantity;
             $sale->payment = $method;
+
+            if($quantity < count($ticketObjects)){
+                throw new Exception('Too many Tickets to redeem with this quantity.');
+            }
+
+            $total = $product->cost * $quantity;
+            $discountTotal = 0;
+            $discountItems = array();
+
+            if($tickets){
+                foreach($ticketObjects as $ticket){
+                    $discountTotal += $ticket->Promotion->value;
+                    $discountItems[] = array(
+                        'name' => $product->name . ' - ' . $ticket->Promotion->name,
+                        'cost' => $product->cost - $ticket->Promotion->value
+                    );
+                }
+                $total -= $discountTotal;
+            }
+            $sale->total = $total;
+
             $sale->save();
+
+            if($tickets){
+                foreach($ticketObjects as $ticket){
+                    $ticket->redeemed = $sale->guid;
+                    $ticket->save();
+                }
+            }
 
             if($method == 'PAYPAL'){
                 $payer = new Payer();
                 $payer->setPaymentMethod("paypal");
 
-                $item = new Item();
-                $item->setName($product->name)
-                    ->setCurrency('USD')
-                    ->setQuantity($quantity)
-                    ->setPrice($product->cost / 100.0);
-                $itemList = new ItemList();
-                $itemList->setItems(array($item));
+                if($tickets){
+                    $regularQuantity = $quantity - $count($discountItems)
+                    $items = array();
+                    foreach($discountItems as $ditem){
+                        $item = new Item();
+                        $item->setName($ditem['name'])
+                            ->setCurrency('USD')
+                            ->setQuantity(1)
+                            ->setPrice($ditem['cost'] / 100.0);
+                        $items[] = $item;
+                    }
+                    if($regularQuantity > 0){
+                        $item = new Item();
+                        $item->setName($product->name)
+                            ->setCurrency('USD')
+                            ->setQuantity($regularQuantity)
+                            ->setPrice($product->cost / 100.0);
+                        $items[] = $item;
+                    }
+                    $itemList = new ItemList();
+                    $itemList->setItems($items);
+                }else{
+                    $item = new Item();
+                    $item->setName($product->name)
+                        ->setCurrency('USD')
+                        ->setQuantity($quantity)
+                        ->setPrice($product->cost / 100.0);
+                    $itemList = new ItemList();
+                    $itemList->setItems(array($item));
+                }
 
                 // $details = new Details();
                 // $details->setShipping('1.20')
@@ -167,6 +220,31 @@
                 'Sale' => $sale,
                 'url' => $redirectUrl
             );
+        }
+
+        /**
+        * Determine whether a given Ticket is currently useable. Does not mutate the Ticket at all.
+        * Throws exceptions on any validation errors.
+        * 
+        * @param $guid String GUID of the Ticket to validate
+        * @return Ticket The Ticket model object for the given Ticket GUID if valid.
+        */
+        public function validateTicket($guid){
+            $ticket = $this->JACKED->Syrup->findOne(array('guid' => $guid));
+            if(!$ticket){
+                throw new Exception('Ticket `' . $guid . '` not found.');
+            }
+            if(!$ticket->valid){
+                throw new TicketInvalidException($guid);
+            }
+            if(!$ticket->Promotion->active){
+                throw new PromotionInactiveException($ticket->Promotion->name);
+            }
+            if($ticket->redeemed){
+                throw new TicketAlreadyRedeemedException($guid);
+            }
+
+            return $ticket;
         }
         
         /**
@@ -252,6 +330,31 @@
             $this->mailer->call('/messages/send.json', $params);
         }
 
+    }
+
+
+    class TicketInvalidException extends Exception{
+        public function __construct($guid, $code = 0, Exception $previous = null){
+            $message = 'Ticket `' . $guid . '` is not valid.';
+            
+            parent::__construct($message, $code, $previous);
+        }
+    }
+
+    class TicketAlreadyRedeemedException extends Exception{
+        public function __construct($guid, $code = 0, Exception $previous = null){
+            $message = 'Ticket `' . $guid . '` has already been redeemed.';
+            
+            parent::__construct($message, $code, $previous);
+        }
+    }
+
+    class PromotionInactiveException extends Exception{
+        public function __construct($name, $code = 0, Exception $previous = null){
+            $message = 'Promotion `'. $name . '` is not active.'
+            
+            parent::__construct($message, $code, $previous);
+        }
     }
 
 ?>
