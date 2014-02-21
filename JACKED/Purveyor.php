@@ -5,11 +5,13 @@
     use PayPal\Api\Amount;
     use PayPal\Rest\ApiContext;
     use PayPal\Api\Details;
+    use PayPal\Api\ExecutePayment;
     use PayPal\Api\Item;
     use PayPal\Api\ItemList;
     use PayPal\Auth\OAuthTokenCredential;
     use PayPal\Api\Payer;
     use PayPal\Api\Payment;
+    use PayPal\Api\PaymentExecution;
     use PayPal\Api\RedirectUrls;
     use PayPal\Api\Transaction;
 
@@ -221,6 +223,42 @@
                 'Sale' => $sale,
                 'url' => $redirectUrl
             );
+        }
+
+        /**
+        * Execute (final step) a PayPal Payment after it has been authorized by the User. Moolah does not 
+        * require this step because it uses IPN to update via our IPN endpoint instead.
+        * 
+        * @param $paymentID String PayPal Payment ID saved as Sale->external_transaction_id by Purveyor::createSale
+        * @param $payerID String PayPal Payer ID provided as GET param to the redirect URL set in Purveyor::createSale
+        * @return boolean Whether the Sale has been successfully executed
+        */
+        public function executePayPalPayment($paymentID, $payerID){
+            $payment = Payment::get($paymentID, $this->paypalAPIContext);
+            $execution = new PaymentExecution();
+            $execution->setPayerId($payerID);
+            $result = $payment->execute($execution, $this->paypalAPIContext);
+
+            $resultData = json_decode($result);
+            if($resultData->state == 'approved'){
+                $uptimestamp = strtotime($resultData->update_time);
+                $this->updatePaymentStatus('complete', $uptimestamp, $paymentID);
+            }else{
+                $this->JACKED->Logr->write('PayPal Execution error: ' . $result, LOGR::LEVEL_FATAL);
+                throw new Exception('PayPal Payment Execution was not successful');
+            }
+
+            return True;
+        }
+
+        /**
+        * Cancel a Sale
+        * 
+        * @param $guid String GUID of the Ticket to validate
+        * @return Ticket The Ticket model object for the given Ticket GUID if valid.
+        */
+        public function cancelSale($guid){
+
         }
 
         /**
