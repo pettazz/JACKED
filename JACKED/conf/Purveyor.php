@@ -3,9 +3,8 @@
     $settings = array(
         'ipn_secret' => 'generateagoodsecrethere',
 
-        'paypal_api_user' => '',
-        'paypal_api_password' => '',
-        'paypal_api_signature' => ''
+        'paypal_client_id' => 'butts',
+        'paypal_client_secret' => 'otherbutts'
     );
 
 ?>
