@@ -153,6 +153,7 @@ CREATE TABLE `Sale` (
   `Product` varchar(64) NOT NULL DEFAULT '',
   `timestamp` int(10) NOT NULL,
   `total` int(8) NOT NULL DEFAULT '0',
+  `converted_total` int(15) NULL DEFAULT '0',
   `quantity` int(5) NOT NULL DEFAULT '1',
   `payment` ENUM('PAYPAL', 'STRIPE', 'DOGE') NOT NULL,
   `shipped` tinyint(1) NULL DEFAULT '0',

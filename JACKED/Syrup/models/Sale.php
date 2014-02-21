@@ -9,6 +9,7 @@
         protected $Product = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'Product.guid'));
         protected $timestamp = array(SyrupField::INT, 10, False);
         protected $total = array(SyrupField::INT, 8, False, 0);
+        protected $converted_total = array(SyrupField::INT, 15, True, 0);
         protected $quantity = array(SyrupField::INT, 5, False, 1);
         protected $payment = array(SyrupField::ENUM, "ENUM('PAYPAL', 'STRIPE', 'DOGE')", False);
         protected $confirmed = array(SyrupField::TINYINT, 1, True, 0);

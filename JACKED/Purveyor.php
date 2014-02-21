@@ -114,7 +114,7 @@
                 $payer->setPaymentMethod("paypal");
 
                 if($tickets){
-                    $regularQuantity = $quantity - $count($discountItems);
+                    $regularQuantity = $quantity - count($discountItems);
                     $items = array();
                     foreach($discountItems as $ditem){
                         $item = new Item();
@@ -151,7 +151,7 @@
 
                 $amount = new Amount();
                 $amount->setCurrency("USD")
-                    ->setTotal($total / 100.0);
+                    ->setTotal(sprintf("%01.2f", ($sale->total / 100.0)));
                     // ->setDetails($details);
 
                 $transaction = new Transaction();
@@ -184,21 +184,21 @@
                 }
 
                 $saleobj = $this->JACKED->Syrup->Sale->findOne(array('guid' => $sale->guid));
+                $saleobj->converted_total = $total;
                 $saleobj->external_transaction_id = $payment->getId();
                 $saleobj->save();
 
             }else{
                 $params = array(
-                    'currency' => 'DOGE',
+                    'currency' => 'USD',
                     'guid' => $this->config->moolah_guid,
-                    'amount' => $total,
+                    'amount' => $total / 100.0,
                     'product' => $product->name,
                     'ipn' => $this->config->ipn_secret,
                     'return' => "$redirectURL?success=true&guid=" . $sale->guid
                 );
 
                 $url = 'https://moolah.ch/api/pay?' . http_build_query($params);
-                echo $url;
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -213,6 +213,7 @@
                 }
 
                 $saleobj = $this->JACKED->Syrup->Sale->findOne(array('guid' => $sale->guid));
+                $saleobj->converted_total = $decoded->amount;
                 $saleobj->external_transaction_id = $decoded->tx;
                 $saleobj->save();
 
@@ -259,7 +260,7 @@
         * @return Ticket The Ticket model object for the given Ticket GUID if valid.
         */
         public function validateTicket($guid){
-            $ticket = $this->JACKED->Syrup->findOne(array('guid' => $guid));
+            $ticket = $this->JACKED->Syrup->Ticket->findOne(array('guid' => $guid));
             if(!$ticket){
                 throw new Exception('Ticket `' . $guid . '` not found.');
             }
