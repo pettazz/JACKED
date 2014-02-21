@@ -170,7 +170,8 @@
                 try{
                     $payment->create($this->paypalAPIContext);
                 }catch(Exception $ex){
-                    echo $ex->getData();
+                    $this->JACKED->Logr->write('PayPal API error:' . $ex->getData(), Logr::LEVEL_FATAL);
+                    throw $ex;
                 }
 
                 foreach($payment->getLinks() as $link){
