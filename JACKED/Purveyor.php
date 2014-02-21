@@ -114,7 +114,7 @@
                 $payer->setPaymentMethod("paypal");
 
                 if($tickets){
-                    $regularQuantity = $quantity - $count($discountItems)
+                    $regularQuantity = $quantity - $count($discountItems);
                     $items = array();
                     foreach($discountItems as $ditem){
                         $item = new Item();
@@ -252,16 +252,6 @@
         }
 
         /**
-        * Cancel a Sale
-        * 
-        * @param $guid String GUID of the Ticket to validate
-        * @return Ticket The Ticket model object for the given Ticket GUID if valid.
-        */
-        public function cancelSale($guid){
-
-        }
-
-        /**
         * Determine whether a given Ticket is currently useable. Does not mutate the Ticket at all.
         * Throws exceptions on any validation errors.
         * 
@@ -390,7 +380,7 @@
 
     class PromotionInactiveException extends Exception{
         public function __construct($name, $code = 0, Exception $previous = null){
-            $message = 'Promotion `'. $name . '` is not active.'
+            $message = 'Promotion `'. $name . '` is not active.';
             
             parent::__construct($message, $code, $previous);
         }
