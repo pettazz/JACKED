@@ -6,7 +6,6 @@
 
         protected $guid = array(SyrupField::VARCHAR, 64, false, NULL, 'PRI', NULL, array('UUID'));
         protected $User = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'User.guid'));
-        protected $Ticket = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'Ticket.guid'));
         protected $Product = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'Product.guid'));
         protected $timestamp = array(SyrupField::INT, 10, False);
         protected $total = array(SyrupField::INT, 8, False, 0);

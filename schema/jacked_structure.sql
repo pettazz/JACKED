@@ -150,7 +150,6 @@ CREATE TABLE `Promotion` (
 CREATE TABLE `Sale` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `User` varchar(64) NOT NULL DEFAULT '',
-  `Ticket` varchar(64) NOT NULL DEFAULT '',
   `Product` varchar(64) NOT NULL DEFAULT '',
   `timestamp` int(10) NOT NULL,
   `total` int(8) NOT NULL DEFAULT '0',
@@ -174,7 +173,7 @@ CREATE TABLE `Ticket` (
   `User` varchar(64) NOT NULL DEFAULT '',
   `Promotion` varchar(64) NOT NULL DEFAULT '',
   `valid` tinyint(1) NULL DEFAULT '1',
-  `redeemed` tinyint(1) NULL DEFAULT '0',
+  `redeemed` varchar(64) NULL DEFAULT '',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

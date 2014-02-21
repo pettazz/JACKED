@@ -144,9 +144,6 @@
             <dt>User</dt>
             <dd class="user">' . $sale->User->email . '</dd>
             
-            <dt>Ticket ID</dt>
-            <dd class="ticket">' . ($sale->Ticket->guid? $sale->Ticket->guid : 'N/A') . '</dd>
-            
             <dt>Timestamp</dt>
             <dd class="timestamp">' . date('D m/d/Y H:i:s', $sale->timestamp) . '</dd>
             
