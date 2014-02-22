@@ -25,7 +25,7 @@
                     <?php
                         foreach($products as $product){
                             echo '
-                    <option value="' . $product->guid . '">' . $product->name . '</option>';
+                    <option value="' . $product->guid . '">' . $product->name . ' - $' . sprintf("%01.2f", ($product->cost / 100.0)) . '</option>';
                         }
                     ?>
                 </select>
