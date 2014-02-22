@@ -378,7 +378,7 @@
         * @return Boolean Whether the email was sent successfully
         */
         public function sendPaymentConfirmationEmail($saleID){ 
-            $template = file_get_contents($this->config->email_template_root . 'confirmation.htm');
+            $template = file_get_contents(JACKED_MODULE_ROOT . $this->config->email_template_root . 'confirmation.htm');
 
             $sale = $this->JACKED->Syrup->Sale->findOne(array('guid' => $saleID));
             if(!$sale){
