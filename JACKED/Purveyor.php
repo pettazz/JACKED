@@ -27,9 +27,6 @@
         public function __construct($JACKED){
             JACKEDModule::__construct($JACKED);
 
-            $JACKED->loadLibrary('Mindrill');
-            $this->mailer = new Mindrill($JACKED->config->apikey_mandrill);
-
             $this->paypalAPIContext = new ApiContext(
                 new OAuthTokenCredential(
                     $this->config->paypal_client_id,
@@ -324,6 +321,9 @@
         * @return Boolean Whether the mail was successfully sent
         */
         private function sendMail($toEmail, $toName, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
+            $JACKED->loadLibrary('Mindrill');
+            $mailer = new Mindrill($JACKED->config->apikey_mandrill);
+
             if(!$text){
                 $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html));
             }
@@ -357,7 +357,7 @@
                 $params = $baseParams;
             }
 
-            $this->mailer->call('/messages/send.json', $params);
+            $mailer->call('/messages/send.json', $params);
         }
 
     }
