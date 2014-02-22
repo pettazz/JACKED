@@ -285,9 +285,10 @@
         * @param $status String New status of the transaction. One of: cancelled|pending|created|complete|part_paid
         * @param $timestamp int Timestamp of this update
         * @param $tx String External Transaction ID of the payment
+        * @param $email Boolean Whether to send a payment confirmation email. Default: True
         * @return Boolean Whether the Payment status update has been accepted
         */
-        public function updatePaymentStatus($status, $timestamp, $tx){
+        public function updatePaymentStatus($status, $timestamp, $tx, $email = True){
             $sale = $this->JACKED->Syrup->Sale->find(array('external_transaction_id' => $tx));
 
             if(!$sale){
@@ -307,6 +308,10 @@
 
             $sale->save();
 
+            if($email && $sale->confirmed = 1){
+                $this->sendPaymentConfirmationEmail($sale->guid);
+            }
+
             return True;
         }
 
@@ -315,7 +320,6 @@
         * https://mandrillapp.com/api/docs/messages.JSON.html
         * 
         * @param $toEmail String Email address to send mail to
-        * @param $toName String Name to send mail to
         * @param $fromEmail String Email address to send mail from
         * @param $fromName String Name to send mail from
         * @param $subject String Email subject
@@ -324,7 +328,7 @@
         * @param $params Array Any additional params to add to the Mandrill request
         * @return Boolean Whether the mail was successfully sent
         */
-        private function sendMail($toEmail, $toName, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
+        public function sendMail($toEmail, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
             $JACKED->loadLibrary('Mindrill');
             $mailer = new Mindrill($JACKED->config->apikey_mandrill);
 
@@ -341,7 +345,6 @@
                     "to" => array(
                         array(
                             "email" => $toEmail,
-                            "name" => $toName,
                             "type" => "to"
                         )
                     ),
@@ -356,15 +359,62 @@
             );
 
             if($params){
-                $params = array_merge_recursive($baseParams, $params);
+                $params = $this->JACKED->Util->array_merge_recursive_distinct($baseParams, $params);
             }else{
                 $params = $baseParams;
             }
 
-            $mailer->call('/messages/send.json', $params);
+            if($mailer->call('/messages/send.json', $params)){
+                return True;
+            }else{
+                return False;
+            }
+        }
+
+        /**
+        * Send a notification email to the User of a Sale that their payment has been confirmed
+        * 
+        * @param $guid String GUID of the Sale
+        * @return Boolean Whether the email was sent successfully
+        */
+        public function sendPaymentConfirmationEmail($saleID){ 
+            $template = file_get_contents($this->config->email_template_root . 'confirmation.htm');
+
+            $sale = $this->JACKED->Syrup->Sale->findOne(array('guid' => $saleID));
+            if(!$sale){
+                throw new Exception('Sale not found');
+            }
+
+            $data = array(
+                'sale_id' => $sale->guid,
+                'sale_date' => date('F d, Y', $sale->timestamp),
+                'product_name' => $sale->Product->name,
+                'product_total' => $sale->Product->cost * $sale->quantity,
+                'quantity' => $sale->quantity,
+                'payment_total' => $sale->total,
+                'payment_symbol' => ($sale->payment == 'DOGE'? 'Ð' : '$'),
+                'payment_method' => ($sale->payment == 'DOGE'? 'Moolah.ch' : 'PayPal'),
+                'client_name' => $this->JACKED->config->client_name,
+                'client_url' => $this->JACKED->config->base_url,
+                'client_email' => $this->JACKED->config->default_reply_email,
+                'current_year' => date('Y'),
+            );
+
+            foreach($data as $key => $value){
+                $template = str_replace('{'.$key.'}', $value, $template);
+            }
+
+            return $this->sendMail(
+                $sale->User->email,
+                $this->config->email_notifications_from,
+                $this->config->email_notifications_from_name,
+                $this->JACKED->config->client_name .' - Order Confirmation',
+                $template
+            );
         }
 
     }
+
 
 
     class InvalidSaleTotalException extends Exception{
