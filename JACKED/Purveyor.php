@@ -168,9 +168,10 @@
 
                 try{
                     $payment->create($this->paypalAPIContext);
-                }catch(Exception $ex){
+                }catch(PayPal\Exception\PPConnectionException $ex) {
                     $this->JACKED->Logr->write('PayPal API error:' . $ex->getData(), Logr::LEVEL_FATAL);
-                    throw $ex;
+                }catch(Exception $ex){
+                    $this->JACKED->Logr->write('PayPal payment creation error:' . $ex->getMessage(), Logr::LEVEL_FATAL);
                 }
 
                 foreach($payment->getLinks() as $link){
