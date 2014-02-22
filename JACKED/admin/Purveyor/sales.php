@@ -160,7 +160,7 @@
             <dd class="confirmed"><i class="icon-' . ($sale->confirmed? 'ok' : 'remove') . '"></i></dd>
             
             <dt>Confirmation Updated</dt>
-            <dd>' . date('D m/d/Y H:i:s', $sale->IPN_timestamp) . '</dd>
+            <dd>' . ($sale->IPN_timestamp > 0? date('D m/d/Y H:i:s', $sale->IPN_timestamp) : 'N/A') . '</dd>
             
             <dt>Payment Method</dt>
             <dd class="payment">' . $sale->payment . '</dd>
