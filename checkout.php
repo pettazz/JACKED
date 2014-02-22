@@ -26,7 +26,7 @@
             $userid = $newUser->guid;
         }
 
-        $result = $JACKED->Purveyor->createSale($userid, $product, $quantity, $method, 'http://localhost/tomhanks.php', 'LOL, ETC.', $tickets);
+        $result = $JACKED->Purveyor->createSale($userid, $product, $quantity, $method, $JACKED->config->base_url . 'JACKED/tomhanks.php', 'LOL, ETC.', $tickets);
 
         header('Location: ' . $result['url']);
 
