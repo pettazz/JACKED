@@ -237,9 +237,8 @@
             $execution->setPayerId($payerID);
             $result = $payment->execute($execution, $this->paypalAPIContext);
 
-            $resultData = json_decode($result);
-            if($resultData->state == 'approved'){
-                $uptimestamp = strtotime($resultData->update_time);
+            if($result->state == 'approved'){
+                $uptimestamp = strtotime($result->update_time);
                 $this->updatePaymentStatus('complete', $uptimestamp, $paymentID);
             }else{
                 $this->JACKED->Logr->write('PayPal Execution error: ' . $result, LOGR::LEVEL_FATAL);
