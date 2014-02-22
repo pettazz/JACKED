@@ -102,7 +102,7 @@
     $sales = $JACKED->Syrup->Sale->find();
     foreach($sales as $sale){
         $paymentSymbol = ($sale->payment == 'DOGE'? '<strong>Ð</strong>' : '<strong>$</strong>');
-        $paymentTotal = ($sale->payment == 'DOGE'? floor($sale->total) : sprintf("%01.2f", ($sale->total / 100.0)));
+        $paymentTotal = ($sale->payment == 'DOGE'? floor($sale->converted_total) : sprintf("%01.2f", ($sale->total / 100.0)));
         if($sale->external_transaction_id){
             if($sale->confirmed){
                 $confirmationState = '<span class="label label-success"><i class="icon-white icon-ok-sign"></i></span>';
@@ -153,8 +153,11 @@
             <dt>Quantity</dt>
             <dd class="quantity">' . $sale->quantity . '</dd>
             
-            <dt>Total</dt>
+            <dt>Total Paid</dt>
             <dd class="total">' . $paymentSymbol . $paymentTotal . '</dd>
+            
+            <dt>Total Price</dt>
+            <dd class="total"> <strong>$</strong>' . sprintf("%01.2f", ($sale->total / 100.0)) . '</dd>
             
             <dt>Payment Confirmation</dt>
             <dd class="confirmed"><i class="icon-' . ($sale->confirmed? 'ok' : 'remove') . '"></i></dd>
