@@ -200,8 +200,6 @@
                     'return' => "$redirectURL?success=true&guid=" . $sale->guid
                 );
 
-                print_r($params);
-
                 $url = 'https://moolah.ch/api/pay?' . http_build_query($params);
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);

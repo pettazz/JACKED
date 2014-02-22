@@ -25,7 +25,7 @@
 
         $result = $JACKED->Purveyor->createSale($user->guid, $product, $quantity, $method, $JACKED->config->base_url . 'JACKED/tomhanks.php', 'LOL, ETC.', $tickets);
 
-        //header('Location: ' . $result['url']);
+        header('Location: ' . $result['url']);
 
     }catch(Exception $e){
         echo '<h1>A Fuck Happened.</h1>';
