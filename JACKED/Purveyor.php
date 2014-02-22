@@ -192,7 +192,7 @@
                     'guid' => $this->config->moolah_guid,
                     'amount' => $total / 100.0,
                     'product' => $product->name,
-                    'ipn' => $this->config->ipn_secret,
+                    'ipn' => $JACKED->config->base_url . 'JACKED/admin/Purveyor/Purveyor-IPN-handler.php',
                     'return' => "$redirectURL?success=true&guid=" . $sale->guid
                 );
 
