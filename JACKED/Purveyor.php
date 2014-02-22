@@ -330,7 +330,7 @@
         */
         public function sendMail($toEmail, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
             $this->JACKED->loadLibrary('Mindrill');
-            $mailer = new Mindrill($JACKED->config->apikey_mandrill);
+            $mailer = new Mindrill($this->JACKED->config->apikey_mandrill);
 
             if(!$text){
                 $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html));
@@ -389,6 +389,7 @@
                 'sale_id' => $sale->guid,
                 'sale_date' => date('F d, Y', $sale->timestamp),
                 'product_name' => $sale->Product->name,
+                'product_price' => $sale->Product->cost,
                 'product_total' => $sale->Product->cost * $sale->quantity,
                 'quantity' => $sale->quantity,
                 'payment_total' => $sale->total,
