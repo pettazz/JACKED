@@ -95,8 +95,12 @@
                 }
                 $total -= $discountTotal;
             }
-            $sale->total = $total;
 
+            if($total <= 0){
+                throw new InvalidSaleTotalException();
+            }
+
+            $sale->total = $total;
             $sale->save();
 
             if($tickets){
@@ -362,6 +366,10 @@
 
     }
 
+
+    class InvalidSaleTotalException extends Exception{
+        private $message = 'Sale transactions cannot be for $0 or less.';
+    }
 
     class TicketInvalidException extends Exception{
         public function __construct($guid, $code = 0, Exception $previous = null){
