@@ -368,7 +368,7 @@
 
 
     class InvalidSaleTotalException extends Exception{
-        private $message = 'Sale transactions cannot be for $0 or less.';
+        protected $message = 'Sale transactions cannot be for $0 or less.';
     }
 
     class TicketInvalidException extends Exception{
