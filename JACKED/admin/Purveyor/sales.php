@@ -99,7 +99,7 @@
 
 <?php
     
-    $sales = $JACKED->Syrup->Sale->find();
+    $sales = $JACKED->Syrup->Sale->find(array(), array('field' => 'timestamp', 'direction' => 'DESC'));
     foreach($sales as $sale){
         $paymentSymbol = ($sale->payment == 'DOGE'? '<strong>Ð</strong>' : '<strong>$</strong>');
         $paymentTotal = ($sale->payment == 'DOGE'? floor($sale->converted_total) : sprintf("%01.2f", ($sale->total / 100.0)));
