@@ -69,7 +69,7 @@
             $ticketObjects = array();
             if($tickets){
                 foreach($tickets as $tguid){
-                    $ticket = $this->validateTicket($tguid);
+                    $ticket = $this->validateTicket(trim($tguid));
                     $ticketObjects[] = $ticket;
                 }
             }
@@ -199,6 +199,8 @@
                     'ipn' => $this->JACKED->config->base_url . 'JACKED/JACKED/admin/Purveyor-IPN-handler.php',
                     'return' => "$redirectURL?success=true&guid=" . $sale->guid
                 );
+
+                print_r($params);
 
                 $url = 'https://moolah.ch/api/pay?' . http_build_query($params);
                 $ch = curl_init();
