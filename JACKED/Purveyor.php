@@ -329,7 +329,7 @@
         * @return Boolean Whether the mail was successfully sent
         */
         public function sendMail($toEmail, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
-            $JACKED->loadLibrary('Mindrill');
+            $this->JACKED->loadLibrary('Mindrill');
             $mailer = new Mindrill($JACKED->config->apikey_mandrill);
 
             if(!$text){
