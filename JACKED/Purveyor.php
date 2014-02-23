@@ -392,7 +392,7 @@
                 'product_price' => ($sale->Product->cost / 100.0),
                 'product_total' => (($sale->Product->cost * $sale->quantity) / 100.0),
                 'quantity' => $sale->quantity,
-                'payment_total' => ($sale->total / 100.0),
+                'payment_total' => ($sale->converted_total / 100.0),
                 'payment_symbol' => ($sale->payment == 'DOGE'? 'Ð' : '$'),
                 'payment_method' => ($sale->payment == 'DOGE'? 'Moolah.ch' : 'PayPal'),
                 'client_name' => $this->JACKED->config->client_name,
