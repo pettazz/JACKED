@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>{client_name} - Order Confirmation</title>
+        <title>Your {client_name} Order Has Shipped!</title>
         <style type="text/css">
             /* /\/\/\/\/\/\/\/\/ CLIENT-SPECIFIC STYLES /\/\/\/\/\/\/\/\/ */
             #outlook a{padding:0;} /* Force Outlook to provide a "view in browser" message */
@@ -451,7 +451,7 @@
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader">
                                         <tr>
                                             <td valign="top" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:20px;" mc:edit="preheader_content00">
-                                                Your order and payment have been confirmed and your {product_name} will be sent to you soon!
+                                                Your recent order from {client_name} is on its way!
                                             </td>
                                         </tr>
                                     </table>
@@ -477,32 +477,19 @@
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody">
                                         <tr>
                                             <td valign="top" class="bodyContent" mc:edit="body_content">
-                                                <h1>Your Order Is Confirmed!</h1>
-                                                We have received your payment and will be sending your {product_name} to you soon!
+                                                <h1>Your {product_name} Has Shipped!</h1>
+                                                Your order <strong>#{sale_id}</strong> on <strong>{sale_date}</strong> has been shipped.
                                                 <br />
                                                 <br />
-                                                <h2>Order Details</h2>
-                                                <h4>Order Date: {sale_date}</h4>
-                                                <h4>Order ID: {sale_id}</h4>
-                                                <ul>
-                                                    <li><strong>{product_name}</strong> - ${product_total}</li>
-                                                    <li>Item Price: ${product_price}</li>
-                                                    <li>Quantity: {quantity}</li>
-                                                    {discounts_li}
-                                                </ul>
-                                                <ul>
-                                                    <li>Paid: <strong>{payment_symbol}{payment_total}</strong></li>
-                                                    <li>via {payment_method}</li>
-                                                </ul>
-                                                {shipping_block}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td valign="top" class="bodyContent">
-                                                If any information is incorrect, please contact Support immediately with your Order ID.
+                                                The tracking number is <strong><a href="http://www.packagetrackr.com/track/{tracking_number}">{tracking_number}</a></strong>.
+                                                <br />
+                                                You can track it here: <a href="http://www.packagetrackr.com/track/{tracking_number}">Tracking</a>.
                                                 <br />
                                                 <br />
-                                                <h3>Thanks for your order!</h3>
+                                                Don't worry if it doesn't appear in the tracking system right away, it takes some time.
+                                                <br />
+                                                <br />
+                                                If you have any questions, contact Support. Now start hitting that refresh button!
                                             </td>
                                         </tr>
                                     </table>

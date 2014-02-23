@@ -403,6 +403,18 @@
                 $discounts_li = '';
             }
 
+            if($sale->Product->tangible){
+                $shippingBlock = '
+                <h4>Shipping Address:</h4>
+                ' . $sale->ShippingAddress->recipient_name . '<br />
+                ' . $sale->ShippingAddress->line1 . '<br />
+                ' . ($sale->ShippingAddress->line2? $sale->ShippingAddress->line2 . '<br />': '') . '
+                ' . $sale->ShippingAddress->city . ', ' . $sale->ShippingAddress->state . ' ' . $sale->ShippingAddress->postal_code . '<br />
+                ' . $sale->ShippingAddress->phone . '<br /><br /><br />';
+            }else{
+                $shippingBlock = '';
+            }
+
             $data = array(
                 'sale_id' => $sale->guid,
                 'sale_date' => date('F d, Y', $sale->timestamp),
@@ -414,6 +426,7 @@
                 'payment_total' => sprintf("%01.2f", ($sale->converted_total / 100.0)),
                 'payment_symbol' => ($sale->payment == 'DOGE'? 'Ð' : '$'),
                 'payment_method' => ($sale->payment == 'DOGE'? 'Moolah.ch' : 'PayPal'),
+                'shipping_block' => $shippingBlock,
                 'client_name' => $this->JACKED->config->client_name,
                 'client_url' => $this->JACKED->config->base_url,
                 'client_email' => $this->JACKED->config->default_reply_email,
@@ -429,6 +442,44 @@
                 $this->config->email_notifications_from,
                 $this->config->email_notifications_from_name,
                 $this->JACKED->config->client_name .' - Order Confirmation',
+                $template
+            );
+        }
+
+        /**
+        * Send a notification email to the User of a Sale that their order has been shipped
+        * 
+        * @param $guid String GUID of the Sale
+        * @return Boolean Whether the email was sent successfully
+        */
+        public function sendShippedEmail($saleID){ 
+            $template = file_get_contents(JACKED_MODULES_ROOT . $this->config->email_template_root . 'shipped.htm');
+
+            $sale = $this->JACKED->Syrup->Sale->findOne(array('guid' => $saleID));
+            if(!$sale){
+                throw new Exception('Sale not found');
+            }
+
+            $data = array(
+                'sale_id' => $sale->guid,
+                'sale_date' => date('F d, Y', $sale->timestamp),
+                'product_name' => $sale->Product->name,
+                'tracking_number' => $sale->tracking,
+                'client_name' => $this->JACKED->config->client_name,
+                'client_url' => $this->JACKED->config->base_url,
+                'client_email' => $this->JACKED->config->default_reply_email,
+                'current_year' => date('Y'),
+            );
+
+            foreach($data as $key => $value){
+                $template = str_replace('{'.$key.'}', $value, $template);
+            }
+
+            return $this->sendMail(
+                $sale->User->email,
+                $this->config->email_notifications_from,
+                $this->config->email_notifications_from_name,
+                'Your ' . $this->JACKED->config->client_name .' Order Has Shipped!',
                 $template
             );
         }
