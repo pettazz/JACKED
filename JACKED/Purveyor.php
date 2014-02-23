@@ -385,14 +385,30 @@
                 throw new Exception('Sale not found');
             }
 
+            $tickets = $this->JACKED->Syrup->Ticket->find(array('redeemed' => $saleID));
+            $discountTotal = 0;
+
+            if($tickets){
+                foreach($tickets as $ticket){
+                    $discountTotal += $ticket->Promotion->value;
+                }
+            }
+
+            if($discountTotal > 0){
+                $discounts_li = '<li>Discounts Applied: <strong>' . sprintf("%01.2f", ($discountTotal / 100.0)) . '</strong></li>';
+            }else{
+                $discounts_li = '';
+            }
+
             $data = array(
                 'sale_id' => $sale->guid,
                 'sale_date' => date('F d, Y', $sale->timestamp),
                 'product_name' => $sale->Product->name,
-                'product_price' => ($sale->Product->cost / 100.0),
-                'product_total' => (($sale->Product->cost * $sale->quantity) / 100.0),
+                'product_price' => sprintf("%01.2f", ($sale->Product->cost / 100.0)),
+                'product_total' => sprintf("%01.2f", (($sale->Product->cost * $sale->quantity) / 100.0)),
                 'quantity' => $sale->quantity,
-                'payment_total' => ($sale->converted_total / 100.0),
+                'discounts_li' => $discounts_li,
+                'payment_total' => sprintf("%01.2f", (($sale->converted_total / 100.0)),
                 'payment_symbol' => ($sale->payment == 'DOGE'? 'Ð' : '$'),
                 'payment_method' => ($sale->payment == 'DOGE'? 'Moolah.ch' : 'PayPal'),
                 'client_name' => $this->JACKED->config->client_name,
