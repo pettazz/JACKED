@@ -150,6 +150,7 @@ CREATE TABLE `Promotion` (
 CREATE TABLE `Sale` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `User` varchar(64) NOT NULL DEFAULT '',
+  `ShippingAddress` varchar(64) DEFAULT '',
   `Product` varchar(64) NOT NULL DEFAULT '',
   `timestamp` int(10) NOT NULL,
   `total` int(8) NOT NULL DEFAULT '0',
