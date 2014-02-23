@@ -395,7 +395,7 @@
             }
 
             if($discountTotal > 0){
-                $discounts_li = '<li>Discounts Applied: <strong>' . sprintf("%01.2f", ($discountTotal / 100.0)) . '</strong></li>';
+                $discounts_li = '<li>Discounts Applied: $' . sprintf("%01.2f", ($discountTotal / 100.0)) . '</li>';
             }else{
                 $discounts_li = '';
             }
