@@ -135,7 +135,7 @@
         echo '    </tr>';
 
         echo '    <tr id="detailsRow-' . $sale->guid . '" style="display:none;">';
-        echo '      <td colspan="7">';
+        echo '      <td colspan="4">';
         echo '
         <dl class="dl-horizontal">
             <dt>JACKED Sale ID</dt>
@@ -167,7 +167,7 @@
             
             <dt>Payment Method</dt>
             <dd class="payment">' . $sale->payment . '</dd>
-            
+        
             <dt>Shipped</dt>
             <dd class="shipped"><i class="icon-' . ($sale->shipped? 'ok' : 'remove') . '"></i></dd>
             
@@ -180,6 +180,39 @@
         </dl>
         <a data-guid="' . $sale->guid . '" href="#" class="btn btn-primary saleDetailsClose"><i class="icon-eye-close icon-white"></i> Hide Details</a>';
         echo '      </td>';
+        if($sale->Product->tangible){
+            echo '<td colspan="3">';
+            echo '
+            <dl class="dl-horizontal">
+                <dt>Shipping Details</dt>
+                <dd><small>' . $sale->User->guid . '</small></dd>
+
+                <dt>Recipient Name</dt>
+                <dd>' . $sale->ShippingAddress->recipient_name . '</dd>
+                
+                <dt>Line 1</dt>
+                <dd>' . $sale->ShippingAddress->line1 . '</dd>
+
+                <dt>Line 2</dt>
+                <dd>' . ($sale->ShippingAddress->line2? $sale->ShippingAddress->line2 : 'N/A') . '</dd>
+
+                <dt>City</dt>
+                <dd>' . $sale->ShippingAddress->city . '</dd>
+
+                <dt>State</dt>
+                <dd>' . $sale->ShippingAddress->state . '</dd>
+
+                <dt>Postal Code</dt>
+                <dd>' . $sale->ShippingAddress->postal_code . '</dd>
+
+                <dt>Phone Number</dt>
+                <dd>' . $sale->ShippingAddress->phone . '</dd>
+
+            </dl>
+            ';
+            echo '</td>';
+        }
+
         echo '    </tr>';
     }
 ?>

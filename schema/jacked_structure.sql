@@ -192,6 +192,24 @@ CREATE TABLE `sessions` (
 
 
 
+# Dump of table ShippingAddress
+# ------------------------------------------------------------
+
+CREATE TABLE `ShippingAddress` (
+  `guid` varchar(64) NOT NULL,
+  `User` varchar(64) NOT NULL,
+  `recipient_name` varchar(50) NOT NULL,
+  `line1` varchar(100) NOT NULL,
+  `line2` varchar(100) DEFAULT NULL,
+  `city` varchar(50) NOT NULL,
+  `postal_code` varchar(20) NOT NULL,
+  `state` varchar(2) NOT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
 # Dump of table Source
 # ------------------------------------------------------------
 

@@ -23,7 +23,39 @@
             $user->save();    
         }
 
-        $result = $JACKED->Purveyor->createSale($user->guid, $product, $quantity, $method, $JACKED->config->base_url . 'JACKED/tomhanks.php', 'LOL, ETC.', $tickets);
+        $productobj = $JACKED->Syrup->Product->findOne(array('guid' => $product));
+        if(!$productobj){
+            throw new Exception('Product not found');
+        }
+
+        if($productobj->tangible){
+            $recipient_name = $_POST['recipient_name'];
+            $line1 = $_POST['line1'];
+            $line2 = $_POST['line2'];
+            $city = $_POST['city'];
+            $postal_code = $_POST['postal_code'];
+            $state = $_POST['state'];
+            $phone = $_POST['phone'];
+
+            $newAddr = $JACKED->Syrup->ShippingAddress->create();
+
+            $newAddr->User = $user->guid;
+            $newAddr->recipient_name = $recipient_name;
+            $newAddr->line1 = $line1;
+            $newAddr->line2 = $line2;
+            $newAddr->city = $city;
+            $newAddr->postal_code = $postal_code;
+            $newAddr->state = $state;
+            $newAddr->phone = $phone;
+
+            $newAddr->save();
+
+            $shippingAddr = $newAddr->guid;
+        }else{
+            $shippingAddr = NULL;
+        }
+
+        $result = $JACKED->Purveyor->createSale($user->guid, $product, $quantity, $method, $JACKED->config->base_url . 'JACKED/tomhanks.php', $shippingAddr, 'LOL, ETC.', $tickets);
 
         header('Location: ' . $result['url']);
 
