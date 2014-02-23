@@ -408,7 +408,7 @@
                 'product_total' => sprintf("%01.2f", (($sale->Product->cost * $sale->quantity) / 100.0)),
                 'quantity' => $sale->quantity,
                 'discounts_li' => $discounts_li,
-                'payment_total' => sprintf("%01.2f", (($sale->converted_total / 100.0)),
+                'payment_total' => sprintf("%01.2f", ($sale->converted_total / 100.0)),
                 'payment_symbol' => ($sale->payment == 'DOGE'? 'Ð' : '$'),
                 'payment_method' => ($sale->payment == 'DOGE'? 'Moolah.ch' : 'PayPal'),
                 'client_name' => $this->JACKED->config->client_name,
