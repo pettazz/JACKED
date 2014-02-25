@@ -311,7 +311,7 @@
 
             $sale->save();
 
-            if($email && $sale->confirmed = 1){
+            if($email && $sale->confirmed == 1){
                 $this->sendPaymentConfirmationEmail($sale->guid);
             }
 
