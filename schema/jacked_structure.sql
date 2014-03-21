@@ -202,6 +202,7 @@ CREATE TABLE `ShippingAddress` (
   `recipient_name` varchar(50) NOT NULL,
   `line1` varchar(100) NOT NULL,
   `line2` varchar(100) DEFAULT NULL,
+  `country` varchar(50) NOT NULL,
   `city` varchar(50) NOT NULL,
   `postal_code` varchar(20) NOT NULL,
   `state` varchar(2) NOT NULL,

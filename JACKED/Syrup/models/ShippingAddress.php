@@ -9,6 +9,7 @@
         protected $recipient_name = array(SyrupField::VARCHAR, 50, false);
         protected $line1 = array(SyrupField::VARCHAR, 100, false);
         protected $line2 = array(SyrupField::VARCHAR, 100, false);
+        protected $country = array(SyrupField::VARCHAR, 50, false);
         protected $city = array(SyrupField::VARCHAR, 50, false);
         protected $postal_code = array(SyrupField::VARCHAR, 20, false);
         protected $state = array(SyrupField::VARCHAR, 2, false);
