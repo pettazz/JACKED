@@ -153,7 +153,7 @@
     
     $promotions = $JACKED->Syrup->Promotion->find();
     foreach($promotions as $promotion){
-        $tickets = $JACKED->Syrup->Promotion->find(array('Promotion' => $promotion->guid));
+        $tickets = $JACKED->Syrup->Ticket->find(array('Promotion' => $promotion->guid));
         echo '    <tr>';
         echo '    <td><small>' . $promotion->guid . '<small></td>';
         echo '            <td class="namerow"> <span class="promotionname">' . $promotion->name . '</span> <input type="text" required class="input-large promotionnameinput" /> </td>';
