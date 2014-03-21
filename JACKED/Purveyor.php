@@ -50,11 +50,12 @@
         * @param $redirectURL String URL to redirect the user to after payment. GET args are appended:
                                 success (Boolean payment authorized), guid (string Sale GUID on success=true)
         * @param $shippingAddress String GUID of a shipping address to be used for shipping this Sale if needed
+        * @param $shippingTotal int Total amount of the shipping cost to be added if needed
         * @param $description String Description of payment (used only for PayPal)
         * @param $tickets Array List of GUIDs of Tickets if used
         * @return Array Sale => Sale model object, url => authorization redirect URL
         */
-        public function createSale($user, $product, $quantity, $method, $redirectURL, $shippingAddress = NULL, $description = NULL, $tickets = NULL){
+        public function createSale($user, $product, $quantity, $method, $redirectURL, $shippingAddress = NULL, $shippingTotal = NULL, $description = NULL, $tickets = NULL){
             if(!($method == 'DOGE' || $method == 'PAYPAL')){
                 throw new Exception('Unsupported Payment method.');
             }
@@ -103,6 +104,10 @@
                 throw new InvalidSaleTotalException();
             }
 
+            if($shippingTotal){
+                $total += $shippingTotal * 100;
+            }
+
             $sale->total = $total;
             $sale->save();
 
@@ -148,15 +153,19 @@
                     $itemList->setItems(array($item));
                 }
 
-                // $details = new Details();
-                // $details->setShipping('1.20')
+                if($shippingTotal){
+                    $details = new Details();
+                    $details->setShipping($shippingTotal)
+                        ->setSubtotal(($sale->total / 100.0) - $shippingTotal);
+                }
                 //     ->setTax('1.30')
-                //     ->setSubtotal('17.50');
 
                 $amount = new Amount();
                 $amount->setCurrency("USD")
                     ->setTotal(sprintf("%01.2f", ($sale->total / 100.0)));
-                    // ->setDetails($details);
+                if($details){
+                    $amount->setDetails($details);
+                }
 
                 $transaction = new Transaction();
                 $transaction->setAmount($amount)
