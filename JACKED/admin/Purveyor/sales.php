@@ -205,6 +205,9 @@
                 <dt>Postal Code</dt>
                 <dd>' . $sale->ShippingAddress->postal_code . '</dd>
 
+                <dt>Country</dt>
+                <dd>' . $sale->ShippingAddress->country . '</dd>
+
                 <dt>Phone Number</dt>
                 <dd>' . $sale->ShippingAddress->phone . '</dd>
 
