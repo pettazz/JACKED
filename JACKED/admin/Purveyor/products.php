@@ -150,6 +150,7 @@
             <th>Name</th>
             <th>Cost</th>
             <th>Tangible</th>
+            <th>Quantity Sold</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -159,11 +160,19 @@
     
     $products = $JACKED->Syrup->Product->find();
     foreach($products as $product){
+        $sales = $JACKED->Syrup->Sale->find(array('AND' => array('Product' => $product->guid, 'confirmed' => 1)));
+        $quantity = 0;
+        if($sales){
+            foreach($sales as $sale){
+                $quantity += $sale->quantity;
+            }
+        }
         echo '    <tr>';
         echo '    <td><small>' . $product->guid . '<small></td>';
         echo '            <td class="namerow"> <span class="productname">' . $product->name . '</span> <input type="text" required class="input-large productnameinput" /> </td>';
         echo '            <td class="costrow"> $<span class="productcost">' . ($product->cost / 100.0) . '</span> <input type="text" required class="input-mini productcostinput" /> </td>';
         echo '            <td class="tangiblerow"> <span class="producttangible">' . ($product->tangible? 'Yes' : 'No') . '</span> <input type="checkbox" value="True" class="producttangibleinput" ' . ($product->tangible? 'checked' : '') . ' /> </td>';
+        echo '            <td class="salesrow"> <span class="productsales">' . $quantity . '</span> <input type="text" required class="input-large productnameinput" /> </td>';
         echo '            <td class="actionsrow">
         <form method="POST" action="' . $JACKED->admin->config->entry_point . 'module/Purveyor">
             <input type="hidden" name="manage_handler" value="products-edit-handler" />
