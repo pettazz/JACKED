@@ -26,11 +26,11 @@
                                     $JACKED->Sessions->delete('admin.loginform.error');
                                 }
                             ?>
-                            <label for="xlInput3">Username</label>
+                            <label for="username">Username</label>
                             <div class="input">
                                 <input type="text" size="30" name="username" id="username" class="xlarge">
                             </div>
-                            <label for="xlInput3">Password</label>
+                            <label for="password">Password</label>
                             <div class="input">
                                 <input type="password" size="30" name="password" id="password" class="xlarge">
                             </div>
