@@ -107,7 +107,7 @@
         </div>
 
         <div class="control-group">
-            <label class="control-label" for="inputTangible">Tangibile</label>
+            <label class="control-label" for="inputTangible">Tangible</label>
             <div class="controls">
                 <label class="checkbox">
                     <input type="checkbox" id="inputTangible" name="inputTangible" value="True" /> This product physically exists and requires shipping.
