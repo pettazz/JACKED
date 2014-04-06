@@ -17,12 +17,13 @@
                         <legend></legend>
                         <div class="clearfix">
                             <?php
-                                if(isset($_GET['error'])){
+                                if($JACKED->Sessions->read('admin.loginform.error')){
                                     echo'
                             <div class="alert alert-error">
                                 <a class="close" data-dismiss="alert" href="#">&times;</a>
-                                <p><strong>Login failed!</strong><br /> ' . $_GET['error'] .  '</p>
+                                <p><strong>Login failed!</strong><br /> ' . $JACKED->Sessions->read('admin.loginform.error') .  '</p>
                             </div>';
+                                    $JACKED->Sessions->delete('admin.loginform.error');
                                 }
                             ?>
                             <label for="xlInput3">Username</label>
@@ -33,6 +34,8 @@
                             <div class="input">
                                 <input type="password" size="30" name="password" id="password" class="xlarge">
                             </div>
+
+                            <input type="hidden" id="qs" name="qs" value="<?php echo (isset($_POST['qs'])? $_POST['qs'] : $_SERVER['REQUEST_URI']); ?>">
                         </div><!-- /clearfix -->
                     </fieldset>
                     <div class="actions">

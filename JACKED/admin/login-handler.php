@@ -2,7 +2,9 @@
     $JACKED = new JACKED("admin");
     $gotime = $JACKED->admin->login($_POST['username'], $_POST['password']);
     if(!($gotime === true)){
-        $error = $gotime['reason'];
+        $JACKED->Sessions->write('admin.loginform.error', $gotime['reason']);
     }
-    header('Location: ' . $JACKED->admin->config->entry_point . ($error? '?error=' . $error : ''));
+    $uri = isset($_POST['qs'])? $_POST['qs'] : $JACKED->admin->config->entry_point;
+
+    header('Location: ' . $uri);
 ?>
