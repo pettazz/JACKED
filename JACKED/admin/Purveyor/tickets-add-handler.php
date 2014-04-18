@@ -15,6 +15,13 @@
         }
 
         $ticket = $JACKED->Syrup->Ticket->create();
+        if(isset($_POST['inputID'])){
+            $exid = $JACKED->Syrup->Ticket->find(array('guid' => $_POST['inputID']));
+            if($exid){
+                throw new Exception('Ticket ID is already in use.');
+            }
+            $ticket->guid = $_POST['inputID'];
+        }
         $ticket->User = $userid;
         $ticket->Promotion = $_POST['inputPromotion'];
         $ticket->save();

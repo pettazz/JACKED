@@ -23,6 +23,7 @@
             $exobj->name = $_POST['newname'];
             $exobj->value = floor($_POST['newvalue'] * 100);
             $exobj->active = (isset($_POST['newactive']) && $_POST['newactive'] == "true")? 1 : 0;
+            $exobj->single_use = (isset($_POST['newsingleuse']) && $_POST['newsingleuse'] == "true")? 1 : 0;
             $exobj->save();
             $JACKED->Sessions->write('admin.success.editpromotion', 'Promotion updated succesfully.');
         }else{

@@ -139,6 +139,7 @@ CREATE TABLE `Promotion` (
   `description` text NULL DEFAULT '',
   `value` int(8) NULL DEFAULT '0',
   `active` tinyint(1) NULL DEFAULT '1',
+  `single_use` tinyint(1) NULL DEFAULT '1',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -177,6 +178,17 @@ CREATE TABLE `Ticket` (
   `valid` tinyint(1) NULL DEFAULT '1',
   `redeemed` varchar(64) NULL DEFAULT '',
   PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table TicketRedemption
+# ------------------------------------------------------------
+
+CREATE TABLE `TicketRedemption` (
+  `Ticket` varchar(64) NOT NULL DEFAULT '',
+  `Sale` varchar(64) NOT NULL DEFAULT '',
+  PRIMARY KEY (`Ticket`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

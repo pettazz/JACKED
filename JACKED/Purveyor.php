@@ -113,8 +113,13 @@
 
             if($tickets){
                 foreach($ticketObjects as $ticket){
-                    $ticket->redeemed = $sale->guid;
-                    $ticket->save();
+                    if($ticket->single_use){
+                        $ticket->redeemed = $sale->guid;
+                        $ticket->save();
+                    }
+                    $redemption = $this->JACKED->Syrup->TicketRedemption->create();
+                    $redemption->Ticket = $ticket->guid;
+                    $redemption->Sale = $sale->guid;
                 }
             }
 
@@ -283,7 +288,7 @@
             if(!$ticket->Promotion->active){
                 throw new PromotionInactiveException($ticket->Promotion->name);
             }
-            if($ticket->redeemed){
+            if($ticket->single_use && $ticket->redeemed){
                 throw new TicketAlreadyRedeemedException($guid);
             }
 

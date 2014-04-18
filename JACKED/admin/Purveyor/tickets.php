@@ -70,9 +70,9 @@
     <fieldset>
         <div class="control-group">
             <label class="control-label" for="inputEmail">User Email</label>
-            <div class="controls input-prepend">
-                <span class="add-on">@</span>
+            <div class="controls">
                 <input type="text" class="input-large" id="inputEmail" name="inputEmail" placeholder="mr@peanut.org" required="true" />
+                <span class="help-block">Some uniquely identifying user info, preferably email. Only for reference, not used anywhere.</span>
             </div>
         </div>
 
@@ -88,6 +88,14 @@
                         }
                     ?>
                 </select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="inputID">Ticket ID</label>
+            <div class="controls">
+                <input type="text" class="input-large" id="inputID" name="inputID" placeholder="" />
+                <span class="help-block">Optionally specify the unique ID a user will type in to redeem. This cannot be changed.</span>
             </div>
         </div>
 
