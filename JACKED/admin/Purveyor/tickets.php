@@ -92,6 +92,15 @@
         </div>
 
         <div class="control-group">
+            <label class="control-label" for="inputSingleUse">Single Use</label>
+            <div class="controls">
+                <label class="checkbox">
+                    <input type="checkbox" id="inputSingleUse" name="inputSingleUse" value="True" /> Limit this Ticket to a single use
+                </label>
+            </div>
+        </div>
+
+        <div class="control-group">
             <label class="control-label" for="inputID">Ticket ID</label>
             <div class="controls">
                 <input type="text" class="input-large" id="inputID" name="inputID" placeholder="" />

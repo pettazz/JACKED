@@ -108,15 +108,6 @@
             </div>
         </div>
 
-        <div class="control-group">
-            <label class="control-label" for="inputSingleUse">Single Use</label>
-            <div class="controls">
-                <label class="checkbox">
-                    <input type="checkbox" id="inputSingleUse" name="inputSingleUse" value="True" /> Limit Tickets for this Promotion to a single use
-                </label>
-            </div>
-        </div>
-
         <div class="form-actions pull-right span9">
             <input type="hidden" name="manage_handler" value="promotions-add-handler" />
             <button id="savecategory" type="submit" class="btn btn-success pull-right" style="margin-left:10px">Save</button>

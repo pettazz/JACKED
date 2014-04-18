@@ -24,6 +24,7 @@
         }
         $ticket->User = $userid;
         $ticket->Promotion = $_POST['inputPromotion'];
+        $ticket->single_use = (isset($_POST['inputSingleUse']) && $_POST['inputSingleUse'] == "True")? 1 : 0;
         $ticket->save();
         $JACKED->Sessions->write('admin.success.addticket', 'Ticket <strong>' . $ticket->guid . '</strong> added succesfully.');
     }catch(Exception $e){
