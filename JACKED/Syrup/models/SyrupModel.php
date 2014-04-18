@@ -134,7 +134,7 @@
                     if(is_object($value) && is_subclass_of($value, 'SyrupModel')){
                         $this->$key = $value;
                     }else{
-                        if($this->$key->isPrimaryKey){
+                        if($this->$key->isPrimaryKey && !$this->_isNew){
                             throw new PrimaryKeyUnmodifiableException($key);
                         }
                         $this->$key->setValue($value);
