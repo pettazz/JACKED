@@ -158,10 +158,13 @@
                     $itemList->setItems(array($item));
                 }
 
+                $details = new Details();
                 if($shippingTotal){
-                    $details = new Details();
                     $details->setShipping($shippingTotal)
-                        ->setSubtotal(($sale->total / 100.0) - $shippingTotal);
+                            ->setSubtotal(($sale->total / 100.0) - $shippingTotal);
+                }else{
+                    $details->setShipping(0)
+                            ->setSubtotal(($sale->total / 100.0));
                 }
                 //     ->setTax('1.30')
 
