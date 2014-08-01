@@ -7,12 +7,11 @@
         'email_notifications_from' => 'noreply@jackedmanager.com',
         'email_notifications_from_name' => 'Purveyor Robot',
 
-        'ipn_secret' => 'lol',
+        'moolah_api_key_public' => 'lol',
+        'moolah_api_key_secret' => 'lol',
 
         'paypal_client_id' => 'lol',
-        'paypal_client_secret' => 'lol',
-
-        'moolah_guid' => 'lol'
+        'paypal_client_secret' => 'lol'
     );
 
 ?>

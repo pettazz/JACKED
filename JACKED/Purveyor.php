@@ -212,31 +212,35 @@
 
             }else{
                 $params = array(
+                    'apiKey' => $this->config->moolah_api_key_public,
+                    'coin' => 'dogecoin',
                     'currency' => 'USD',
-                    'guid' => $this->config->moolah_guid,
                     'amount' => $total / 100.0,
                     'product' => $product->name,
                     'ipn' => $this->JACKED->config->base_url . 'JACKED/JACKED/admin/Purveyor-IPN-handler.php',
-                    'return' => "$redirectURL?success=true&guid=" . $sale->guid
+                    'apiSecret' => $this->config->moolah_api_key_secret,
+                    //'return' => "$redirectURL?success=true&guid=" . $sale->guid
                 );
 
-                $url = 'https://moolah.io/api/pay?' . http_build_query($params);
+                $url = 'https://api.moolah.io/v2/private/merchant/create';
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, count($params));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
                 curl_setopt($ch, CURLOPT_HEADER, false);
 
                 $result = curl_exec($ch);
                 curl_close($ch);
                 $decoded = json_decode($result);
 
-                if(is_null($decoded)){
+                if(is_null($decoded) || !$decoded->status){
                     throw new Exception('Moolah payment was not authorized successfully');
                 }
 
                 $saleobj = $this->JACKED->Syrup->Sale->findOne(array('guid' => $sale->guid));
                 $saleobj->converted_total = $decoded->amount;
-                $saleobj->external_transaction_id = $decoded->tx;
+                $saleobj->external_transaction_id = $decoded->guid;
                 $saleobj->save();
 
                 $redirectUrl = $decoded->url;
