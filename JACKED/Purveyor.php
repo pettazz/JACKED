@@ -234,7 +234,7 @@
                 curl_close($ch);
                 $decoded = json_decode($result);
 
-                if(is_null($decoded) || !$decoded->status){
+                if(is_null($decoded) || $decoded->status != 'success'){
                     throw new Exception('Moolah payment was not authorized successfully');
                 }
 
