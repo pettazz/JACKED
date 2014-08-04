@@ -446,7 +446,7 @@
                 'discounts_li' => $discounts_li,
                 'payment_total' => sprintf("%01.2f", ($sale->converted_total / ($sale->payment == 'DOGE'? '1.0' : '100.0'))),
                 'payment_symbol' => ($sale->payment == 'DOGE'? 'Ð' : '$'),
-                'payment_method' => ($sale->payment == 'DOGE'? 'Moolah.ch' : 'PayPal'),
+                'payment_method' => ($sale->payment == 'DOGE'? 'Moolah' : 'PayPal'),
                 'shipping_block' => $shippingBlock,
                 'client_name' => $this->JACKED->config->client_name,
                 'client_url' => $this->JACKED->config->base_url,
