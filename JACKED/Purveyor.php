@@ -219,7 +219,7 @@
                     'product' => $product->name,
                     'ipn' => $this->JACKED->config->base_url . 'JACKED/JACKED/admin/Purveyor-IPN-handler.php',
                     'apiSecret' => $this->config->moolah_api_key_secret,
-                    //'return' => "$redirectURL?success=true&guid=" . $sale->guid
+                    'return' => "$redirectURL?success=true&guid=" . $sale->guid
                 );
 
                 $url = 'https://api.moolah.io/v2/private/merchant/create';
