@@ -3,21 +3,21 @@
     require('../../jacked_conf.php');
     $JACKED = new JACKED(array('Syrup', 'Purveyor'));
 
-    if((isset($_GET['apiSecret']) &&
-         isset($_GET['guid']) && 
-         isset($_GET['status']) && 
-         isset($_GET['timestamp']) && 
-         isset($_GET['tx'])
+    if((isset($_POST['apiSecret']) &&
+         isset($_POST['guid']) && 
+         isset($_POST['status']) && 
+         isset($_POST['timestamp']) && 
+         isset($_POST['tx'])
         )){
 
         try{
 
-            if($_GET['apiSecret'] !== $JACKED->Purveyor->config->moolah_api_key_secret){
+            if($_POST['apiSecret'] !== $JACKED->Purveyor->config->moolah_api_key_secret){
                 header('HTTP/1.1 401 Unauthorized');
                 exit();
             }
 
-            $JACKED->Purveyor->updatePaymentStatus($_GET['status'], $_GET['timestamp'], $_GET['guid']);
+            $JACKED->Purveyor->updatePaymentStatus($_POST['status'], $_POST['timestamp'], $_POST['guid']);
 
         }catch(Exception $e){
             header('HTTP/1.1 500 Internal Server Error');
