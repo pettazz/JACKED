@@ -49,13 +49,14 @@
         * @param $method String Payment method for this sale. One of: DOGE, PAYPAL
         * @param $redirectURL String URL to redirect the user to after payment. GET args are appended:
                                 success (Boolean payment authorized), guid (string Sale GUID on success=true)
+        * @param $dimensions Array Key/Value pairs of dimensions, such as size or color
         * @param $shippingAddress String GUID of a shipping address to be used for shipping this Sale if needed
         * @param $shippingTotal int Total amount of the shipping cost to be added if needed
         * @param $description String Description of payment (used only for PayPal)
         * @param $tickets Array List of GUIDs of Tickets if used
         * @return Array Sale => Sale model object, url => authorization redirect URL
         */
-        public function createSale($user, $product, $quantity, $method, $redirectURL, $shippingAddress = NULL, $shippingTotal = NULL, $description = NULL, $tickets = NULL){
+        public function createSale($user, $product, $quantity, $method, $redirectURL, $dimensions = NULL, $shippingAddress = NULL, $shippingTotal = NULL, $description = NULL, $tickets = NULL){
             if(!($method == 'DOGE' || $method == 'PAYPAL')){
                 throw new Exception('Unsupported Payment method.');
             }
@@ -70,6 +71,7 @@
             $sale->User = $user;
             $sale->ShippingAddress = $shippingAddress;
             $sale->Product = $product;
+
             $ticketObjects = array();
             if($tickets){
                 foreach($tickets as $tguid){
@@ -77,6 +79,9 @@
                     $ticketObjects[] = $ticket;
                 }
             }
+
+            $sale->dimensions = ($dimensions? json_encode($dimensions) : NULL);
+
             $sale->timestamp = time();
             $sale->quantity = $quantity;
             $sale->payment = $method;

@@ -8,6 +8,7 @@
         protected $User = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'User.guid'));
         protected $ShippingAddress = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'ShippingAddress.guid'));
         protected $Product = array(SyrupField::VARCHAR, 64, false, NULL, 'FK', array('hasOne' => 'Product.guid'));
+        protected $dimensions = array(SyrupField::TEXT);
         protected $timestamp = array(SyrupField::INT, 10, False);
         protected $total = array(SyrupField::INT, 8, False, 0);
         protected $converted_total = array(SyrupField::INT, 15, True, 0);

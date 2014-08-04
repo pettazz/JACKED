@@ -153,6 +153,7 @@ CREATE TABLE `Sale` (
   `User` varchar(64) NOT NULL DEFAULT '',
   `ShippingAddress` varchar(64) DEFAULT '',
   `Product` varchar(64) NOT NULL DEFAULT '',
+  `dimensions` text,
   `timestamp` int(10) NOT NULL,
   `total` int(8) NOT NULL DEFAULT '0',
   `converted_total` int(15) NULL DEFAULT '0',

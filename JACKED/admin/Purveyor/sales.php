@@ -175,11 +175,19 @@
             <dd class="tracking">' . ($sale->tracking? $sale->tracking : 'N/A') . '</dd>
             
             <dt>External Transaction ID</dt>
-            <dd class="external">' . ($sale->external_transaction_id? $sale->external_transaction_id : 'N/A') . '</dd>
+            <dd class="external">' . ($sale->external_transaction_id? $sale->external_transaction_id : 'N/A') . '</dd>';
 
+        if($sale->dimensions){
+            foreach(json_decode($sale->dimensions) as $dimKey => $dimValue){
+                echo '<dt>' . $dimKey . '</dt>';
+                echo '<dd>' . $dimValue . '</dd>';
+            }
+        }
+
+        echo '
         </dl>
-        <a data-guid="' . $sale->guid . '" href="#" class="btn btn-primary saleDetailsClose"><i class="icon-eye-close icon-white"></i> Hide Details</a>';
-        echo '      </td>';
+        <a data-guid="' . $sale->guid . '" href="#" class="btn btn-primary saleDetailsClose"><i class="icon-eye-close icon-white"></i> Hide Details</a>
+      </td>';
         if($sale->Product->tangible){
             echo '<td colspan="3">';
             echo '
