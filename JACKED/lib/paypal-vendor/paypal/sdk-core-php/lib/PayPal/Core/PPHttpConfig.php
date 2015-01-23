@@ -8,7 +8,7 @@ class PPHttpConfig {
 	 * These are typically overridden by PPConnectionManager
 	 */
 	public static $DEFAULT_CURL_OPTS = array(
-		CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1,
+		CURLOPT_SSLVERSION => 4,
 		CURLOPT_CONNECTTIMEOUT => 10,
 		CURLOPT_RETURNTRANSFER => TRUE,
 		CURLOPT_TIMEOUT        => 60,	// maximum number of seconds to allow cURL functions to execute
