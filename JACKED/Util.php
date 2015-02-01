@@ -153,10 +153,13 @@
          * Generates pseudo-random VALID RFC 4211 COMPLIANT Universally Unique IDentifiers (UUID) version 4.
          * As found here: http://www.php.net/manual/en/function.uniqid.php#94959
          * 
+         * @param $dashes bool Whether to include dashes in the generated uuid string. Default: true.
          * @return string The generated UUID
          */
-        public static function uuid4(){
-            return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        public static function uuid4($dashes = true){
+            $str = ($dashes)? '%04x%04x-%04x-%04x-%04x-%04x%04x%04x' : '%04x%04x%04x%04x%04x%04x%04x%04x';
+            
+            return sprintf($str,
                 // 32 bits for "time_low"
                 mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
 
