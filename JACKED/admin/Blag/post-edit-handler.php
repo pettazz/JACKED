@@ -77,6 +77,25 @@
                     }
                     
                     $existingPost->save();
+
+                    if($existingPost->alive == 1){
+                        //tell facebook this live post needs a new scrape
+
+                        $ch = curl_init();
+                        // TODO: this shouldnt use a hardcoded "/post" in the path
+                        //    canonical post url path should be a configur value for Blag
+                        $params = array(
+                            'id' => $JACKED->config->base_url . 'post/' . $existingPost->guid,
+                            'scrape' => 'true'
+                        );
+                        curl_setopt($ch, CURLOPT_URL, 'https://graph.facebook.com');
+                        curl_setopt($ch, CURLOPT_POST, count($params));
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+
+                        $result = curl_exec($ch);
+                        curl_close($ch);
+                    }
+
                     $JACKED->Sessions->write('admin.success.editpost', 'Post successfully saved.');
                     include('posts.php');
                 }catch(Exception $e){
