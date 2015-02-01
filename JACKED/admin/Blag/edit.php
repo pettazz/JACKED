@@ -16,6 +16,7 @@
                 'guid' => $_POST['guid'],
                 'title' => isset($_POST['inputTitle'])? $_POST['inputTitle'] : '',
                 'headline' => isset($_POST['inputHeadline'])? $_POST['inputHeadline'] : '',
+                'thumbnail' => isset($_POST['inputThumbnail'])? $_POST['inputThumbnail'] : '',
                 'content' => isset($_POST['inputContent'])? $_POST['inputContent'] : '',
                 'category' => isset($_POST['inputCategory'])? $_POST['inputCategory'] : '',
                 'Author' => isset($_POST['inputAuthor'])? $_POST['inputAuthor'] : '',
@@ -43,7 +44,20 @@
 
 ?>
 <link href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/select2/select2.css" rel="stylesheet" />
+<link href="<?php echo $JACKED->admin->config->entry_point; ?>assets/css/croppic.css" rel="stylesheet" />
+
+<style type="text/css">
+    #croppicThumb img{
+        max-width: none;
+    }
+    #croppicThumb img.croppedImg{
+        width: 600px;
+        height: 315px;
+    }
+</style>
+
 <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/select2/select2.min.js"></script>
+<script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/croppic.min.js"></script>
 <script type="text/javascript">
     
     var editor;
@@ -96,9 +110,28 @@
         }
     }
 
+    var cropperOptions = {
+        uploadUrl: '<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload', 
+        uploadData: {
+            'isCroppic': true
+        },
+        cropUrl: '<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload',
+        cropData: {
+            'isCroppic': true
+        },
+        outputUrlId: 'inputThumbnail',
+        loaderHtml: '<div class="loader bubblingG"><span id="bubblingG_1"></span><span id="bubblingG_2"></span><span id="bubblingG_3"></span></div> '
+    }
+
     $(document).ready(function(){
         editor = new EpicEditor(opts);
         editor.load();
+
+        $("#editThumbButton").click(function(eo){
+            $("#editThumbButton, #thumbPreview").remove();
+            $("#croppicThumb").show();
+            var cropperHeader = new Croppic('croppicThumb', cropperOptions);
+        });
 
         $("#cancelButton").click(function(eo){
             var confirmCancel = confirm('Discard your changes to this post?');
@@ -186,6 +219,16 @@
             <label class="control-label" for="inputHeadline">Headline/Preview Text</label>
             <div class="controls">
                 <textarea rows="6" class="input-xxlarge" name="inputHeadline" id="inputHeadline"><?php echo ($existingEdit? $post['headline'] : $post->headline); ?></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="inputThumb">Social Media Thumbnail</label>
+            <div class="controls">
+                <div id="thumbPreview" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0;"><img src="<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" style="width:600px; height:315px;" /></div>
+                <button id="editThumbButton" class="btn btn-primary pull-left">Change Thumbnail</button>
+                <div id="croppicThumb" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0; display:none;"></div>
+                <input type="hidden" id="inputThumbnail" name="inputThumbnail" value="<?php echo ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" />
             </div>
         </div>
         

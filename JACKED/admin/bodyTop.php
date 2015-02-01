@@ -25,6 +25,10 @@
                         keyboard: true
                     });
                 });
+
+                Dropzone.options.imguploadDropzone = {
+                    paramName: 'img'
+                };
             });
         </script>
 

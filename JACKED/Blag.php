@@ -8,7 +8,7 @@
         */
     
         const moduleName = 'Blag';
-        const moduleVersion = 1.0;
+        const moduleVersion = 1.1;
         public static $dependencies = array('MySQL', 'Syrup');
         
 

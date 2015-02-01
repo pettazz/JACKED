@@ -40,6 +40,7 @@ CREATE TABLE `Blag` (
   `posted` int(11) NOT NULL,
   `category` varchar(64) NOT NULL DEFAULT '',
   `alive` tinyint(1) DEFAULT '1',
+  `thumbnail` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NOT NULL DEFAULT '',
   `headline` text,
   `content` text NOT NULL,

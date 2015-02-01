@@ -31,6 +31,7 @@
         $post->alive = ($_POST['saveType'] == 'live'? 1 : 0);
         $post->title = $_POST['inputTitle'];
         $post->headline = $_POST['inputHeadline'];
+        $post->thumbnail = substr(strrchr($_POST['inputThumbnail'], '/'), 1);
         $post->content = $markdown->toHTML($_POST['inputContent']);
 
         $post->save();

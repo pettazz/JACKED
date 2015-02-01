@@ -43,7 +43,20 @@
 
 ?>
 <link href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/select2/select2.css" rel="stylesheet" />
+<link href="<?php echo $JACKED->admin->config->entry_point; ?>assets/css/croppic.css" rel="stylesheet" />
+
+<style type="text/css">
+    #croppicThumb img{
+        max-width: none;
+    }
+    #croppicThumb img.croppedImg{
+        width: 600px;
+        height: 315px;
+    }
+</style>
+
 <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/select2/select2.min.js"></script>
+<script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/croppic.min.js"></script>
 <script type="text/javascript">
     
     var editor;
@@ -91,9 +104,24 @@
         }
     }
 
+    var cropperOptions = {
+        uploadUrl: '<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload', 
+        uploadData: {
+            'isCroppic': true
+        },
+        cropUrl: '<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload',
+        cropData: {
+            'isCroppic': true
+        },
+        outputUrlId: 'inputThumbnail',
+        loaderHtml: '<div class="loader bubblingG"><span id="bubblingG_1"></span><span id="bubblingG_2"></span><span id="bubblingG_3"></span></div> '
+    }
+
     $(document).ready(function(){
         editor = new EpicEditor(opts);
         editor.load();
+
+        var cropperHeader = new Croppic('croppicThumb', cropperOptions);
 
         $("#cancelButton").click(function(eo){
             var confirmCancel = confirm('Discard this post?');
@@ -168,6 +196,14 @@
             <label class="control-label" for="inputHeadline">Headline/Preview Text</label>
             <div class="controls">
                 <textarea rows="6" class="input-xxlarge" name="inputHeadline" id="inputHeadline"><?php echo $inputHeadline? $inputHeadline : "This is where we would put a brief intro or teaser type thing of the article to convince people that it's cool and they should read it. The container won't expand dynamically at all, so these should overall be kept relatively short. Because otherwise the text will overflow down into the tabs below, and my shiny css will actually just truncate it at an awkward point."; ?></textarea>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="inputThumb">Social Media Thumbnail</label>
+            <div class="controls">
+                <div id="croppicThumb" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0;"></div>
+                <input type="hidden" id="inputThumbnail" name="inputThumbnail" />
             </div>
         </div>
         
