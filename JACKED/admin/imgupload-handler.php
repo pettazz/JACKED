@@ -53,12 +53,13 @@
             if($isCroppic){
                 header('HTTP/1.1 200 OK');
             }else{
-                header('HTTP/1.1 400 Bad Request');
+                header('HTTP/1.1 500 Internal Server Error');
             }
             generateResponse(array('message' => 'I didn\'t make this yet.'));
         }else{
             try{
                 $imgUrl = $_POST['imgUrl'];
+                $prevName = substr($imgUrl, strrpos($imgUrl, '/') + 1, strrpos($imgUrl, '.') - strlen($imgUrl)); 
                 // original sizes
                 $imgInitW = $_POST['imgInitW'] * 2;
                 $imgInitH = $_POST['imgInitH'] * 2;
@@ -77,7 +78,7 @@
                 $png_quality = -1;
                 $jpeg_quality = 100;
 
-                $name = "cropped_" . $JACKED->Util->uuid4(false);
+                $name = $prevName . "_cropped";
                 $output_filename = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory . $name;
                 $output_url = $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . $name;
                 $what = getimagesize($imgUrl);
