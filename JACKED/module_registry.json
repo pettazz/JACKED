@@ -7,7 +7,7 @@
         },
         "Blag": {
             "name": "Blag",
-            "version": "1.0",
+            "version": "1.1",
             "dependencies": ["MySQL", "Flock", "Syrup"]
         },
         "Configur": {
