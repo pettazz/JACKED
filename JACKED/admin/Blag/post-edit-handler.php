@@ -51,6 +51,7 @@
                     $existingPost->alive = ($_POST['saveType'] == 'live'? 1 : 0);
                     $existingPost->title = $_POST['inputTitle'];
                     $existingPost->headline = $_POST['inputHeadline'];
+                    $existingPost->thumbnail = $_POST['inputThumbnail'];
                     $existingPost->content = $markdown->toHTML($_POST['inputContent']);
 
                     // three cases for tags
