@@ -67,6 +67,10 @@
             $this->assertNotNull($this->JACKED->Util->uuid4());
         }
 
+        public function test_uuidgenerator_nodashes(){
+            $this->assertFalse(strpos($this->JACKED->Util->uuid4(true), '-'));
+        }
+
         public function test_hashPassword(){
             $password = 'butts123';
 
