@@ -85,12 +85,13 @@
                         // TODO: this shouldnt use a hardcoded "/post" in the path
                         //    canonical post url path should be a configur value for Blag
                         $params = array(
-                            'id' => $JACKED->config->base_url . 'post/' . $existingPost->guid,
+                            'id' => 'http://staging.warrantynowvoid.com/post/' . $existingPost->guid,
                             'scrape' => 'true'
                         );
                         curl_setopt($ch, CURLOPT_URL, 'https://graph.facebook.com');
-                        curl_setopt($ch, CURLOPT_POST, count($params));
+                        curl_setopt($ch, CURLOPT_POST, true);
                         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
                         $result = curl_exec($ch);
                         curl_close($ch);
