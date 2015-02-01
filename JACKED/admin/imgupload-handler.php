@@ -20,7 +20,9 @@
         try{
             $tempFile = $_FILES['img']['tmp_name'];                     
             $targetPath = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory;
-            $targetFile = $targetPath . $_FILES['img']['name'];
+            $ext = substr(strrchr($_FILES['img']['name'], '.'), 0);
+            $targetName = $JACKED->Util->uuid4(false) . $ext;
+            $targetFile = $targetPath . $targetName;
             if(file_exists($targetFile)){
                 if($isCroppic){
                     header('HTTP/1.1 200 OK');
@@ -30,6 +32,7 @@
                 generateResponse(array('message' => 'A file with that name already exists!'), false);  
             }
             move_uploaded_file($tempFile, $targetFile); 
+            $imagedetails = getimagesize($targetFile);
         }catch(Exception $e){
             if($isCroppic){
                 header('HTTP/1.1 200 OK');
@@ -40,11 +43,10 @@
             generateResponse(array('message' => 'Internal server error: ' . $e->getMessage()), false);
         }
         header('HTTP/1.1 200 OK');
-        $dimensions = getimagesize($targetFile);
         generateResponse(array(
-            'url' => $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . rawurlencode($_FILES['img']['name']),
-            'width' => $dimensions[0] / 2,
-            'height' => $dimensions[1] / 2 
+            'url' => $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . rawurlencode($targetName),
+            'width' => $imagedetails[0] / 2,
+            'height' => $imagedetails[1] / 2 
         ));
     }else if(array_key_exists('imgUrl', $_POST) && $_POST['imgUrl']){
         if(extension_loaded('imagick')){
@@ -75,7 +77,7 @@
                 $png_quality = -1;
                 $jpeg_quality = 100;
 
-                $name = "croppedImg_" . $JACKED->Util->uuid4(false);
+                $name = "cropped_" . $JACKED->Util->uuid4(false);
                 $output_filename = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory . $name;
                 $output_url = $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . $name;
                 $what = getimagesize($imgUrl);
@@ -96,7 +98,8 @@
                         $source_image = imagecreatefromgif($imgUrl);
                         $type = '.gif';
                         break;
-                    default: die('image type not supported');
+                    default: 
+                        throw new Exception('Image type not supported');
                 }
 
                 // resize the original image to size of editor
