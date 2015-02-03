@@ -85,7 +85,7 @@
                         // TODO: this shouldnt use a hardcoded "/post" in the path
                         //    canonical post url path should be a configur value for Blag
                         $params = array(
-                            'id' => 'http://staging.warrantynowvoid.com/post/' . $existingPost->guid,
+                            'id' => $JACKED->config->base_url . 'post/' . $existingPost->guid,
                             'scrape' => 'true'
                         );
                         curl_setopt($ch, CURLOPT_URL, 'https://graph.facebook.com');
@@ -95,6 +95,8 @@
 
                         $result = curl_exec($ch);
                         curl_close($ch);
+
+                        $JACKED->Logr->write('Facebook Open Graph submission results: ' . (string) $result, Logr::LEVEL_NOTICE);
                     }
 
                     $JACKED->Sessions->write('admin.success.editpost', 'Post successfully saved.');
