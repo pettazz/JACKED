@@ -121,7 +121,9 @@
         },
         outputUrlId: 'inputThumbnail',
         loaderHtml: '<div class="loader bubblingG"><span id="bubblingG_1"></span><span id="bubblingG_2"></span><span id="bubblingG_3"></span></div> '
-    }
+    };
+
+    var cropperHeader;
 
     $(document).ready(function(){
         editor = new EpicEditor(opts);
@@ -130,7 +132,16 @@
         $("#editThumbButton").click(function(eo){
             $("#editThumbButton, #thumbPreview").remove();
             $("#croppicThumb").show();
-            var cropperHeader = new Croppic('croppicThumb', cropperOptions);
+            cropperOptions.loadPicture = "<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . $post->thumbnail; ?>";
+            cropperHeader = new Croppic('croppicThumb', cropperOptions);
+        });
+
+        $("#replaceThumbButton").click(function(eo){
+            $("#replaceThumbButton, #editThumbButton, #thumbPreview").remove();
+            $("#croppicThumb").show();
+            cropperOptions.loadPicture = "";
+            cropperHeader? cropperHeader.destroy() : '';
+            cropperHeader = new Croppic('croppicThumb', cropperOptions);
         });
 
         $("#cancelButton").click(function(eo){
@@ -226,9 +237,12 @@
             <label class="control-label" for="inputThumb">Social Media Thumbnail</label>
             <div class="controls">
                 <div id="thumbPreview" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0;"><img src="<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" style="width:600px; height:315px;" /></div>
-                <button id="editThumbButton" class="btn btn-primary pull-left">Change Thumbnail</button>
                 <div id="croppicThumb" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0; display:none;"></div>
                 <input type="hidden" id="inputThumbnail" name="inputThumbnail" value="<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" />
+            </div>
+            <div class="controls">
+                <button id="editThumbButton" class="btn btn-primary pull-left">Re-Crop Thumbnail</button>
+                <button id="replaceThumbButton" class="btn btn-primary pull-left">Upload a Different Thumbnail</button>
             </div>
         </div>
         

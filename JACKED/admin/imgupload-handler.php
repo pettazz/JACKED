@@ -21,8 +21,8 @@
             $tempFile = $_FILES['img']['tmp_name'];    
             if($isCroppic){                 
                 $targetPath = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory;
-                $ext = substr(strrchr($_FILES['img']['name'], '.'), 0);
-                $targetName = $JACKED->Util->uuid4(false) . $ext;
+                // $ext = substr(strrchr($_FILES['img']['name'], '.'), 0);
+                $targetName = $JACKED->Util->uuid4(false);
                 $targetFile = $targetPath . $targetName;
             }else{
                 $targetFile = $targetPath . $_FILES['img']['name'];
@@ -63,7 +63,7 @@
         }else{
             try{
                 $imgUrl = $_POST['imgUrl'];
-                $prevName = substr($imgUrl, strrpos($imgUrl, '/') + 1, strrpos($imgUrl, '.') - strlen($imgUrl)); 
+                $prevName = substr($imgUrl, strrpos($imgUrl, '/') + 1); 
                 // original sizes
                 $imgInitW = $_POST['imgInitW'] * 2;
                 $imgInitH = $_POST['imgInitH'] * 2;
