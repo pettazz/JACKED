@@ -228,7 +228,7 @@
                 <div id="thumbPreview" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0;"><img src="<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" style="width:600px; height:315px;" /></div>
                 <button id="editThumbButton" class="btn btn-primary pull-left">Change Thumbnail</button>
                 <div id="croppicThumb" style="width:600px; height:315px; position:relative; border:1px solid #c0c0c0; display:none;"></div>
-                <input type="hidden" id="inputThumbnail" name="inputThumbnail" value="<?php echo ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" />
+                <input type="hidden" id="inputThumbnail" name="inputThumbnail" value="<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . ($existingEdit? $post['thumbnail'] : $post->thumbnail); ?>" />
             </div>
         </div>
         
