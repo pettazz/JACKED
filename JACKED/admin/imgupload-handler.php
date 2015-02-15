@@ -19,8 +19,8 @@
     if(!empty($_FILES)){
         try{
             $tempFile = $_FILES['img']['tmp_name'];    
+            $targetPath = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory;
             if($isCroppic){                 
-                $targetPath = JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory;
                 // $ext = substr(strrchr($_FILES['img']['name'], '.'), 0);
                 $targetName = $JACKED->Util->uuid4(false);
                 $targetFile = $targetPath . $targetName;
