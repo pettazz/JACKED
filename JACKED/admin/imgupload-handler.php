@@ -23,10 +23,10 @@
             if($isCroppic){                 
                 // $ext = substr(strrchr($_FILES['img']['name'], '.'), 0);
                 $targetName = $JACKED->Util->uuid4(false);
-                $targetFile = $targetPath . $targetName;
             }else{
-                $targetFile = $targetPath . $_FILES['img']['name'];
+                $targetName = $_FILES['img']['name'];
             }
+            $targetFile = $targetPath . $targetName;
             if(file_exists($targetFile)){
                 if($isCroppic){
                     header('HTTP/1.1 200 OK');
