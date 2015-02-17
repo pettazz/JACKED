@@ -132,7 +132,29 @@
         $("#editThumbButton").click(function(eo){
             $("#editThumbButton, #thumbPreview").remove();
             $("#croppicThumb").show();
-            cropperOptions.loadPicture = "<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . $post->thumbnail; ?>";
+            <?php 
+                // get some info about the existing thumb if we have one
+                if($post->thumbnail){
+                    $existingURL = $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory . $post->thumbnail;
+                    $imagedetails = getimagesize(JACKED_SITE_ROOT . $JACKED->admin->config->imgupload_directory . $post->thumbnail); 
+                    $existingWidth = $imagedetails[0] / 2;
+                    $existingHeight = $imagedetails[1] / 2;
+            ?>
+            // exploit the fact that this is just a string inserted as the src attribute of a new img element, 
+            // so we can close the quotes and change other attributes, specifically height and width to make
+            // sure that the @2x trickery continues even with a pre-loaded image
+            cropperOptions.loadPicture = '<?php echo $existingURL; ?>" width="<?php echo $existingWidth; ?>" height="<?php echo $existingHeight; ?>"';
+            // but this means we have to clean that url up before croppic tries to use it 
+            cropperOptions.onBeforeImgCrop = function(){
+                var index = this.imgUrl.indexOf('"');
+                if(index > 0){
+                    this.imgUrl = this.imgUrl.substring(0, index);
+                    console.log(this.imgUrl);
+                }
+            }
+            <?php
+                }
+            ?>
             cropperHeader = new Croppic('croppicThumb', cropperOptions);
         });
 
