@@ -80,7 +80,7 @@
         parser: marked,
         theme: {
             base: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/base/epiceditor.css',
-            preview: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/preview/wnv.css',
+            preview: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/preview/github.css',
             editor: '<?php echo $JACKED->admin->config->entry_point; ?>assets/js/EpicEditor/themes/editor/epic-dark.css'
         },
         button: {
