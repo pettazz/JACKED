@@ -150,9 +150,11 @@
                 var index = this.imgUrl.indexOf('"');
                 if(index > 0){
                     this.imgUrl = this.imgUrl.substring(0, index);
-                    console.log(this.imgUrl);
                 }
-            }
+            };
+            cropperOptions.onAfterImgCrop = function(){
+                this.obj.find('img').attr('src', this.imgUrl + '_cropped.png?' + new Date().getTime());
+            };
             <?php
                 }
             ?>
