@@ -1,94 +1,80 @@
 <?php
+
 namespace PayPal\Test\Api;
 
-use PayPal\Api\Address;
+use PayPal\Common\PayPalModel;
 use PayPal\Api\CreditCard;
-use PayPal\Test\Constants;
-class CreditCardTest extends \PHPUnit_Framework_TestCase {
-	
-	private $cards;
-	
-	public static $id = "id";
-	public static $validUntil = "2013-02-28T00:00:00Z";
-	public static $state = "created";
-	public static $payerId = "payer-id";
-	public static $cardType = "visa";
-	public static $cardNumber = "4417119669820331";
-	public static $expireMonth = 11;
-	public static $expireYear = "2019";
-	public static $cvv = "012";
-	public static $firstName = "V";
-	public static $lastName = "C";
-	
-	public static function createCreditCard() {
-		$card = new CreditCard();
-		$card->setType(self::$cardType);
-		$card->setNumber(self::$cardNumber);
-		$card->setExpireMonth(self::$expireMonth);
-		$card->setExpireYear(self::$expireYear);
-		$card->setCvv2(self::$cvv);
-		$card->setFirstName(self::$firstName);
-		$card->setLastName(self::$lastName);
-		$card->setId(self::$id);
-		$card->setValidUntil(self::$validUntil);
-		$card->setState(self::$state);
-		$card->setPayerId(self::$payerId);
-		return $card;
-	}
-	
-	public function setup() {
-		
-		$card = self::createCreditCard();
-		$card->setBillingAddress(AddressTest::createAddress());	
-		$card->setLinks(array(LinksTest::createLinks()));
-		$this->cards['full'] = $card;
-		
-		$card = self::createCreditCard();	
-		$this->cards['partial'] = $card;
-	}
-	
-	public function testGetterSetters() {
-		$c = $this->cards['partial'];
-		$this->assertEquals(self::$cardType, $c->getType());
-		$this->assertEquals(self::$cardNumber, $c->getNumber());
-		$this->assertEquals(self::$expireMonth, $c->getExpireMonth());
-		$this->assertEquals(self::$expireYear, $c->getExpireYear());
-		$this->assertEquals(self::$cvv, $c->getCvv2());
-		$this->assertEquals(self::$firstName, $c->getFirstName());
-		$this->assertEquals(self::$lastName, $c->getLastName());
-		$this->assertEquals(self::$id, $c->getId());
-		$this->assertEquals(self::$validUntil, $c->getValidUntil());
-		$this->assertEquals(self::$state, $c->getState());
-		$this->assertEquals(self::$payerId, $c->getPayerId());
-		
-		$c = $this->cards['full'];
-		$this->assertEquals(AddressTest::$line1, $c->getBillingAddress()->getLine1());
-		$link = $c->getLinks();
-		$this->assertEquals(LinksTest::$href, $link[0]->getHref());
-	}
-	
-	public function testSerializeDeserialize() {
-		$c1 = $this->cards['full'];
-		$json = $c1->toJson();
-		
-		$c2 = new CreditCard();
-		$c2->fromJson($json);		
-		
-		$this->assertEquals($c1, $c2);
-	}
-	
-	public function testOperations() {
-		$c1 = $this->cards['full'];
-		
-// 		$this->assertNull($c1->getId());
-		$c1->create();		
-		$this->assertNotNull($c1->getId());
-		
-		$c2 = CreditCard::get($c1->getId());
-		$this->assertEquals($c1->getBillingAddress(), $c2->getBillingAddress());
-		$this->assertGreaterThan(0, count($c2->getLinks()));
-		$this->assertEquals(self::$cardType, $c2->getType());
-		$this->assertNotNull($c2->getState());
- 		$this->assertEquals(true, $c2->delete());
-	}
+
+/**
+ * Class CreditCard
+ *
+ * @package PayPal\Test\Api
+ */
+class CreditCardTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Gets Json String of Object CreditCard
+     * @return string
+     */
+    public static function getJson()
+    {
+        return '{"id":"TestSample","number":"TestSample","type":"TestSample","expire_month":123,"expire_year":123,"cvv2":"TestSample","first_name":"TestSample","last_name":"TestSample","billing_address":' .AddressTest::getJson() . ',"external_customer_id":"TestSample","state":"TestSample","valid_until":"TestSample","links":' .LinksTest::getJson() . '}';
+    }
+
+    /**
+     * Gets Object Instance with Json data filled in
+     * @return CreditCard
+     */
+    public static function getObject()
+    {
+        return new CreditCard(self::getJson());
+    }
+
+
+    /**
+     * Tests for Serialization and Deserialization Issues
+     * @return CreditCard
+     */
+    public function testSerializationDeserialization()
+    {
+        $obj = new CreditCard(self::getJson());
+        $this->assertNotNull($obj);
+        $this->assertNotNull($obj->getId());
+        $this->assertNotNull($obj->getNumber());
+        $this->assertNotNull($obj->getType());
+        $this->assertNotNull($obj->getExpireMonth());
+        $this->assertNotNull($obj->getExpireYear());
+        $this->assertNotNull($obj->getCvv2());
+        $this->assertNotNull($obj->getFirstName());
+        $this->assertNotNull($obj->getLastName());
+        $this->assertNotNull($obj->getBillingAddress());
+        $this->assertNotNull($obj->getExternalCustomerId());
+        $this->assertNotNull($obj->getState());
+        $this->assertNotNull($obj->getValidUntil());
+        $this->assertNotNull($obj->getLinks());
+        $this->assertEquals(self::getJson(), $obj->toJson());
+        return $obj;
+    }
+
+    /**
+     * @depends testSerializationDeserialization
+     * @param CreditCard $obj
+     */
+    public function testGetters($obj)
+    {
+        $this->assertEquals($obj->getId(), "TestSample");
+        $this->assertEquals($obj->getNumber(), "TestSample");
+        $this->assertEquals($obj->getType(), "TestSample");
+        $this->assertEquals($obj->getExpireMonth(), 123);
+        $this->assertEquals($obj->getExpireYear(), 123);
+        $this->assertEquals($obj->getCvv2(), "TestSample");
+        $this->assertEquals($obj->getFirstName(), "TestSample");
+        $this->assertEquals($obj->getLastName(), "TestSample");
+        $this->assertEquals($obj->getBillingAddress(), AddressTest::getObject());
+        $this->assertEquals($obj->getExternalCustomerId(), "TestSample");
+        $this->assertEquals($obj->getState(), "TestSample");
+        $this->assertEquals($obj->getValidUntil(), "TestSample");
+        $this->assertEquals($obj->getLinks(), LinksTest::getObject());
+    }
+
 }

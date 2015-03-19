@@ -2,38 +2,58 @@
 
 namespace PayPal\Test\Api;
 
+use PayPal\Common\PayPalModel;
 use PayPal\Api\PaymentHistory;
-use PayPal\Test\Constants;
 
-class PaymentHistoryTest extends \PHPUnit_Framework_TestCase {
-	
-	private $history;
-	
-	public static $count = "10";
-	public static $nextId = "11";
-	
-	public static function createPaymentHistory() {
-		$history = new PaymentHistory();
-		$history->setCount(self::$count);
-		$history->setNextId(self::$nextId);
-		$history->setPayments(array(PaymentTest::createPayment()));
-		return $history;
-	}
-	public function setup() {		
-		$this->history = PaymentHistoryTest::createPaymentHistory();
-	}
-	
-	public function testGetterSetters() {
-		$this->assertEquals(self::$count, $this->history->getCount());
-		$this->assertEquals(self::$nextId, $this->history->getNextId());
-		
-	}
-	
-	public function testSerializeDeserialize() {
-		$history = new PaymentHistory();
-		$history->fromJson($this->history->toJSON());
-	
-		$this->assertEquals($history, $this->history);
-	}
-	
+/**
+ * Class PaymentHistory
+ *
+ * @package PayPal\Test\Api
+ */
+class PaymentHistoryTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Gets Json String of Object PaymentHistory
+     * @return string
+     */
+    public static function getJson()
+    {
+        return '{"payments":' .PaymentTest::getJson() . ',"count":123,"next_id":"TestSample"}';
+    }
+
+    /**
+     * Gets Object Instance with Json data filled in
+     * @return PaymentHistory
+     */
+    public static function getObject()
+    {
+        return new PaymentHistory(self::getJson());
+    }
+
+
+    /**
+     * Tests for Serialization and Deserialization Issues
+     * @return PaymentHistory
+     */
+    public function testSerializationDeserialization()
+    {
+        $obj = new PaymentHistory(self::getJson());
+        $this->assertNotNull($obj);
+        $this->assertNotNull($obj->getPayments());
+        $this->assertNotNull($obj->getCount());
+        $this->assertNotNull($obj->getNextId());
+        $this->assertEquals(self::getJson(), $obj->toJson());
+        return $obj;
+    }
+
+    /**
+     * @depends testSerializationDeserialization
+     * @param PaymentHistory $obj
+     */
+    public function testGetters($obj)
+    {
+        $this->assertEquals($obj->getPayments(), PaymentTest::getObject());
+        $this->assertEquals($obj->getCount(), 123);
+        $this->assertEquals($obj->getNextId(), "TestSample");
+    }
 }

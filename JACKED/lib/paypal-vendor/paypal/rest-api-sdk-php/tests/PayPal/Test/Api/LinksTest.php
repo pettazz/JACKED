@@ -2,39 +2,65 @@
 
 namespace PayPal\Test\Api;
 
+use PayPal\Common\PayPalModel;
 use PayPal\Api\Links;
-use PayPal\Test\Constants;
 
-class LinksTest extends \PHPUnit_Framework_TestCase {
+/**
+ * Class Links
+ *
+ * @package PayPal\Test\Api
+ */
+class LinksTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Gets Json String of Object Links
+     * @return string
+     */
+    public static function getJson()
+    {
+        return '{"href":"TestSample","rel":"TestSample","targetSchema":' .HyperSchemaTest::getJson() . ',"method":"TestSample","enctype":"TestSample","schema":' .HyperSchemaTest::getJson() . '}';
+    }
 
-	private $links;
+    /**
+     * Gets Object Instance with Json data filled in
+     * @return Links
+     */
+    public static function getObject()
+    {
+        return new Links(self::getJson());
+    }
 
-	public static $href = "USD";
-	public static $rel = "1.12";
-	public static $method = "1.12";
-	
-	public static function createLinks() {
-		$links = new Links();
-		$links->setHref(self::$href);
-		$links->setRel(self::$rel);
-		$links->setMethod(self::$method);
-		
-		return $links;
-	}
-	
-	public function setup() {
-		$this->links = self::createLinks();
-	}
-	
-	public function testGetterSetters() {
-		$this->assertEquals(self::$href, $this->links->getHref());
-		$this->assertEquals(self::$rel, $this->links->getRel());
-		$this->assertEquals(self::$method, $this->links->getMethod());
-	}
-	
-	public function testSerializeDeserialize() {
-		$link2 = new Links();
-		$link2->fromJson($this->links->toJSON());
-		$this->assertEquals($this->links, $link2);
-	}
+
+    /**
+     * Tests for Serialization and Deserialization Issues
+     * @return Links
+     */
+    public function testSerializationDeserialization()
+    {
+        $obj = new Links(self::getJson());
+        $this->assertNotNull($obj);
+        $this->assertNotNull($obj->getHref());
+        $this->assertNotNull($obj->getRel());
+        $this->assertNotNull($obj->getTargetSchema());
+        $this->assertNotNull($obj->getMethod());
+        $this->assertNotNull($obj->getEnctype());
+        $this->assertNotNull($obj->getSchema());
+        $this->assertEquals(self::getJson(), $obj->toJson());
+        return $obj;
+    }
+
+    /**
+     * @depends testSerializationDeserialization
+     * @param Links $obj
+     */
+    public function testGetters($obj)
+    {
+        $this->assertEquals($obj->getHref(), "TestSample");
+        $this->assertEquals($obj->getRel(), "TestSample");
+        $this->assertEquals($obj->getTargetSchema(), HyperSchemaTest::getObject());
+        $this->assertEquals($obj->getMethod(), "TestSample");
+        $this->assertEquals($obj->getEnctype(), "TestSample");
+        $this->assertEquals($obj->getSchema(), HyperSchemaTest::getObject());
+    }
+
 }

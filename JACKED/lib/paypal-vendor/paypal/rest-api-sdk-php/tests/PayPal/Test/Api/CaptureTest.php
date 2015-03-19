@@ -1,87 +1,128 @@
 <?php
+
 namespace PayPal\Test\Api;
 
-use PayPal\Api\Capture;
+use PayPal\Common\PayPalResourceModel;
+use PayPal\Validation\ArgumentValidator;
 use PayPal\Api\Refund;
-use PayPal\Api\Authorization;
-use PayPal\Api\Amount;
-use PayPal\Test\Constants;
+use PayPal\Rest\ApiContext;
+use PayPal\Transport\PPRestCall;
+use PayPal\Api\Capture;
 
-class CaptureTest extends \PHPUnit_Framework_TestCase {
+/**
+ * Class Capture
+ *
+ * @package PayPal\Test\Api
+ */
+class CaptureTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Gets Json String of Object Capture
+     * @return string
+     */
+    public static function getJson()
+    {
+        return '{"id":"TestSample","amount":' .AmountTest::getJson() . ',"is_final_capture":true,"state":"TestSample","parent_payment":"TestSample","transaction_fee":' .CurrencyTest::getJson() . ',"create_time":"TestSample","update_time":"TestSample","links":' .LinksTest::getJson() . '}';
+    }
 
-	private $captures;
+    /**
+     * Gets Object Instance with Json data filled in
+     * @return Capture
+     */
+    public static function getObject()
+    {
+        return new Capture(self::getJson());
+    }
 
-	public static $authorization_id = "AUTH-123";
-	public static $create_time = "2013-02-28T00:00:00Z";
-	public static $id = "C-5678";
-	public static $parent_payment = "PAY-123";
-	public static $state = "Created";
 
-	public static function createCapture() {
-		$capture = new Capture();
-		$capture->setCreateTime(self::$create_time);
-		$capture->setId(self::$id);
-		$capture->setParentPayment(self::$parent_payment);
-		$capture->setState(self::$state);		
-		
-		return $capture;
-	}
-	
-	public function setup() {
-		$this->captures['partial'] = self::createCapture();
-		
-		$capture = self::createCapture();
-		$capture->setAmount(AmountTest::createAmount());
-		$capture->setLinks(array(LinksTest::createLinks()));
-		$this->captures['full'] = $capture;
-	}
+    /**
+     * Tests for Serialization and Deserialization Issues
+     * @return Capture
+     */
+    public function testSerializationDeserialization()
+    {
+        $obj = new Capture(self::getJson());
+        $this->assertNotNull($obj);
+        $this->assertNotNull($obj->getId());
+        $this->assertNotNull($obj->getAmount());
+        $this->assertNotNull($obj->getIsFinalCapture());
+        $this->assertNotNull($obj->getState());
+        $this->assertNotNull($obj->getParentPayment());
+        $this->assertNotNull($obj->getTransactionFee());
+        $this->assertNotNull($obj->getCreateTime());
+        $this->assertNotNull($obj->getUpdateTime());
+        $this->assertNotNull($obj->getLinks());
+        $this->assertEquals(self::getJson(), $obj->toJson());
+        return $obj;
+    }
 
-	public function testGetterSetter() {
-		$this->assertEquals(self::$create_time, $this->captures['partial']->getCreateTime());
-		$this->assertEquals(self::$id, $this->captures['partial']->getId());
-		$this->assertEquals(self::$parent_payment, $this->captures['partial']->getParentPayment());
-		$this->assertEquals(self::$state, $this->captures['partial']->getState());
-		
-		$this->assertEquals(AmountTest::$currency, $this->captures['full']->getAmount()->getCurrency());
-		$links = $this->captures['full']->getLinks();
-		$this->assertEquals(LinksTest::$href, $links[0]->getHref());
-	}
-	
-	public function testSerializeDeserialize() {
-		$c1 = $this->captures['partial'];
-		
-		$c2 = new Capture();
-		$c2->fromJson($c1->toJson());
-		
-		$this->assertEquals($c1, $c2);
-	}
-	
-	public function testOperations()
-	{
-		$authId = AuthorizationTest::authorize();
-		$auth = Authorization::get($authId);
-		
-		$amount = new Amount();
-		$amount->setCurrency("USD");
-		$amount->setTotal("1.00");
-		
-		$captr = new Capture();
-		$captr->setId($authId);
-		$captr->setAmount($amount);
-		
-		$capt = $auth->capture($captr);
-		$captureId = $capt->getId();
-		$this->assertNotNull($captureId);
-		
-		$refund = new Refund();
-		$refund->setId($captureId);
-		$refund->setAmount($amount);
-		
-		$capture = Capture::get($captureId);
-		$this->assertNotNull($capture->getId());
-		
-		$retund = $capture->refund($refund);
-		$this->assertNotNull($retund->getId());
-		
-	}
+    /**
+     * @depends testSerializationDeserialization
+     * @param Capture $obj
+     */
+    public function testGetters($obj)
+    {
+        $this->assertEquals($obj->getId(), "TestSample");
+        $this->assertEquals($obj->getAmount(), AmountTest::getObject());
+        $this->assertEquals($obj->getIsFinalCapture(), true);
+        $this->assertEquals($obj->getState(), "TestSample");
+        $this->assertEquals($obj->getParentPayment(), "TestSample");
+        $this->assertEquals($obj->getTransactionFee(), CurrencyTest::getObject());
+        $this->assertEquals($obj->getCreateTime(), "TestSample");
+        $this->assertEquals($obj->getUpdateTime(), "TestSample");
+        $this->assertEquals($obj->getLinks(), LinksTest::getObject());
+    }
+
+
+    /**
+     * @dataProvider mockProvider
+     * @param Capture $obj
+     */
+    public function testGet($obj, $mockApiContext)
+    {
+        $mockPPRestCall = $this->getMockBuilder('\PayPal\Transport\PayPalRestCall')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockPPRestCall->expects($this->any())
+            ->method('execute')
+            ->will($this->returnValue(
+                    CaptureTest::getJson()
+            ));
+
+        $result = $obj->get("captureId", $mockApiContext, $mockPPRestCall);
+        $this->assertNotNull($result);
+    }
+    /**
+     * @dataProvider mockProvider
+     * @param Capture $obj
+     */
+    public function testRefund($obj, $mockApiContext)
+    {
+        $mockPPRestCall = $this->getMockBuilder('\PayPal\Transport\PayPalRestCall')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockPPRestCall->expects($this->any())
+            ->method('execute')
+            ->will($this->returnValue(
+                    RefundTest::getJson()
+            ));
+        $refund = RefundTest::getObject();
+
+        $result = $obj->refund($refund, $mockApiContext, $mockPPRestCall);
+        $this->assertNotNull($result);
+    }
+
+    public function mockProvider()
+    {
+        $obj = self::getObject();
+        $mockApiContext = $this->getMockBuilder('ApiContext')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+        return array(
+            array($obj, $mockApiContext),
+            array($obj, null)
+        );
+    }
 }

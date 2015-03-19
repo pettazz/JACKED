@@ -2,43 +2,56 @@
 
 namespace PayPal\Test\Api;
 
+use PayPal\Common\PayPalModel;
 use PayPal\Api\Payee;
-use PayPal\Test\Constants;
 
-class PayeeTest extends \PHPUnit_Framework_TestCase {
+/**
+ * Class Payee
+ *
+ * @package PayPal\Test\Api
+ */
+class PayeeTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Gets Json String of Object Payee
+     * @return string
+     */
+    public static function getJson()
+    {
+        return '{"email":"TestSample","merchant_id":"TestSample"}';
+    }
 
-	private $payee;
+    /**
+     * Gets Object Instance with Json data filled in
+     * @return Payee
+     */
+    public static function getObject()
+    {
+        return new Payee(self::getJson());
+    }
 
-	public static $email = "test@paypal.com";
-	public static $merchant_id = "1XY12121";
-	public static $phone = "+14081234566";
-	
 
-	public static function createPayee() {
-		$payee = new Payee();
-		$payee->setEmail(self::$email);
-		$payee->setMerchantId(self::$merchant_id);
-		$payee->setPhone(self::$phone);		
-		
-		return $payee;
-	}
-	
-	public function setup() {
-		$this->payee = self::createPayee();
-	}
+    /**
+     * Tests for Serialization and Deserialization Issues
+     * @return Payee
+     */
+    public function testSerializationDeserialization()
+    {
+        $obj = new Payee(self::getJson());
+        $this->assertNotNull($obj);
+        $this->assertNotNull($obj->getEmail());
+        $this->assertNotNull($obj->getMerchantId());
+        $this->assertEquals(self::getJson(), $obj->toJson());
+        return $obj;
+    }
 
-	public function testGetterSetter() {
-		$this->assertEquals(self::$email, $this->payee->getEmail());
-		$this->assertEquals(self::$merchant_id, $this->payee->getMerchantId());
-		$this->assertEquals(self::$phone, $this->payee->getPhone());
-	}
-	
-	public function testSerializeDeserialize() {
-		$p1 = $this->payee;
-		
-		$p2 = new Payee();
-		$p2->fromJson($p1->toJson());
-		
-		$this->assertEquals($p1, $p2);
-	}
+    /**
+     * @depends testSerializationDeserialization
+     * @param Payee $obj
+     */
+    public function testGetters($obj)
+    {
+        $this->assertEquals($obj->getEmail(), "TestSample");
+        $this->assertEquals($obj->getMerchantId(), "TestSample");
+    }
 }

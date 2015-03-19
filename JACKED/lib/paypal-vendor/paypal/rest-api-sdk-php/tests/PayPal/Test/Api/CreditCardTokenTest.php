@@ -1,38 +1,66 @@
 <?php
+
 namespace PayPal\Test\Api;
 
+use PayPal\Common\PayPalModel;
 use PayPal\Api\CreditCardToken;
-use PayPal\Test\Constants;
 
-class CreditCardTokenTest extends \PHPUnit_Framework_TestCase {
+/**
+ * Class CreditCardToken
+ *
+ * @package PayPal\Test\Api
+ */
+class CreditCardTokenTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Gets Json String of Object CreditCardToken
+     * @return string
+     */
+    public static function getJson()
+    {
+        return '{"credit_card_id":"TestSample","payer_id":"TestSample","last4":"TestSample","type":"TestSample","expire_month":123,"expire_year":123}';
+    }
 
-	private $ccToken;
+    /**
+     * Gets Object Instance with Json data filled in
+     * @return CreditCardToken
+     */
+    public static function getObject()
+    {
+        return new CreditCardToken(self::getJson());
+    }
 
-	public static $payerId = "PAYER-123";
-	public static $creditCardId = "CC-123";
 
-	public static function createCreditCardToken() {
-		$ccToken = new CreditCardToken();
-		$ccToken->setPayerId(self::$payerId);
-		$ccToken->setCreditCardId(self::$creditCardId);
-		return $ccToken;
-	}
-	
-	public function setup() {
-		$this->ccToken = self::createCreditCardToken();		
-	}
+    /**
+     * Tests for Serialization and Deserialization Issues
+     * @return CreditCardToken
+     */
+    public function testSerializationDeserialization()
+    {
+        $obj = new CreditCardToken(self::getJson());
+        $this->assertNotNull($obj);
+        $this->assertNotNull($obj->getCreditCardId());
+        $this->assertNotNull($obj->getPayerId());
+        $this->assertNotNull($obj->getLast4());
+        $this->assertNotNull($obj->getType());
+        $this->assertNotNull($obj->getExpireMonth());
+        $this->assertNotNull($obj->getExpireYear());
+        $this->assertEquals(self::getJson(), $obj->toJson());
+        return $obj;
+    }
 
-	public function testGetterSetter() {
-		$this->assertEquals(self::$payerId, $this->ccToken->getPayerId());
-		$this->assertEquals(self::$creditCardId, $this->ccToken->getCreditCardId());
-	}
-	
-	public function testSerializeDeserialize() {
-		$t1 = $this->ccToken;
-		
-		$t2 = new CreditCardToken();
-		$t2->fromJson($t1->toJson());
-		
-		$this->assertEquals($t1, $t2);
-	}
+    /**
+     * @depends testSerializationDeserialization
+     * @param CreditCardToken $obj
+     */
+    public function testGetters($obj)
+    {
+        $this->assertEquals($obj->getCreditCardId(), "TestSample");
+        $this->assertEquals($obj->getPayerId(), "TestSample");
+        $this->assertEquals($obj->getLast4(), "TestSample");
+        $this->assertEquals($obj->getType(), "TestSample");
+        $this->assertEquals($obj->getExpireMonth(), 123);
+        $this->assertEquals($obj->getExpireYear(), 123);
+    }
+
 }

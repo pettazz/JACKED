@@ -197,7 +197,7 @@
 
                 try{
                     $payment->create($this->paypalAPIContext);
-                }catch(PayPal\Exception\PPConnectionException $ex) {
+                }catch(PayPal\Exception\PayPalConnectionException $ex) {
                     $this->JACKED->Logr->write('PayPal API error:' . $ex->getData(), Logr::LEVEL_FATAL);
                 }catch(Exception $ex){
                     $this->JACKED->Logr->write('PayPal payment creation error:' . $ex->getMessage(), Logr::LEVEL_FATAL);

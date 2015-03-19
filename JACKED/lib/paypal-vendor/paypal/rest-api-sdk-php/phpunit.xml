@@ -15,8 +15,15 @@
         </testsuite>
     </testsuites>
 
+    <groups>
+        <exclude>
+            <group>integration</group>
+        </exclude>
+    </groups>
+
     <logging>
         <log type="junit" target="build/junit.xml" logIncompleteSkipped="false" />
+        <log type="coverage-clover" target="build/coverage/clover.xml"/>
     </logging>
 
     <filter>
