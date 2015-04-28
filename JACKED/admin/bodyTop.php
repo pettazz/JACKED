@@ -72,11 +72,7 @@
         exit();
     }
     
-    $mods = $JACKED->getInstalledModules();
-    $modules = '';
-    foreach($mods as $mod){
-        $modules .= $mod['name'] . ' ' . $mod['version'] . ', ';
-    }
+    $modules = $JACKED->getInstalledModules();
 ?>
     
     <!-- image uploader modal -->
@@ -116,8 +112,8 @@
 
                             <ul class="dropdown-menu">
                             <?php
-                                foreach($mods as $mod){
-                                    echo '<li><a href="' . $JACKED->admin->config->entry_point . 'module/' . $mod['name'] . '">' . $mod['name'] . '</a></li>';
+                                foreach($modules as $shortname => $mod){
+                                    echo '<li><a href="' . $JACKED->admin->config->entry_point . 'module/' . $shortname . '">' . $mod['name'] . '</a></li>';
                                 }
                             ?>
                                 <li class="divider"></li>
