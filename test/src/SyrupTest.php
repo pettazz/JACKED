@@ -7,11 +7,13 @@
             
             $this->JACKED->MySQL->config->db_host = 'localhost';
             $this->JACKED->MySQL->config->db_user = 'root';
+            $this->JACKED->MySQL->config->db_name = 'jacked_test';
 
             $syrupDConf = $this->JACKED->Syrup->config->driverConfig;
             $syrupDConf['db_host'] = 'localhost';
             $syrupDConf['db_user'] = 'root';
             $syrupDConf['db_pass'] = '';
+            $syrupDConf['db_name'] = 'jacked_test';
             $syrupDConf['model_root'] = 'Syrup/models/';
             $this->JACKED->Syrup->config->driverConfig = $syrupDConf;
         }
