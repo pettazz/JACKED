@@ -75,12 +75,35 @@
             $this->registeredModels[$moduleName] = new $modelName($this->config->driverConfig, $this->JACKED->Logr, $this->JACKED->Util, $modelName);
             $thingy = $this->registeredModels[$moduleName];
         }
+
+        /**
+        * Register a Model (not a module) with Syrup. This method accepts an already instantiated model object 
+        * and adds it to registered models.
+        * 
+        * @param $model SyrupModel The model object to be registered 
+        * @param $modelName String The full (case-sensitive) class name of the Model to be registered
+        * @throws ModelAlreadyExistsException If the given name has already been registered
+        */
+        public function registerModel($model, $modelName){
+            if(array_key_exists($modelName, $this->registeredModels)){
+                throw new ModelAlreadyExistsException($modelName);
+            }
+            $this->registeredModels[$modelName] = $model;
+        }
     }
 
 
     class UnknownModelException extends Exception{
         public function __construct($name, $code = 0, Exception $previous = null){
             $message = "Could not find a model named: `$name`.";
+            
+            parent::__construct($message, $code, $previous);
+        }
+    }
+
+    class ModelAlreadyExistsException extends Exception{
+        public function __construct($name, $code = 0, Exception $previous = null){
+            $message = "Model named `$name` has already been registered.";
             
             parent::__construct($message, $code, $previous);
         }
