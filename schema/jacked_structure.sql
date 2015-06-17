@@ -85,6 +85,32 @@ CREATE TABLE `CuratorRelation` (
 
 
 
+# Dump of table DatasBeardTable
+# ------------------------------------------------------------
+
+CREATE TABLE `DatasBeardTable` (
+  `uuid` varchar(64) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `created` int(11) NOT NULL,
+  `alive` tinyint(1) DEFAULT 1,
+  `schema` blob DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table DatasBeardRow
+# ------------------------------------------------------------
+
+CREATE TABLE `DatasBeardRow` (
+  `uuid` varchar(64) NOT NULL,
+  `Table` varchar(64) NOT NULL,
+  `edited` int(11) NOT NULL,
+  `alive` tinyint(1) DEFAULT 1,
+  `content` blob DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 # Dump of table Karma
 # ------------------------------------------------------------
 
