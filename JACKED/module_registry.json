@@ -25,6 +25,11 @@
             "version": "1.0",
             "dependencies": []
         },
+        "DatasBeard": {
+            "name": "Data's Beard",
+            "version": "1.0",
+            "dependencies": ["Syrup"]
+        },
         "Flock": {
             "name": "Flock",
             "version": "1.1",
