@@ -246,7 +246,7 @@
         * 
         * @return Array Associative list of all fields and values.
         */
-        public function repr(){
+        public function toArray(){
             $result = array();
             foreach($this->getFields() as $fieldName){
                 if(is_object($this->$fieldName)){
