@@ -272,8 +272,7 @@
          *
          * @param string $identifier The username or email to log in with 
          * @param string $password The user's password 
-         * @throws UserNotFoundException if the given username does not exist
-         * @throws IncorrectPasswordException if the given password does not match the username's login
+         * @throws FlockLoginException if the given username and password do not match stored data
          * @return boolean Whether the user is now logged in successfully
          */
         public function login($identifier, $password){
@@ -298,10 +297,10 @@
                     }
                     return true;
                 }else{
-                    throw new IncorrectPasswordException();
+                    throw new FlockLoginException();
                 }
             }else{
-                throw new UserNotFoundException();
+                throw new FlockLoginException();
             }
         }
         
@@ -536,11 +535,8 @@
         
     }
 
-    class UserNotFoundException extends Exception{
-        protected $message = "User does not exist.";
-    }
-    class IncorrectPasswordException extends Exception{
-        protected $message = "Incorrect password for user.";
+    class FlockLoginException extends Exception{
+        protected $message = "Incorrect login information.";
     }
     class NotLoggedInException extends Exception{
         protected $message = "User is not logged in.";

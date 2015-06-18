@@ -15,10 +15,8 @@
         public function login($username, $password){
             try{
                 $this->JACKED->Flock->login($username, $password);
-            }catch(IncorrectPasswordException $e){
-                return array('reason' => 'Incorrect password.');
-            }catch(UserNotFoundException $e){
-                return array('reason' => 'User does not exist.');
+            }catch(FlockLoginException $e){
+                return array('reason' => 'Incorrect login information.');
             }
             $id = $this->JACKED->Sessions->read('auth.Flock.userid');
             
