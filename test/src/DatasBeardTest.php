@@ -145,12 +145,28 @@
             $got_tables = $this->JACKED->DatasBeard->getTables();
             $this->assertFalse(!$got_tables);
             for($i = 0; $i < 3; $i++){
-                $test_post = $got_tables[$i];
-                $post = $fixtures[$i];
-                foreach($post as $key => $val){
-                    $this->assertEquals($val, $test_post->$key);
+                $test_table = $got_tables[$i];
+                $table_fixture = $fixtures[$i];
+                foreach($table_fixture as $key => $val){
+                    $this->assertEquals($val, $test_table->$key);
                 }
             }
+        }
+
+        public function test_deleteTable(){
+            $fixture = $this->createTestTable();
+
+            $this->JACKED->DatasBeard->deleteTable($fixture['uuid']);
+
+            //verify that we don't have any tables now with a normal getTables()
+            $got_tables = $this->JACKED->DatasBeard->getTables();
+            $this->assertTrue(!$got_tables);
+
+            //verify that we still get the soft deleted table when we use onlyActive = false
+            $got_tables = $this->JACKED->DatasBeard->getTables(false);
+            $this->assertFalse(!$got_tables);
+            $table = $got_tables[0];
+            $this->assertEquals($table->uuid, $fixture['uuid']);
         }
 
         public function test_getRows(){
@@ -223,6 +239,23 @@
             $id = $this->JACKED->DatasBeard->createRow($table['uuid'], json_decode($contentValid[2]));
 
             $this->JACKED->DatasBeard->setRow($id, json_decode($contentInvalid[3], true));
+        }
+
+        public function test_deleteRow(){
+            global $testSchema, $contentValid;
+
+            $table = $this->createTestTable(1, 'test', $testSchema);
+            $id = $this->JACKED->DatasBeard->createRow($table['uuid'], json_decode($contentValid[1]));
+
+            $this->JACKED->DatasBeard->deleteRow($id);
+
+            // verify the soft deleted row doesnt show up in normal results
+            $got_row = $this->JACKED->DatasBeard->getRows($table['uuid']);
+            $this->assertTrue(!$got_row);
+
+            // verify we can still see it if we use onlyActive = false
+            $got_row = $this->JACKED->DatasBeard->getRow($id, true);
+            $this->assertEquals($got_row['uuid'], $id);
         }
     }
 ?>

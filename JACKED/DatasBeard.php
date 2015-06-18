@@ -77,12 +77,28 @@
         }
 
         /**
+        * Delete a Table. Sets active to FALSE, so that this operation can be undone.
+        * Permanent delete can be accomplished with Syrup's delete method.
+        * 
+        * @param $tableId String UUID of the table to be deleted
+        * @throws DatasBeardTableNotFoundException if table with UUID does not exist
+        */
+        public function deleteTable($tableId){
+            $table = $this->JACKED->Syrup->DatasBeardTable->findOne(array('uuid' => $tableId));
+
+            if(!$table){
+                throw new DatasBeardTableNotFoundException($tableId);
+            }
+            $table->alive = false;
+            $table->save();
+        }
+
+        /**
         * Get all the rows from a given table
         * 
         * @param $tableId String UUID of the table to get data from
         * @param $onlyActive Boolean Whether to only get rows that have not been deactivated. Default: True
         * @return Array List of all rows retrieved as Arrays
-        * @throws DatasBeardTableNotFoundException if table with UUID does not exist or $onlyActive is true and table is inactive
         */
         public function getRows($tableId, $onlyActive = true){
             $where = array('Table' => $tableId);
@@ -90,10 +106,6 @@
                 $where['alive'] = 1;
             }
             $results = $this->JACKED->Syrup->DatasBeardRow->find($where);
-
-            if(!(count($results) > 0)){
-                throw new DatasBeardTableNotFoundException($tableId);
-            }
 
             $ret = array();
             foreach($results as $resObj){
@@ -182,6 +194,22 @@
             $row->save();
 
             return $row->uuid;
+        }
+
+        /**
+        * Delete a row
+        * 
+        * @param $uuid String UUID of the row to be deleted
+        * @throws DatasBeardRowNotFoundException if row with UUID does not exist
+        */
+        public function deleteRow($uuid){
+            $row = $this->JACKED->Syrup->DatasBeardRow->findOne(array('uuid' => $uuid));
+            if(!$row){
+                throw new DatasBeardRowNotFoundException($uuid);
+            }
+
+            $row->alive = false;
+            $row->save();
         }
 
         /**
