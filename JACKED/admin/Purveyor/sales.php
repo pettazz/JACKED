@@ -172,7 +172,7 @@
             <dd class="shipped"><i class="icon-' . ($sale->shipped? 'ok' : 'remove') . '"></i></dd>
             
             <dt>Shipping Tracker</dt>
-            <dd class="tracking">' . ($sale->tracking? $sale->tracking : 'N/A') . '</dd>
+            <dd class="tracking">' . ($sale->tracking? '<a href="https://www.packagetrackr.com/track/' . $sale->tracking . '" target="_blank">' . $sale->tracking . '</a>' : 'N/A') . '</dd>
             
             <dt>External Transaction ID</dt>
             <dd class="external">' . ($sale->external_transaction_id? $sale->external_transaction_id : 'N/A') . '</dd>';
