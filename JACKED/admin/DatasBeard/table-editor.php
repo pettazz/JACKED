@@ -24,9 +24,19 @@
 
 <script type="text/javascript">
 
+    var sandwichStuff = [
+        'Cheese Color',
+        'Bread Shape',
+        'Tomato Thickness',
+        'Mayo Density',
+        'Lettuce Aptitude',
+        'Meat Arrangement',
+        'Pickle Disposition'
+    ];
+
     var rowTemplate = '\
                     <tr>\
-                        <td><input type="text" required class="fieldName" placeholder="Cheese Color" /></td>\
+                        <td><input type="text" required class="fieldName" placeholder="{placeholder_text}" /></td>\
                         <td>\
                             <select class="fieldType">\
                                 <option value="string">String</option>\
@@ -48,12 +58,16 @@
         });
     }
 
+    function getSandwichWord(){
+        return sandwichStuff[Math.floor(Math.random() * sandwichStuff.length)];
+    }
+
     $(document).ready(function(){
         if(<?php echo (isset($table) && !($table === null))? 'true' : 'false'; ?>){
             var existingSchema = <?php echo (isset($table))? $table['schema'] : '""'; ?>;
 
             $.each(existingSchema.properties, function(propName, prop){
-                var newRow = $(rowTemplate);
+                var newRow = $(rowTemplate.replace('{placeholder_text}', getSandwichWord()));
                 newRow.find('.fieldName').val(propName);
                 newRow.find('.fieldType').val(prop.type);
                 if($.inArray(propName, existingSchema.required) >= 0){
@@ -66,13 +80,13 @@
             $('form#tableEditor').find('input[name=manage_handler]').val('table-edit-handler');
             $('form#tableEditor').find('input[name=inputTableId]').val('<?php echo (isset($table))? $table['uuid'] : ''; ?>');
         }else{
-            $('.schema-editor tbody').append($(rowTemplate));            
+            $('.schema-editor tbody').append($(rowTemplate.replace('{placeholder_text}', getSandwichWord())));            
         }
 
         bindRows();
 
         $(".field-add").click(function(el, ev){
-            $('.schema-editor tbody').append($(rowTemplate));
+            $('.schema-editor tbody').append($(rowTemplate.replace('{placeholder_text}', getSandwichWord())));
             bindRows();
 
             return false;
