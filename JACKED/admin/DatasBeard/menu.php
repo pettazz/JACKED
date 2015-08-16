@@ -72,7 +72,11 @@
 <p class="pull-right">
     <button class="btn btn-success table-action" data-table-action="create"><i class="icon-white icon-plus"></i> Add New Table</button>
 </p>
-
+<?php
+    if(empty($tables)){
+        echo '<p class="lead text-center">No tables</p>';
+    }else{
+?>
 <table class="table table-hover">
     <thead>
         <tr>
@@ -125,6 +129,7 @@
         </tr>
     <?php
         }
+    }
     ?>
 
     </tbody>

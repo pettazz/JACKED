@@ -64,7 +64,7 @@
             });
 
             $('form#tableEditor').find('input[name=manage_handler]').val('table-edit-handler');
-            $('form#tableEditor').find('input[name=inputTableId]').val('<?php echo $table['uuid']; ?>');
+            $('form#tableEditor').find('input[name=inputTableId]').val('<?php echo (isset($table))? $table['uuid'] : ''; ?>');
         }else{
             $('.schema-editor tbody').append($(rowTemplate));            
         }
