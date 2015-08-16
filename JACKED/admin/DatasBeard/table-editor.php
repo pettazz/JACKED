@@ -198,7 +198,7 @@
         <div class="control-group">
             <label class="control-label" for="inputTableName">Table Name</label>
             <div class="controls">
-                <input type="text" class="input-xxlarge" required name="inputTableName" id="inputTableName" value="<?php echo isset($table)? $table['name'] : ''; ?>" placeholder="My Sandwiches">
+                <input type="text" class="input-xxlarge" required name="inputTableName" id="inputTableName" value="<?php echo isset($table)? $table['name'] : ''; ?>" placeholder="Sandwiches I've Eaten">
             </div>
         </div>
 
