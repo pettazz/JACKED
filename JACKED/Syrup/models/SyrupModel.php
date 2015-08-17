@@ -251,7 +251,7 @@
             foreach($this->getFields() as $fieldName){
                 if(is_object($this->$fieldName)){
                     if(get_class($this->$fieldName) == 'SyrupField'){
-                        $result[$fieldName] = "SyrupField: " . $this->$fieldName->getValue();
+                        $result[$fieldName] = $this->$fieldName->getValue();
                     }else{
                         $result[$fieldName] = get_class($this->$fieldName) . " Object";
                     }

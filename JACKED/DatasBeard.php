@@ -24,7 +24,7 @@
         public function getTables($onlyActive = true){
             $where = array();
             if($onlyActive){
-                $where['alive'] = 1;
+                $where = array('AND' => array_merge($where, array('alive' => 1)));
             }
             return $this->JACKED->Syrup->DatasBeardTable->find($where);
         }
@@ -41,7 +41,7 @@
         public function getTable($tableId, $onlyActive = true, $fetchRows = true){
             $where = array('uuid' => $tableId);
             if($onlyActive){
-                $where['alive'] = 1;
+                $where = array('AND' => array_merge($where, array('alive' => 1)));
             }
             $result = $this->JACKED->Syrup->DatasBeardTable->findOne($where);
 
@@ -89,7 +89,7 @@
             if(!$table){
                 throw new DatasBeardTableNotFoundException($tableId);
             }
-            $table->alive = false;
+            $table->alive = 0;
             $table->save();
         }
 
@@ -103,7 +103,7 @@
         public function getRows($tableId, $onlyActive = true){
             $where = array('Table' => $tableId);
             if($onlyActive){
-                $where['alive'] = 1;
+                $where = array('AND' => array_merge($where, array('alive' => 1)));
             }
             $results = $this->JACKED->Syrup->DatasBeardRow->find($where);
 
@@ -127,7 +127,7 @@
         public function getRow($uuid, $onlyActive = false){
             $where = array('uuid' => $uuid);
             if(!$onlyActive){
-                $where['alive'] = 1;
+                $where = array('AND' => array_merge($where, array('alive' => 1)));
             }
             $result = $this->JACKED->Syrup->DatasBeardRow->findOne($where);
             if(count($result)){

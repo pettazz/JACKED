@@ -146,7 +146,7 @@ CREATE TABLE `Logr` (
 CREATE TABLE `Product` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `description` text NULL DEFAULT '',
+  `description` text NULL,
   `cost` int(8) NULL DEFAULT '0',
   `active` tinyint(1) DEFAULT '1',
   `tangible` tinyint(1) DEFAULT '0',
@@ -163,7 +163,7 @@ CREATE TABLE `Product` (
 CREATE TABLE `Promotion` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `description` text NULL DEFAULT '',
+  `description` text NULL,
   `value` int(8) NULL DEFAULT '0',
   `active` tinyint(1) NULL DEFAULT '1',
   `single_use` tinyint(1) NULL DEFAULT '1',
