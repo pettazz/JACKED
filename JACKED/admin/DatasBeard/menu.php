@@ -70,20 +70,20 @@
 <h3>Tables</h3>
 
 <p class="pull-right">
-    <button class="btn btn-success table-action" data-table-action="create"><i class="icon-white icon-plus"></i> Add New Table</button>
+    <button class="btn btn-success btn-mini table-action" data-table-action="create"><i class="icon-white icon-plus"></i> Add New Table</button>
 </p>
 <?php
     if(empty($tables)){
         echo '<p class="lead text-center">No tables</p>';
     }else{
 ?>
-<table class="table table-hover">
+<table class="table table-hover table-condensed table-striped">
     <thead>
         <tr>
             <th>Name</th>
             <th>Rows</th>
             <th>Updated</th>
-            <th width="215px">Actions</th>
+            <th width="160px">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -112,11 +112,11 @@
             <td><?php echo $table->name; ?></td>
             <td><?php echo count($rows); ?></td>
             <td><?php echo $lastUpdate; ?></td>
-            <td width="215px">
-                <button class="btn btn-info table-action" data-table-action="manage" data-table-id="<?php echo $table->uuid; ?>"><i class="icon-white icon-edit"></i> Manage Contents</button>
+            <td width="160px">
+                <button class="btn btn-info btn-mini table-action" data-table-action="manage" data-table-id="<?php echo $table->uuid; ?>"><i class="icon-white icon-edit"></i> Manage Contents</button>
 
                 <div class="btn-group">
-                    <a class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn btn-inverse btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="icon-white icon-cog"></i>
                         <span class="caret"></span>
                     </a>
