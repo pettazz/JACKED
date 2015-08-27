@@ -9,11 +9,11 @@
             $extable->name = trim($_POST['inputTableName']);
             $extable->schema = trim($_POST['inputTableSchema']);
             $extable->save();
+            $JACKED->Sessions->write('admin.datasbeard.success', 'Table edited successfully.');
         }catch(Exception $e){
             $JACKED->Sessions->write('admin.datasbeard.error', $e->getMessage());
         }
-
-        $JACKED->Sessions->write('admin.datasbeard.success', 'Table edited successfully.');
+        
         include('menu.php');    
 
     }else{
