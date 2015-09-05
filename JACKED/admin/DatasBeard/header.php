@@ -6,7 +6,7 @@
 <div class="hero-unit">
     <div class="row">
         <div class="span5 offset1">
-            <h2>Data's Beard v0.5</h2>
+            <h2>Data's Beard v1.0</h2>
             <em>Manage your own data; don't worry about how it works, just focus on how majestic it looks.</em>
         </div>
         <div class="span2 offset1">
