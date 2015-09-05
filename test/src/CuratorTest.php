@@ -5,7 +5,7 @@
         public function setUp(){
             $this->JACKED = new JACKED("Curator, Testur, MySQL");
             
-            $this->JACKED->MySQL->config->db_host = 'localhost';
+            $this->JACKED->MySQL->config->db_host = '127.0.0.1';
             $this->JACKED->MySQL->config->db_user = 'root';
             $this->JACKED->MySQL->config->db_name = 'jacked_test';
         }
