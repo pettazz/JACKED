@@ -6,16 +6,16 @@
         $table = $JACKED->DatasBeard->getTable(trim($_POST['table-id']), true, false);
 
         if($table){
-            if(isset($_POST['doSaveNew']) && trim($_POST['doSaveNew']) == 'true'){
+            if(isset($_POST['row-action']) && trim($_POST['row-action']) == 'create'){
                 try{
-                    $JACKED->DatasBeard->createRow(trim($_POST['inputTableId']), trim($_POST['inputRowContent']));
+                    $JACKED->DatasBeard->createRow(trim($_POST['table-id']), json_decode(trim($_POST['row-data'])));
                     $JACKED->Sessions->write('admin.datasbeard.success', 'Table updated successfully.');
                 }catch(Exception $e){
                     $JACKED->Sessions->write('admin.datasbeard.error', $e->getMessage());
                 }
-            }else if(isset($_POST['doSaveEdit']) && trim($_POST['doSaveEdit']) == 'true'){
+            }else if(isset($_POST['row-action']) && trim($_POST['row-action']) == 'edit'){
                 try{
-                    $JACKED->DatasBeard->setRow(trim($_POST['inputRowId']), trim($_POST['inputRowContent']));
+                    $JACKED->DatasBeard->setRow(trim($_POST['row-id']), json_decode(trim($_POST['row-data'])));
                     $JACKED->Sessions->write('admin.datasbeard.success', 'Table updated successfully.');
                 }catch(Exception $e){
                     $JACKED->Sessions->write('admin.datasbeard.error', $e->getMessage());

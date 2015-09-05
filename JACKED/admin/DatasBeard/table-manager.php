@@ -5,6 +5,11 @@
     // $table was loaded by the handler
     $schema = json_decode($table['schema'], true);
     $fieldDefs = $schema['properties'];
+    $requiredFields = $schema['required'];
+
+    foreach ($fieldDefs as $fieldName => $def){
+        $fieldDefs[$fieldName]['required'] = in_array($fieldName, $requiredFields);
+    }
 
     $rows = $JACKED->DatasBeard->getRows($table['uuid']);
 ?>
@@ -15,16 +20,162 @@
 
 <script type="text/javascript">
 
+    var rows = <?php echo json_encode($rows); ?>;
+    var fieldDefinitions = <?php echo json_encode($fieldDefs); ?>;
+
     $(document).ready(function(){
-        
+        $('.row-action').click(function(el, ev){
+            var action = $(this).data('row-action');
+            var rowId = $(this).data('row-id');
+
+            if(action === 'delete'){
+                $('#deleteConfirmationModal').modal({
+                    keyboard: false,
+                    backdrop: 'static',
+                    show: true
+                });
+            }else{
+                $('form#bullshitRouterTM [name=row-action]').val(action);
+                $('form#bullshitRouterTM [name=row-id]').val(rowId);
+                if(action === 'create'){
+                    $('#rowEditModal').find('p.lead').html('Add Row');   
+                    $('#rowEditModal').find('form input,textarea').val('');
+                }else{
+                    $('#rowEditModal').find('p.lead').html('Edit Row');
+                    $('#rowEditModal').find('form input,textarea').each(function(){
+                        var name = $(this).attr('name');
+                        var type = fieldDefinitions[name]['type'];
+
+                        if(type.toLowerCase() === 'boolean'){
+                            $(this).prop('checked', rows[rowId][name]);
+                        }else{
+                            $(this).val(rows[rowId][name]);
+                        }
+                    });
+                }
+
+                $('#rowEditModal').modal({
+                    keyboard: false,
+                    backdrop: 'static',
+                    show: true
+                });
+            }
+        });
+
+        $('#confirmDelete').click(function(el, ev){
+            $('form#bullshitRouterTM').submit();
+        });
+
+        $('#confirmRowSave').click(function(el, ev){
+            var newRow = {};
+
+            $('#rowEditModal').find('form input,textarea').each(function(){
+                var name = $(this).attr('name');
+                var type = fieldDefinitions[name]['type'];
+
+                switch(type.toLowerCase()){
+                    case 'boolean':
+                        newRow[name] = Boolean($(this).prop('checked'));
+                        console.log(Boolean($(this).prop('checked')));
+                        break;
+                    case 'integer':
+                    case 'number':
+                        newRow[name] = parseInt($(this).val());
+                        break;
+                    default:
+                        newRow[name] = $(this).val();
+                        break;
+                }
+            });
+
+            //add it to router 
+            $('form#bullshitRouterTM [name=row-data]').val(JSON.stringify(newRow));
+
+           $('form#bullshitRouterTM').submit(); 
+        });
     });
 
 </script>
 
+<div id="rowEditModal" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <button type="button" style="margin-right:10px;" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <div class="modal-body">
+        <p class="lead">Poop</p>
+        <form id="rowEditor" class="form-horizontal">
+            <fieldset>
+
+                <?php foreach($fieldDefs as $fieldName => $field){ ?>
+                <div class="control-group">
+                    <label class="control-label" for="beardEdit-<?php echo $fieldName; ?>"><?php echo $fieldName; ?></label>
+                    <div class="controls">
+                        <?php 
+                            switch(strtolower($field['type'])){ 
+                                case 'boolean':
+                                    echo '<input type="checkbox" id="beardEdit-' . $fieldName . '" name="' . $fieldName . '" ' . ($field['required']? 'required' : '') . ' />';
+                                    break;
+                                case 'any':
+                                    echo '<textarea id="beardEdit-' . $fieldName . '" name="' . $fieldName . '" ' . ($field['required']? 'required' : '') . '></textarea>';
+                                    break;
+                                default:
+                                    echo '<input id="beardEdit-' . $fieldName . '" type="text" name="' . $fieldName . '" ' . ($field['required']? 'required' : '') . ' />';
+                                    break;
+                            }
+                        ?>
+                    </div>
+                </div>
+                <?php } ?>
+
+            </fieldset>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary" id="confirmRowSave">Save</button>
+    </div>
+</div>
+
+<div id="deleteConfirmationModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-body">
+        <p class="lead">Are you sure you want to delete this row?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button class="btn btn-danger" id="confirmDelete">Delete Row</button>
+    </div>
+</div>
+
+<form id="bullshitRouterTM" action="<?php echo $JACKED->admin->config->entry_point; ?>module/DatasBeard" method="POST">
+    <input type="hidden" name="manage_handler" value="table-manage-handler" />
+    <input type="hidden" name="row-action" value="" />
+    <input type="hidden" name="table-id" value="<?php echo $table['uuid']; ?>" />
+    <input type="hidden" name="row-id" value="" />
+    <input type="hidden" name="row-data" value="" />
+</form>
+
+<?php
+    if($JACKED->Sessions->check('admin.datasbeard.error')){
+        echo '<div class="alert alert-error alert-block">
+                  <a href="#" class="close" data-dismiss="alert">&times;</a>
+                  <p><strong>Error: </strong>"' . $JACKED->Sessions->read('admin.datasbeard.error') .  '" </p>
+        </div>';
+        $JACKED->Sessions->delete('admin.datasbeard.error');
+    }
+
+    if($JACKED->Sessions->check('admin.datasbeard.success')){
+        echo '<div class="alert alert-success alert-block">
+                  <a href="#" class="close" data-dismiss="alert">&times;</a>
+                  <p>' . $JACKED->Sessions->read('admin.datasbeard.success') .  ' </p>
+        </div>';
+        $JACKED->Sessions->delete('admin.datasbeard.success');
+    }
+
+?>
+
 <h2>Contents of <?php echo $table['name']; ?></h2>
 
 <p class="pull-right">
-    <button class="btn btn-success btn-mini table-action" data-row-action="create"><i class="icon-white icon-plus"></i> Add New Row</button>
+    <a class="btn btn-mini" href="<?php echo $JACKED->admin->config->entry_point; ?>module/DatasBeard"><i class="icon-chevron-left icon-chevron-left"></i> Back to Tables</a>
+    <button class="btn btn-success btn-mini row-action" data-row-action="create"><i class="icon-white icon-plus"></i> Add New Row</button>
 </p>
 
 <table class="table table-hover table-stripe table-condensed">
