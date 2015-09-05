@@ -155,7 +155,7 @@
             $result = $this->JACKED->Syrup->DatasBeardRow->findOne($where);
 
             if(count($result)){
-                $this->validateForTable($result->Table->uuid, $newContent);
+                $this->validateForTable($result->Table, $newContent);
 
                 $result->content = $newContent;
                 $result->edited = time();
