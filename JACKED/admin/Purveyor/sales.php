@@ -198,6 +198,9 @@
                 <dt>Recipient Name</dt>
                 <dd>' . $sale->ShippingAddress->recipient_name . '</dd>
                 
+                <dt>Type</dt>
+                <dd>' . $sale->ShippingAddress->type . '</dd>
+                
                 <dt>Line 1</dt>
                 <dd>' . $sale->ShippingAddress->line1 . '</dd>
 

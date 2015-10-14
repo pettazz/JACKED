@@ -433,6 +433,7 @@
                 $shippingBlock = '
                 <h4>Shipping Address:</h4>
                 ' . $sale->ShippingAddress->recipient_name . '<br />
+                ' . ucFirst(strtolower($sale->ShippingAddress->type)) . '<br />
                 ' . $sale->ShippingAddress->line1 . '<br />
                 ' . ($sale->ShippingAddress->line2? $sale->ShippingAddress->line2 . '<br />': '') . '
                 ' . $sale->ShippingAddress->city . ', ' . $sale->ShippingAddress->state . ' ' . $sale->ShippingAddress->postal_code . '<br />

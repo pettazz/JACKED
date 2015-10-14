@@ -240,6 +240,7 @@ CREATE TABLE `ShippingAddress` (
   `guid` varchar(64) NOT NULL,
   `User` varchar(64) NOT NULL,
   `recipient_name` varchar(50) NOT NULL,
+  `type` ENUM('RESIDENTIAL', 'COMMERCIAL', 'UNKNOWN') NOT NULL DEFAULT 'UNKNOWN',
   `line1` varchar(100) NOT NULL,
   `line2` varchar(100) DEFAULT NULL,
   `country` varchar(50) NOT NULL,
