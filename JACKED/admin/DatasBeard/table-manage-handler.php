@@ -9,14 +9,21 @@
             if(isset($_POST['row-action']) && trim($_POST['row-action']) == 'create'){
                 try{
                     $JACKED->DatasBeard->createRow(trim($_POST['table-id']), json_decode(trim($_POST['row-data'])));
-                    $JACKED->Sessions->write('admin.datasbeard.success', 'Table updated successfully.');
+                    $JACKED->Sessions->write('admin.datasbeard.success', 'Row saved successfully.');
                 }catch(Exception $e){
                     $JACKED->Sessions->write('admin.datasbeard.error', $e->getMessage());
                 }
             }else if(isset($_POST['row-action']) && trim($_POST['row-action']) == 'edit'){
                 try{
                     $JACKED->DatasBeard->setRow(trim($_POST['row-id']), json_decode(trim($_POST['row-data'])));
-                    $JACKED->Sessions->write('admin.datasbeard.success', 'Table updated successfully.');
+                    $JACKED->Sessions->write('admin.datasbeard.success', 'Row updated successfully.');
+                }catch(Exception $e){
+                    $JACKED->Sessions->write('admin.datasbeard.error', $e->getMessage());
+                }
+            }else if(isset($_POST['row-action']) && trim($_POST['row-action']) == 'delete'){
+                try{
+                    $JACKED->DatasBeard->deleteRow(trim($_POST['row-id']));
+                    $JACKED->Sessions->write('admin.datasbeard.success', 'Row deleted successfully.');
                 }catch(Exception $e){
                     $JACKED->Sessions->write('admin.datasbeard.error', $e->getMessage());
                 }
