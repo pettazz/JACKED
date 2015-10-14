@@ -28,6 +28,9 @@
             var action = $(this).data('row-action');
             var rowId = $(this).data('row-id');
 
+            $('form#bullshitRouterTM [name=row-action]').val(action);
+            $('form#bullshitRouterTM [name=row-id]').val(rowId);
+                
             if(action === 'delete'){
                 $('#deleteConfirmationModal').modal({
                     keyboard: false,
@@ -35,8 +38,6 @@
                     show: true
                 });
             }else{
-                $('form#bullshitRouterTM [name=row-action]').val(action);
-                $('form#bullshitRouterTM [name=row-id]').val(rowId);
                 if(action === 'create'){
                     $('#rowEditModal').find('p.lead').html('Add Row');   
                     $('#rowEditModal').find('form input,textarea').val('');
