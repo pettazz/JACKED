@@ -154,10 +154,10 @@
                                 switch($relationData['type']){
                                     case 'hasOne':
                                     case 'hasOneForeign':
-                                        $key = "( " . $this->_tableName . ".$prefix = $relKey AND $relTable.$fieldName = ? )";
+                                        $key = "( " . $this->_tableName . ".$prefix = $relKey AND $relTable.$fieldName )";
                                         break;
                                     case 'hasManyForeign':
-                                        $key = "( " . $relModel::relationTable . ".target = " . $relationData['target'] . " AND " . $relationData['field'] . " = " . $relModel::relationTable . ".$prefix AND $prefix.$fieldName = ? ) ";
+                                        $key = "( " . $relModel::relationTable . ".target = " . $relationData['target'] . " AND " . $relationData['field'] . " = " . $relModel::relationTable . ".$prefix AND $prefix.$fieldName ) ";
                                         break;
                                     default:
                                         throw new Exception("Unknown relation type '" . $relationData['type'] . "' for field prefix: '" . $prefix . "'");
