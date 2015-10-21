@@ -1,5 +1,5 @@
 <?php
-    $JACKED = new JACKED(array('admin', 'Syrup', 'Purveyor'));
+    $JACKED = new JACKED(array('admin', 'Syrup'));
 
     if(!$JACKED->admin->checkLogin()){
         header('HTTP/1.1 401 Unauthorized');
