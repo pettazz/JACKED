@@ -11,6 +11,8 @@
         exit();
     }
 
+    $output = fopen('php://output', 'w');
+
     $dateParts = array_map('trim', explode('-', $_GET['dateRange']));
     $startDate = strtotime($dateParts[0] . ' midnight');
     $endDate = strtotime($dateParts[1] . ' 11:59:59 PM');
@@ -59,9 +61,9 @@
         foreach($result[0] as $key => $row){
             $keys[] = $key;
         }
-        echo implode(",", $keys) . "\n";
+        fputcsv($output, $keys);
         foreach($result as $row){
-            echo implode(",", $row) . "\n";
+            fputcsv($output, $row);
         }
     }else{
         header('HTTP/1.1 500 Internal Server Error');
