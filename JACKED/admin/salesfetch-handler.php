@@ -12,7 +12,7 @@
     if(isset($_GET['dateRange'])){
         $parts = array_map('trim', explode('-', $_GET['dateRange']));
         $startDate = strtotime($parts[0] . ' midnight');
-        $endDate = strtotime($parts[1] . ' 11:59 PM');
+        $endDate = strtotime($parts[1] . ' 11:59:59 PM');
 
         $dateCriteria['AND'] = array('timestamp >= ?' => $startDate, 'timestamp <= ?' => $endDate);
     }
