@@ -1,6 +1,6 @@
 <?php
 
-    $JACKED->loadDependencies(array('Syrup'));
+    $JACKED->loadDependencies(array('Syrup', 'DatasBeard'));
 
 ?>
 <link href="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/daterangepicker/daterangepicker.css" rel="stylesheet" />
@@ -16,6 +16,10 @@
     #filters div{
         margin-right: 40px;
     }
+
+    #reportsButton[disabled]{
+        cursor: not-allowed;
+    }
 </style>
 
 <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/moment.min.js"></script>
@@ -23,6 +27,15 @@
 <script type="text/javascript" src="<?php echo $JACKED->admin->config->entry_point; ?>assets/js/daterangepicker/daterangepicker.js"></script>
 
 <script type="text/javascript">
+    
+    var availableReports = [
+        <?php 
+            // well this sucks. we need a way to not have to hardcode IDs
+            foreach($JACKED->DatasBeard->getRows('d0b2bc36-9f16-4864-9544-f7a73d5d5e7f') as $row){
+                echo '{id: "' . $row['id'] . '", name: "' . $row['name'] . '"},';
+            }
+        ?>
+    ];
     
     $(document).ready(function(){
         $('input[name="daterange"]').val(moment(), moment());
@@ -38,7 +51,7 @@
             updateRows();
         });
 
-        $("input[name=filter]").keyup($.debounce( 500, function(){
+        $("input[name=filter]").keyup($.debounce( 2000, function(){
             updateRows();
         }));
 
@@ -65,6 +78,29 @@
             }
         });
         $('input[name="daterange"]').change(updateRows);
+
+        $('#reportsButton').click(function(el, ev){
+            var isDisabled = !!$(this).attr('disabled');
+            if(isDisabled){
+                el.preventDefault();
+            }
+            return !isDisabled;
+        });
+
+        $.each(availableReports, function(idx, report){
+            var newEl = $('<li><a href="#" data-report-id="' + report.id + '">' + report.name + '</a></li>');
+            $('#reportsList').append(newEl);
+        });
+
+        $("#reportsList li a").click(function(el, ev){
+            var reportId = $(this).data('report-id');
+            var dateRange = $('input[name=daterange]').val();
+
+            window.location = '<?php echo $JACKED->admin->config->entry_point; ?>handler/reportdownload?' + $.param({
+                reportId: reportId,
+                dateRange: dateRange
+            });
+        });
     });
 
     function updateRows(){
@@ -103,11 +139,22 @@
 
         var data = {};
         if(filterActive){
+            $('#reportsButton')
+                .attr('disabled', true)
+                .addClass('noClicky')
+                .attr('title', "Search filter disables reports")
+                .tooltip({trigger: 'hover'});
+
             if(dateConstraint){
                 data['dateRange'] = $('input[name=daterange]').val();
             }
             data['filter'] = filterValue;
         }else{
+            $('#reportsButton')
+                .attr('disabled', false)
+                .removeClass('noClicky')
+                .attr('title', '')
+                .tooltip('destroy');
             data['dateRange'] = $('input[name=daterange]').val();
         }
 
@@ -211,6 +258,14 @@
         <input id="searchWithinDateRange" type="checkbox" checked> Search only within selected date range
     </label>
 </form>
+
+<div class="btn-group">
+    <a id="reportsButton" class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="#">
+        <i class="icon-list-alt icon-white"></i> Generate Report for Selected Date Range
+        <span class="caret"></span>
+    </a>
+    <ul id="reportsList" class="dropdown-menu"></ul>
+</div>
 
 <table class="table">
     <thead>
