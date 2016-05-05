@@ -402,7 +402,7 @@
             if($status === 200){
                 $success = $decoded['results']['total_accepted_recipients'] > 0;
                 if(!$success){
-                    $this->JACKED->Logr->write('sendMail error:' $result. , Logr::LEVEL_ERROR);
+                    $this->JACKED->Logr->write('sendMail error:' $result, Logr::LEVEL_ERROR);
                 }
                 return $success;
             }else{
