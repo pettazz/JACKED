@@ -397,7 +397,7 @@
             $result = curl_exec($ch);
             $status = curl_getinfo($ch);
             curl_close($ch);
-            $decoded = json_decode($result);
+            $decoded = json_decode($result, true);
 
             if($status['http_code'] === 200){
                 $success = $decoded['results']['total_accepted_recipients'] > 0;
