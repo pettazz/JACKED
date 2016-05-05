@@ -406,7 +406,7 @@
                 }
                 return $success;
             }else{
-                $this->JACKED->Logr->write('sendMail error: status code: ' . $status, Logr::LEVEL_ERROR);
+                $this->JACKED->Logr->write('sendMail error: status code: ' . print_r($status, true), Logr::LEVEL_ERROR);
                 return False;
             }
         }
