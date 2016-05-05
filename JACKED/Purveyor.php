@@ -345,8 +345,8 @@
         }
 
         /**
-        * Send an email through Mandrill. Simple wrapper for Mindrill.
-        * https://mandrillapp.com/api/docs/messages.JSON.html
+        * Send an email through SparkPost via REST with curl.
+        * https://developers.sparkpost.com/api/#/reference/transmissions/create-a-transmission
         * 
         * @param $toEmail String Email address to send mail to
         * @param $fromEmail String Email address to send mail from
@@ -354,47 +354,53 @@
         * @param $subject String Email subject
         * @param $html String HTML content of email
         * @param $text String Plaintext content of email. If NULL, $html is stripped and used
-        * @param $params Array Any additional params to add to the Mandrill request
         * @return Boolean Whether the mail was successfully sent
         */
-        public function sendMail($toEmail, $fromEmail, $fromName, $subject, $html, $text = NULL, $params = array()){
-            $this->JACKED->loadLibrary('Mindrill');
-            $mailer = new Mindrill($this->JACKED->config->apikey_mandrill);
-
+        public function sendMail($toEmail, $fromEmail, $fromName, $subject, $html, $text = NULL){
             if(!$text){
                 $text = strip_tags(preg_replace('#<br\s*/?>#i', "\n", $html));
             }
-            $baseParams = array(
-                "message" => array(
+            $params = array(
+                "recipients" => array(
+                    array(
+                        "address" => $toEmail
+                    )
+                ),
+                "content" => array(
                     "html" => $html,
                     "text" => $text,
                     "subject" => $subject,
-                    "from_email" => $fromEmail,
-                    "from_name" => $fromName,
-                    "to" => array(
-                        array(
-                            "email" => $toEmail,
-                            "type" => "to"
-                        )
+                    "from" => array(
+                        "name" => $fromName,
+                        "email" => $fromEmail
                     ),
-                    "headers" => array(
-                        "Reply-To" => $this->JACKED->config->default_reply_email
-                    ),
-                    "important" => false,
-                    "track_opens" => null,
-                    "track_clicks" => null,
-                    "view_content_link" => false
+                    "reply_to" => $this->JACKED->config->default_reply_email
+                ),
+                "options" => array(
+                    "transactional" => True,
                 )
             );
 
-            if($params){
-                $params = $this->JACKED->Util->array_merge_recursive_distinct($baseParams, $params);
-            }else{
-                $params = $baseParams;
-            }
+            $url = 'https://api.sparkpost.com/api/v1/transmissions';
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);
+            curl_setopt($ch, CURLOPT_POST, count($params));
+            curl_setopt($ch, CURLOPT_HEADER, False);
+            curl_setopt($ch, CURLOPT_POST, True);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+              "Content-Type: application/json",
+              "Authorization: " . $this->JACKED->config->apikey_sparkpost
+            ));
 
-            if($mailer->call('/messages/send.json', $params)){
-                return True;
+            $result = curl_exec($ch);
+            $status = curl_getinfo($ch);
+            curl_close($ch);
+            $decoded = json_decode($result);
+
+            if($status === 200){
+                return $decoded['results']['total_accepted_recipients'] > 0;
             }else{
                 return False;
             }
