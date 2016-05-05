@@ -400,8 +400,13 @@
             $decoded = json_decode($result);
 
             if($status === 200){
-                return $decoded['results']['total_accepted_recipients'] > 0;
+                $success = $decoded['results']['total_accepted_recipients'] > 0;
+                if(!$success){
+                    $this->JACKED->Logr->write('sendMail error:' $result. , Logr::LEVEL_ERROR);
+                }
+                return $success;
             }else{
+                $this->JACKED->Logr->write('sendMail error: status code: ' . $status, Logr::LEVEL_ERROR);
                 return False;
             }
         }
