@@ -399,14 +399,15 @@
             curl_close($ch);
             $decoded = json_decode($result);
 
-            if($status === 200){
+            if($status['http_code'] === 200){
                 $success = $decoded['results']['total_accepted_recipients'] > 0;
                 if(!$success){
-                    $this->JACKED->Logr->write('sendMail error:' . print_r($result, true), Logr::LEVEL_SEVERE);
+                    $this->JACKED->Logr->write('sendMail error: recipient rejected. id: ' .$decoded['results']['id'], Logr::LEVEL_SEVERE);
                 }
                 return $success;
             }else{
                 $this->JACKED->Logr->write('sendMail error: status code: ' . print_r($status, true), Logr::LEVEL_SEVERE);
+                $this->JACKED->Logr->write('sendMail error: status code: ' . print_r($result, true), Logr::LEVEL_SEVERE);
                 return False;
             }
         }
