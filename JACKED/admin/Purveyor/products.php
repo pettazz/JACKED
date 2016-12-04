@@ -32,6 +32,9 @@
     #inputDescription{
         width: 400px;
     }
+    td.namerow{
+        width:200px;
+    }
 </style>
 
 
