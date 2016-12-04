@@ -22,10 +22,15 @@
                 
                 // i wish there was a better way but not in this version of bootstrap
                 var imguploadChooserCurrentField; 
+                var didimguploadChooserDuck = false;
 
                 $(".alert").alert();
 
-                $("#imgupload").click(function(eo){
+                $(".imguploadLink").click(function(eo){
+                    if($('#imguploadChooserModal').is(':visible')){
+                        $('#imguploadChooserModal').modal('hide');
+                        didimguploadChooserDuck = true;
+                    }
                     $('#imguploadModal').modal({
                         keyboard: true
                     });
@@ -97,6 +102,13 @@
 
                 });
 
+                $('#imguploadModal').on('hide', function(){
+                    if(didimguploadChooserDuck){
+                        $('#imguploadChooserModal').modal('show');
+                        didimguploadChooserDuck = false;
+                    }
+                });
+
                 $('#imguploadChooserModal').on('hidden', function(){
                     $("#imguploadChooserContainer").html('<div id="imguploadChooserSpinner"></div>');
                 });
@@ -158,26 +170,6 @@
     
     $modules = $JACKED->getInstalledModules();
 ?>
-    
-    <!-- image uploader modal -->
-    <div id="imguploadModal" class="modal hide fade">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h3>Image Uploader</h3>
-        </div>
-
-        <div class="modal-body">
-            <p>Uploaded images are available in <br /><code><?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory; ?></code><br />using their original filename.</p>
-            <form action="<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload"
-              class="dropzone"
-              id="imguploadDropzone"></form>
-        </div>
-
-        <div class="modal-footer">
-            <a data-dismiss="modal" href="#" class="btn btn-primary">Done</a>
-        </div>
-    </div>
-    <!-- end uploader modal -->
 
     <!-- imgupload chooser modal -->
     <div id="imguploadChooserModal" class="modal hide fade">
@@ -196,7 +188,28 @@
         </div>
 
         <div class="modal-footer">
+            <a href="#" class="btn btn-success imguploadLink"><i class="icon-upload icon-white"></i> Upload New</a>
             <a data-dismiss="modal" href="#" class="btn btn-primary">Close</a>
+        </div>
+    </div>
+    <!-- end uploader modal -->
+
+    <!-- image uploader modal -->
+    <div id="imguploadModal" class="modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Image Uploader</h3>
+        </div>
+
+        <div class="modal-body">
+            <p>Uploaded images are available in <br /><code><?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory; ?></code><br />using their original filename.</p>
+            <form action="<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload"
+              class="dropzone"
+              id="imguploadDropzone"></form>
+        </div>
+
+        <div class="modal-footer">
+            <a data-dismiss="modal" href="#" class="btn btn-primary">Done</a>
         </div>
     </div>
     <!-- end uploader modal -->
@@ -231,7 +244,7 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
 
                             <ul class="dropdown-menu">
-                                <li><a id="imgupload" href="#">Upload Images</a></li>
+                                <li><a class="imguploadLink" href="#">Upload Images</a></li>
                                 <li><a id="imguploadChooserLink" href="#">View Uploaded Images</a></li>
                             </ul>
                         </li>
