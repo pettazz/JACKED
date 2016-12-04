@@ -146,6 +146,7 @@ CREATE TABLE `Logr` (
 CREATE TABLE `Product` (
   `guid` varchar(64) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
+  `image` varchar(255) NOT NULL DEFAULT '',
   `description` text NULL,
   `cost` int(8) NULL DEFAULT '0',
   `active` tinyint(1) DEFAULT '1',

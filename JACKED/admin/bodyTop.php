@@ -18,6 +18,11 @@
         <script type="text/javascript">
             
             $(document).ready(function(){
+                var imguploadWebPath = '<?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory; ?>';
+                
+                // i wish there was a better way but not in this version of bootstrap
+                var imguploadChooserCurrentField; 
+
                 $(".alert").alert();
 
                 $("#imgupload").click(function(eo){
@@ -29,6 +34,73 @@
                 Dropzone.options.imguploadDropzone = {
                     paramName: 'img'
                 };
+
+                $("#imguploadChooserLink").click(function(eo){
+                    imguploadChooserCurrentField = null;
+                    $('#imguploadChooserModal').modal({
+                        keyboard: true
+                    });
+                });
+
+                $(".imguploadChooserControl").click(function(){
+                    imguploadChooserCurrentField = $(this).siblings('.imguploadChooserField')[0];
+                    $('#imguploadChooserModal').modal({
+                        keyboard: true
+                    });
+                });
+
+                $('#imguploadChooserModal').on('show', function(){
+                    $('#imguploadChooserSelectionMessage').toggle(!!imguploadChooserCurrentField);
+
+                    $('#imguploadChooserSpinner').show();
+                    var opts = {
+                      lines: 15// The number of lines to draw
+                      , length: 15 // The length of each line
+                      , width: 1 // The line thickness
+                      , radius: 15 // The radius of the inner circle
+                      , scale: 1 // Scales overall size of the spinner
+                      , corners: 0.5 // Corner roundness (0..1)
+                      , color: '#000' // #rgb or #rrggbb or array of colors
+                      , opacity: 0.0 // Opacity of the lines
+                      , rotate: 0 // The rotation offset
+                      , direction: 1 // 1: clockwise, -1: counterclockwise
+                      , speed: 1.2 // Rounds per second
+                      , trail: 50 // Afterglow percentage
+                      , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+                      , zIndex: 2e9 // The z-index (defaults to 2000000000)
+                      , className: 'spinner' // The CSS class to assign to the spinner
+                      , top: '50%' // Top position relative to parent
+                      , left: '50%' // Left position relative to parent
+                      , shadow: false // Whether to render a shadow
+                      , hwaccel: true // Whether to use hardware acceleration
+                      , position: 'absolute' // Element positioning
+                    }
+                    var target = $('#imguploadChooserSpinner')[0];
+                    var spinner = new Spinner(opts).spin(target);
+
+                    $.get('<?php echo $JACKED->admin->config->entry_point; ?>handler/imgupload-listing')
+                    .done(function(data){
+                        for(var i = data.length - 1; i >= 0; i--){
+                            $("#imguploadChooserContainer").append('<img class="imguploadPreview" src="' + imguploadWebPath + data[i] + '" data-imgupload-file-name="' + data[i] + '"/>');
+                        };
+                        spinner.stop();
+                        $('#imguploadChooserSpinner').hide();
+                        $("img.imguploadPreview").each(function(){
+                            $(this).click(function(){
+                                if(imguploadChooserCurrentField){
+                                    $(imguploadChooserCurrentField).val(imguploadWebPath + $(this).data('imguploadFileName'));
+                                    $('#imguploadChooserModal').modal('hide');
+                                }
+                            })
+                        });
+                    });
+
+                });
+
+                $('#imguploadChooserModal').on('hidden', function(){
+                    $("#imguploadChooserContainer").html('<div id="imguploadChooserSpinner"></div>');
+                });
+
             });
         </script>
 
@@ -59,6 +131,18 @@
 
             footer{
                 margin: 40px;
+            }
+            #imguploadChooserSpinner{
+                display: block;
+                position: relative;
+                height: 75px;
+                width: 100%;
+            }
+            img.imguploadPreview{
+                cursor: pointer;
+                border: 1px solid #333;
+                width: 100%;
+                margin-bottom: 10px;
             }
         </style>
     </head>
@@ -95,6 +179,28 @@
     </div>
     <!-- end uploader modal -->
 
+    <!-- imgupload chooser modal -->
+    <div id="imguploadChooserModal" class="modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Uploaded Images</h3>
+        </div>
+
+        <div class="modal-body">
+            <p>Showing uploaded images from: <br /><code><?php echo $JACKED->config->base_url . $JACKED->admin->config->imgupload_directory; ?></code></p>
+            <p class="lead" id="imguploadChooserSelectionMessage">Click to choose an image</p>
+
+            <div id="imguploadChooserContainer" class="well">
+                <div id="imguploadChooserSpinner"></div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <a data-dismiss="modal" href="#" class="btn btn-primary">Close</a>
+        </div>
+    </div>
+    <!-- end uploader modal -->
+
 
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
@@ -126,6 +232,7 @@
 
                             <ul class="dropdown-menu">
                                 <li><a id="imgupload" href="#">Upload Images</a></li>
+                                <li><a id="imguploadChooserLink" href="#">View Uploaded Images</a></li>
                             </ul>
                         </li>
                     </ul>
