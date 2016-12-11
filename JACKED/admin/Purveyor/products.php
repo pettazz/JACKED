@@ -79,7 +79,6 @@
             descriptionrow.children('textarea.productdescriptioninput').show();
             
             var costrow = $(this).parents('td.actionsrow').siblings('td.costrow');
-            costrow.children('input.productcostinput').val(costrow.children('span.productcost').text());
             costrow.children('span.productcost').hide();
             costrow.children('input.productcostinput').show();
             
@@ -240,7 +239,7 @@
             <td class="imagerow"> <span class="productimage"><img class="productImageThumb" src="<?php echo $product->image ? $product->image : ''; ?>" /></span> <span><input type="text" required class="input-large productimageinput imguploadChooserField" /> <button class="btn productimageinputbutton imguploadChooserControl"><i class="icon-folder-open"></i></span> </td>
             <td class="namerow"> <span class="productname"><?php echo $product->name; ?></span> <input type="text" required class="input-large productnameinput" /> </td>
             <td class="descriptionrow"> <span class="productdescription"><?php echo $product->description; ?></span> <textarea rows="4" required class="productdescriptioninput"></textarea> </td>
-            <td class="costrow"> <span class="productcost"><?php echo money_format('%.2n', ($product->cost / 100)); ?></span> <input type="text" required class="input-mini productcostinput" /> </td>
+            <td class="costrow"> <span class="productcost"><?php echo money_format('%.2n', ($product->cost / 100)); ?></span> <input type="text" required class="input-mini productcostinput" value="<?php echo ($product->cost / 100); ?>" /> </td>
             <td class="maxquantityrow"> <span class="productmaxquantity"><?php echo $product->max_quantity; ?></span> <input type="text" required class="input-mini productmaxquantityinput" /> </td>
             <td class="actionsrow">
                 <form method="POST" action="<?php echo $JACKED->admin->config->entry_point; ?>module/Purveyor">
