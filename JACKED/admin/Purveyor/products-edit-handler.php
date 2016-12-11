@@ -21,7 +21,8 @@
             $exobj->image = $_POST['newimage'];
             $exobj->description = $_POST['newdescription'];
             $exobj->cost = floor($_POST['newcost'] * 100);
-            $exobj->tangible = (isset($_POST['newtangible']) && $_POST['newtangible'] == "true")? 1 : 0;
+            // $exobj->tangible = (isset($_POST['newtangible']) && $_POST['newtangible'] == "true")? 1 : 0;
+            $exobj->max_quantity = $_POST['newmaxquantity'];
             $exobj->save();
             $JACKED->Sessions->write('admin.success.editproduct', 'Product updated succesfully.');
         }else{

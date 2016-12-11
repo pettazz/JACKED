@@ -23,6 +23,9 @@
     input.producttangibleinput{
         display: none;
     }
+    input.productmaxquantityinput{
+        display: none;
+    }
     .controls.input-prepend, .controls.input-append{
         margin-left: 20px;
     }
@@ -71,24 +74,30 @@
             costrow.children('input.productcostinput').val(costrow.children('span.productcost').text());
             costrow.children('span.productcost').hide();
             costrow.children('input.productcostinput').show();
+            
+            var maxquantityrow = $(this).parents('td.actionsrow').siblings('td.maxquantityrow');
+            maxquantityrow.children('input.productmaxquantityinput').val(maxquantityrow.children('span.productmaxquantity').text());
+            maxquantityrow.children('span.productmaxquantity').hide();
+            maxquantityrow.children('input.productmaxquantityinput').show();
 
-            var tangiblerow = $(this).parents('td.actionsrow').siblings('td.tangiblerow');
-            //tangiblerow.children('input.producttangibleinput').val(tangiblerow.children('span.producttangible').text());
-            tangiblerow.children('span.producttangible').hide();
-            tangiblerow.children('input.producttangibleinput').show();
+            // var tangiblerow = $(this).parents('td.actionsrow').siblings('td.tangiblerow');
+            // tangiblerow.children('input.producttangibleinput').val(tangiblerow.children('span.producttangible').text());
+            // tangiblerow.children('span.producttangible').hide();
+            // tangiblerow.children('input.producttangibleinput').show();
 
             $(this).siblings('button.productsave').click(function(eo){
                 var newname = $(this).parents('td.actionsrow').siblings('td.namerow').children('input.productnameinput').val();
                 var newimage = $(this).parents('td.actionsrow').siblings('td.imagerow').find('input.productimageinput').val();
                 var newdescription = $(this).parents('td.actionsrow').siblings('td.descriptionrow').children('textarea.productdescriptioninput').val();
                 var newcost = $(this).parents('td.actionsrow').siblings('td.costrow').children('input.productcostinput').val();
-                var newtangible = $(this).parents('td.actionsrow').siblings('td.tangiblerow').children('input.producttangibleinput').is(':checked');
-                if(newname && newimage && newdescription && newcost){
+                // var newtangible = $(this).parents('td.actionsrow').siblings('td.tangiblerow').children('input.producttangibleinput').is(':checked');
+                var newmaxquantity = $(this).parents('td.actionsrow').siblings('td.maxquantityrow').children('input.productmaxquantityinput').val();
+                if(newname && newimage && newdescription && newcost && newmaxquantity){
                     $(this).siblings('input[name="newname"]').val(newname);
                     $(this).siblings('input[name="newimage"]').val(newimage);
                     $(this).siblings('input[name="newdescription"]').val(newdescription);
                     $(this).siblings('input[name="newcost"]').val(newcost);
-                    $(this).siblings('input[name="newtangible"]').val(newtangible);
+                    $(this).siblings('input[name="newmaxquantity"]').val(newmaxquantity);
                     $(this).parent('form').submit();
                 }else{
                     $(this).parents('td.actionsrow').siblings('td.namerow').children('input.productnameinput').focus();
@@ -155,12 +164,21 @@
             </div>
         </div>
 
+
+<!-- this has no purpose currently
         <div class="control-group">
             <label class="control-label" for="inputTangible">Tangible</label>
             <div class="controls">
                 <label class="checkbox">
                     <input type="checkbox" id="inputTangible" name="inputTangible" value="True" /> This product physically exists and requires shipping.
                 </label>
+            </div>
+        </div>
+-->
+        <div class="control-group">
+            <label class="control-label" for="inputMaxQuantity">Maximum Quantity Per Order</label>
+            <div class="controls">
+                <input type="text" class="input-small" id="inputMaxQuantity" name="inputMaxQuantity" placeholder="1" required="true" />
             </div>
         </div>
 
@@ -199,7 +217,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>Cost</th>
-            <th>Tangible</th>
+            <th>Max Qty</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -214,8 +232,8 @@
             <td class="imagerow"> <span class="productimage"><img class="productImageThumb" src="<?php echo $product->image ? $product->image : ''; ?>" /></span> <span><input type="text" required class="input-large productimageinput imguploadChooserField" /> <button class="btn productimageinputbutton imguploadChooserControl"><i class="icon-folder-open"></i></span> </td>
             <td class="namerow"> <span class="productname"><?php echo $product->name; ?></span> <input type="text" required class="input-large productnameinput" /> </td>
             <td class="descriptionrow"> <span class="productdescription"><?php echo $product->description; ?></span> <textarea rows="4" required class="productdescriptioninput"></textarea> </td>
-            <td class="costrow"> $<span class="productcost"><?php echo ($product->cost / 100.0); ?></span> <input type="text" required class="input-mini productcostinput" /> </td>
-            <td class="tangiblerow"> <span class="producttangible"><?php echo ($product->tangible? 'Yes' : 'No'); ?></span> <input type="checkbox" value="True" class="producttangibleinput" <?php echo ($product->tangible? 'checked' : ''); ?> /> </td>
+            <td class="costrow"> <span class="productcost"><?php echo money_format('%.2n', ($product->cost / 100)); ?></span> <input type="text" required class="input-mini productcostinput" /> </td>
+            <td class="maxquantityrow"> <span class="productmaxquantity"><?php echo $product->max_quantity; ?></span> <input type="text" required class="input-mini productmaxquantityinput" /> </td>
             <td class="actionsrow">
                 <form method="POST" action="<?php echo $JACKED->admin->config->entry_point; ?>module/Purveyor">
                     <input type="hidden" name="manage_handler" value="products-edit-handler" />
@@ -224,7 +242,7 @@
                     <input type="hidden" name="newimage" />
                     <input type="hidden" name="newdescription" />
                     <input type="hidden" name="newcost" />
-                    <input type="hidden" name="newtangible" />
+                    <input type="hidden" name="newmaxquantity" />
                     <input type="hidden" name="guid" value="<?php echo $product->guid; ?>" />
                     <button class="btn btn-warning catedit"><i class="icon-edit"></i></button> 
                     <button class="btn hidden btn-success productsave"><i class="icon-ok"></i></button> 

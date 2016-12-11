@@ -16,6 +16,7 @@
 	    'remote_addr' => isset($_SERVER['REMOTE_ADDR'])? (preg_match('/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', $_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "127.0.0.1") : '127.0.0.1',
 	    
 	    'default_timezone' => 'America/New_York',
+	    'currency_locale' => 'en_US',
 
 	    'apikey_sparkpost' => 'poop',
 	    

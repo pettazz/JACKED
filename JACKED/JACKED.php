@@ -32,6 +32,7 @@
             
             // do some basic php setup stuff
             date_default_timezone_set(self::$_instance->config->default_timezone);
+            setlocale(LC_MONETARY, self::$_instance->config->currency_locale);
             
             //load util and logging 
             self::$_instance->Logr = new Logr(self::$_instance);
