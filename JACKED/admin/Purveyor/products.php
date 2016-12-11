@@ -38,11 +38,19 @@
     td.namerow{
         width:200px;
     }
+    tr.detailsrow{
+        display: none;
+    }
 </style>
 
 
 <script type="text/javascript">
     $(document).ready(function(){
+        $('button.catinfo').click(function(eo){
+            eo.preventDefault();
+            $('tr.detailsrow').filter('[data-product="' + $(this).data('product') + '"]').show();
+        });
+
         $('button.catdelete').click(function(eo){
             $(this).siblings('input[name="action"]').val('delete');
             $(this).parents('form').submit();
@@ -244,11 +252,15 @@
                     <input type="hidden" name="newcost" />
                     <input type="hidden" name="newmaxquantity" />
                     <input type="hidden" name="guid" value="<?php echo $product->guid; ?>" />
+                    <button class="btn btn-info catinfo" data-product="<?php echo $product->guid; ?>"><i class="icon-info-sign"></i></button>
                     <button class="btn btn-warning catedit"><i class="icon-edit"></i></button> 
                     <button class="btn hidden btn-success productsave"><i class="icon-ok"></i></button> 
                     <button class="btn btn-danger catdelete"><i class="icon-trash"></i></button>
                 </form>
             </td>
+        </tr>
+        <tr class="detailsrow" data-product="<?php echo $product->guid; ?>">
+            <td colspan="6"><strong>Product id:</strong> <?php echo $product->guid; ?></td>
         </tr>
     <?php
     }
