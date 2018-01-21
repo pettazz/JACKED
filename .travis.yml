@@ -9,3 +9,4 @@ before_script:
 script: phpunit test/src
 after_script:
   - mysql -e 'drop database jacked;'
+group: deprecated-2017Q4
