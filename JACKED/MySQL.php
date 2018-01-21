@@ -246,7 +246,7 @@
                 $query = "SELECT `" . $field . "` FROM `" . $table . "`";
             if($cond)
                 $query .= " WHERE " . $cond;
-            $result = $this->mysqlQuery($query, $use_memcache, MYSQL_BOTH);
+            $result = $this->mysqlQuery($query, $use_memcache, MYSQLI_BOTH);
             if($result){
                 $result = $result[0][0];
             }
