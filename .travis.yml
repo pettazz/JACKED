@@ -3,7 +3,7 @@ php:
   - 5.6
 before_script:
   - mysql -e 'create database jacked_test;'
-  - mysql -h 127.0.0.1 -u root jacked < schema/jacked_structure.sql
+  - mysql -h 127.0.0.1 -u root jacked_test < schema/jacked_structure.sql
 script: phpunit test/src
 after_script:
   - mysql -e 'drop database jacked_test;'
