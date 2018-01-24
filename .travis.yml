@@ -1,6 +1,6 @@
 language: php
 php:
-  - 5.5.9
+  - 5.6
 before_script:
   - mysql -e 'create database jacked;'
   - mysql -h 127.0.0.1 -u root jacked < schema/jacked_structure.sql
