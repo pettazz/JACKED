@@ -13,7 +13,7 @@
             JACKEDModule::__construct($JACKED);
 
             $JACKED->loadLibrary('MarkovGenerator');
-            ini_set('memory_limit', '500M'); // only needed to create the table
+            // ini_set('memory_limit', '500M'); // only needed to create the table
 
             $this->markov = new MarkovLetterChain(6, true);
             $this->markov->root(2);
